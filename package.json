@@ -1,11 +1,7 @@
 {
-  "//1": "describes your app and its dependencies",
-  "//2": "https://docs.npmjs.com/files/package.json",
-  "//3": "updating this file will download and update your packages",
-
-  "name": "my-glitch-app",
+  "name": "smol-maps",
   "version": "0.0.1",
-  "description": "What am I about?",
+  "description": "An editable offline-friendly slippy map",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -17,12 +13,12 @@
     "node": "8.x"
   },
   "repository": {
-    "url": "https://glitch.com/edit/#!/welcome-project"
+    "url": "https://github.com/dphiffer/glitch-smol-maps"
   },
   "license": "MIT",
   "keywords": [
-    "node",
-    "glitch",
-    "express"
+    "smol data",
+    "maps",
+    "glitch"
   ]
 }
