@@ -14,6 +14,12 @@ app.get("/", function(request, response) {
 	response.sendFile(__dirname + '/views/index.html');
 });
 
+app.get("/api/config", function(request, response) {
+	response.send({
+		mapzen_api_key: process.env.MAPZEN_API_KEY
+	});
+});
+
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function() {
 	console.log('Your app is listening on port ' + listener.address().port);
