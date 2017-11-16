@@ -1,0 +1,28 @@
+{
+  "name": "smol-maps",
+  "description": "An editable offline-friendly map",
+  "main": "public/js/smol.maps.js",
+  "authors": [
+    "Dan Phiffer <dan@phiffer.org>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/dphiffer/glitch-smol-maps",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "leaflet": "^1.2.0",
+    "file-saver": "^1.3.3",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.2.1",
+    "leaflet-geocoder-mapzen": "^1.9.4",
+    "leaflet.locatecontrol": "^0.62.0",
+    "tangram": "^0.14.2"
+  }
+}
