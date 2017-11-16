@@ -9,4 +9,10 @@ html {
 
 body {
 	font-family: sans-serif;
+	margin: 0;
+}
+
+#map {
+	width: 100vw;
+	height: 100vh;
 }
