@@ -1,6 +1,6 @@
 # Smol Maps
 
-Note: this is a work in progress.
+Note: this is a work in progress port from the more feature-complete [php-smol-maps](https://github.com/smoldata/php-smol-maps).
 
 ## Dependencies
 
@@ -11,7 +11,7 @@ Note: this is a work in progress.
 ## Quick setup
 
 1. Register a [Mapzen API key](https://mapzen.com/dashboard)
-2. In a terminal, run (replace `mapzen-xxxxx` with your API key):  
+2. In a terminal, run these commands (replace `mapzen-xxxxx` with your API key):  
     ```
     cd path/to/smol-maps
     make
