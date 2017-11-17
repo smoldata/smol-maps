@@ -4,6 +4,7 @@
 // make it pretty. Keep it simple and dumb, no magic. (20171116/dphiffer)
 
 var express = require('express');
+var body_parser = require('body-parser');
 var fs = require('fs');
 var app = express();
 
@@ -51,6 +52,10 @@ app.get("/", function(request, response) {
 	response.sendFile(__dirname + '/views/index.html');
 });
 
+// http://expressjs.com/en/api.html#req.body
+app.use(body_parser.json()); // application/json
+app.use(body_parser.urlencoded({ extended: true })); // application/x-www-form-urlencoded
+
 app.get("/api/dotdata/:name", function(request, response) {
 	var onsuccess = function(data) {
 		response.send({
@@ -61,10 +66,30 @@ app.get("/api/dotdata/:name", function(request, response) {
 	var onerror = function(err) {
 		response.send({
 			ok: 0,
+			error: err,
 			data: {}
 		});
 	};
-	dotdata.get(request.params.name).then(onsuccess, onerror);
+	dotdata.get(request.params.name)
+	       .then(onsuccess, onerror);
+});
+
+app.post("/api/dotdata/:name", function(request, response) {
+	var onsuccess = function(data) {
+		response.send({
+			ok: 1,
+			data: data
+		});
+	};
+	var onerror = function(err) {
+		response.send({
+			ok: 0,
+			error: err,
+			data: {}
+		});
+	};
+	dotdata.set(request.params.name, request.body)
+	       .then(onsuccess, onerror);
 });
 
 // listen for requests :)

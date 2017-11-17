@@ -7,8 +7,8 @@ smol.maps = (function() {
 		config: null,
 
 		init: function() {
-			$.get('/api/config', function(config) {
-				self.config = config;
+			$.get('/api/dotdata/config', function(rsp) {
+				self.config = rsp.data;
 				self.setup_map();
 			});
 		},
