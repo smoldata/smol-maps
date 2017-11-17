@@ -4,7 +4,44 @@
 // make it pretty. Keep it simple and dumb, no magic. (20171116/dphiffer)
 
 var express = require('express');
+var fs = require('fs');
 var app = express();
+
+var dotdata = {
+
+	init: function() {
+		var path = __dirname + '/.data';
+		if (! fs.existsSync(path)) {
+			fs.mkdirSync(path, 0o755);
+		}
+	},
+
+	get: function(name) {
+		return new Promise(function(resolve, reject) {
+			var path = __dirname + '/.data/' + name + '.json';
+			fs.readFile(path, 'utf8', function(err, json) {
+				if (err) {
+					return reject(err);
+				}
+				resolve(JSON.parse(json));
+			});
+		});
+	},
+
+	set: function(name, data) {
+		var json = JSON.stringify(data);
+		return new Promise(function(resolve, reject) {
+			var path = __dirname + '/.data/' + name + '.json';
+			fs.writeFile(path, json, 'utf8', function(err) {
+				if (err) {
+					return reject(err);
+				}
+				resolve(data);
+			});
+		});
+	}
+};
+dotdata.init();
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
@@ -14,13 +51,24 @@ app.get("/", function(request, response) {
 	response.sendFile(__dirname + '/views/index.html');
 });
 
-app.get("/api/config", function(request, response) {
-	response.send({
-		mapzen_api_key: process.env.MAPZEN_API_KEY
-	});
+app.get("/api/dotdata/:name", function(request, response) {
+	var onsuccess = function(data) {
+		response.send({
+			ok: 1,
+			data: data
+		});
+	};
+	var onerror = function(err) {
+		response.send({
+			ok: 0,
+			data: {}
+		});
+	};
+	dotdata.get(request.params.name).then(onsuccess, onerror);
 });
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT, function() {
+var port = process.env.PORT || 4321;
+var listener = app.listen(port, function() {
 	console.log('Your app is listening on port ' + listener.address().port);
 });
