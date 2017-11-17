@@ -22,6 +22,11 @@ app.get("/", function(request, response) {
 app.use(body_parser.json()); // application/json
 app.use(body_parser.urlencoded({ extended: true })); // application/x-www-form-urlencoded
 
+// These next two API endpoints let people read and write to the .data folder.
+// You may notice that there's no access control here, and pretty minimal
+// validation in dotdata.js. This is a known-known, and needs to be addressed,
+// just not today. (20171117/dphiffer)
+
 app.get("/api/dotdata/:name", function(request, response) {
 	var onsuccess = function(data) {
 		response.send({

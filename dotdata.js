@@ -1,6 +1,7 @@
 var fs = require('fs');
+var path = require('path');
 
-module.exports = {
+var dotdata = {
 
 	init: function() {
 		var path = __dirname + '/.data';
@@ -11,8 +12,13 @@ module.exports = {
 
 	get: function(name) {
 		return new Promise(function(resolve, reject) {
-			var path = __dirname + '/.data/' + name + '.json';
-			fs.readFile(path, 'utf8', function(err, json) {
+			filename = dotdata.filename(name);
+			if (! filename) {
+				return reject({
+					error: 'Invalid name: ' + name
+				});
+			}
+			fs.readFile(filename, 'utf8', function(err, json) {
 				if (err) {
 					return reject(err);
 				}
@@ -24,13 +30,36 @@ module.exports = {
 	set: function(name, data) {
 		var json = JSON.stringify(data);
 		return new Promise(function(resolve, reject) {
-			var path = __dirname + '/.data/' + name + '.json';
-			fs.writeFile(path, json, 'utf8', function(err) {
+			filename = dotdata.filename(name);
+			if (! filename) {
+				return reject({
+					error: 'Invalid name: ' + name
+				});
+			}
+			var dir = path.dirname(filename);
+			if (! fs.existsSync(dir)) {
+				fs.mkdirSync(dir, 0o755);
+			}
+			fs.writeFile(filename, json, 'utf8', function(err) {
 				if (err) {
 					return reject(err);
 				}
 				resolve(data);
 			});
 		});
+	},
+
+	filename: function(name) {
+		if (! name.match(/^[a-z0-9_:.-]+$/i)) {
+			return null;
+		}
+		if (name.indexOf('..') != -1) {
+			return null;
+		}
+		name = name.replace(/:/g, '/');
+		filename = __dirname + '/.data/' + name + '.json';
+		return filename;
 	}
 };
+
+module.exports = dotdata;
