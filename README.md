@@ -8,15 +8,21 @@ Note: this is a work in progress port from the more feature-complete [php-smol-m
 * [curl](https://curl.haxx.se/)
 * [make](https://www.gnu.org/software/make/)
 
-## Quick setup
+## Setup
 
 1. Register a [Mapzen API key](https://mapzen.com/dashboard)
-2. In a terminal, run these commands (replace `mapzen-xxxxx` with your API key):  
+2. In a terminal, run these commands:  
     ```
     cd path/to/smol-maps
     make
-    export PORT=4321
-    export MAPZEN_API_KEY=mapzen-xxxxx
     npm start
     ```
 3. Load the website: http://localhost:4321/
+4. When prompted, enter the API key you just registered
+
+## Remix on Glitch
+
+1. Register a [Mapzen API key](https://mapzen.com/dashboard)
+2. Go to [smol-maps](https://glitch.com/edit/#!/smol-maps) and click "Remix this 🎤"
+3. Click the "🕶 Show" button in the top left corner
+4. When prompted, enter the API key you just registered
