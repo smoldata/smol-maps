@@ -5,8 +5,12 @@
 	width: 100vw;
 	height: 100vh;
 	background: #eee;
-	/*transition: top 0.25s ease-out;*/
 	overflow: auto;
+	transition: top 0.25s ease-out;
+}
+
+#menu.no-animation {
+	transition: none;
 }
 
 #menu.active {

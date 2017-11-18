@@ -25,15 +25,25 @@
 					<label>
 						Mapzen API key
 						<input type="text" name="mapzen_api_key" id="config-api-key" value="">
-						<div class="help">You can register for a free API key at <a href="https://mapzen.com/dashboard" class="_blank">mapzen.com/dashboard</a></div>
+						<div class="help">Register a free API key at <a href="https://mapzen.com/dashboard" target="_blank">mapzen.com/dashboard</a></div>
 					</label>
-					<label id="config-default-location" class="hidden">
-						Default location
-						<input type="text" id="config-default-location-input" value="">
-						<div class="help">Where do new maps get centered initially?</div>
+					<label class="column">
+						Default latitude
+						<input type="text" name="default_latitude" id="config-latitude" placeholder="latitude">
+						<div class="help"><a href="#" id="config-geolocate">Detect location</a></div>
 					</label>
-					<div class="headroom">
-						<div class="feedback"></div>
+					<label class="column">
+						Default longitude
+						<input type="text" name="default_longitude" id="config-longitude" placeholder="longitude">
+					</label>
+					<label class="column">
+						Default zoom level
+						<input type="text" name="default_zoom" id="config-zoom" value="14" placeholder="zoom">
+						<div class="help">ranges from 10 to 20</div>
+					</label>
+					<div class="clear"></div>
+					<div class="buttons">
+						<div class="response"></div>
 						<input type="submit" name="action" class="btn btn-save" value="Save">
 					</div>
 				</form>

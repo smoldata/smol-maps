@@ -48,16 +48,18 @@ app.get("/api/dotdata/:name", function(request, response) {
 app.post("/api/dotdata/:name", function(request, response) {
 	var onsuccess = function(data) {
 		response.send({
-			ok: 1,
+			ok: 0,
+			error: 'test',
 			data: data
 		});
 	};
 	var onerror = function(err) {
-		response.send({
-			ok: 0,
-			error: err,
-			data: {}
-		});
+		response.body({
+				ok: 0,
+				error: 'Error saving data.',
+				details: err,
+				data: {}
+			}).status(400);
 	};
 	dotdata.set(request.params.name, request.body)
 	       .then(onsuccess, onerror);

@@ -20,6 +20,11 @@ smol.menu = (function() {
 				}
 			});
 
+			$('#menu .menu-page').each(function(index, form) {
+				var page = $(form).attr('id');
+				$('#menu').trigger(page + '-setup', [form]);
+			});
+
 			$('#menu form').submit(self.submit);
 		},
 
@@ -45,7 +50,7 @@ smol.menu = (function() {
 			var url = $form.attr('action');
 			var data = $form.serialize();
 
-			var onsuccess = function() {
+			var onsuccess = function(rsp) {
 				var page = $form.attr('id');
 				var args = $form.serializeArray();
 				var data = {};
@@ -53,12 +58,12 @@ smol.menu = (function() {
 					var key = args[i].name;
 					data[key] = args[i].value;
 				}
-				$('#menu').trigger(page + '-submit', [data]);
+				$('#menu').trigger(page + '-submit', [rsp, data]);
 			};
 
 			var onerror = function(rsp) {
-				// Something better than this...
-				console.error(rsp);
+				var error = rsp.error || 'Error submitting data.';
+				$form.find('.response').html(error);
 			};
 
 			$.post(url, data).then(onsuccess, onerror);
