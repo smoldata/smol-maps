@@ -10,16 +10,10 @@ smol.maps = (function() {
 			$.get('/api/dotdata/config').then(function(rsp) {
 				if (rsp.ok) {
 					self.config = rsp.data;
+					self.setup_map();
 				} else {
-					var key = prompt('Please enter an API key from mapzen.com/dashboard');
-					if (key) {
-						self.config = {
-							mapzen_api_key: key
-						};
-						$.post('/api/dotdata/config', self.config);
-					}
+					smol.menu.show('config');
 				}
-				self.setup_map();
 			});
 		},
 

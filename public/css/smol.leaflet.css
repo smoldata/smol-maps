@@ -1,0 +1,229 @@
+.leaflet-pelias-input {
+	background: #170A26;
+	opacity: 0.8;
+	color: #fff;
+}
+
+.leaflet-bar,
+.leaflet-control-layers,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: none;
+	box-shadow: none;
+}
+
+.leaflet-control-locate
+.leaflet-touch .leaflet-control-locate {
+	border: none;
+}
+
+.leaflet-control-zoom a,
+.leaflet-touch .leaflet-control-zoom a,
+.leaflet-control-locate a,
+.leaflet-touch .leaflet-control-locate a,
+.leaflet-touch .leaflet-control-add-venue a,
+.leaflet-control-add-venue a,
+.leaflet-control-locate a:hover,
+.leaflet-control-add-venue a:hover,
+.leaflet-control-locate a:first-child,
+.leaflet-control-add-venue a:first-child,
+.leaflet-control-zoom a:first-child,
+.leaflet-control-locate a:last-child,
+.leaflet-control-add-venue a:last-child,
+.leaflet-control-zoom a:last-child {
+	width: 40px;
+	height: 40px;
+	line-height: 40px;
+	font-size: 20px;
+	background: #170A26;
+	opacity: 0.8;
+	color: #fff;
+	cursor: pointer;
+}
+
+.leaflet-control-add-venue a,
+.leaflet-touch .leaflet-control-add-venue a,
+.leaflet-control-add-venue a:first-child,
+.leaflet-control-add-venue a:last-child {
+	background: #8442D5;
+	border-radius: 20px;
+}
+
+.leaflet-control-locate a:hover,
+.leaflet-control-add-venue a:hover,
+.leaflet-control-zoom a:hover,
+.leaflet-touch .leaflet-control-locate a:hover,
+.leaflet-touch .leaflet-control-add-venue a:hover,
+.leaflet-touch .leaflet-control-zoom a:hover {
+	opacity: 1.0;
+}
+
+.leaflet-control-zoom-in, .leaflet-control-zoom-in:hover {
+	margin-bottom: 1px;
+	border-bottom-color: transparent !important;
+}
+
+.leaflet-control-attribution {
+	position: fixed;
+	bottom: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	color: #ccc;
+}
+
+.leaflet-control-attribution a {
+	color: #999;
+}
+
+.leaflet-pelias-control {
+	border-radius: 4px;
+	background-color: transparent;
+}
+
+.leaflet-pelias-input {
+	border-radius: 4px;
+}
+
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+}
+
+.leaflet-pelias-search-icon,
+.leaflet-pelias-search-icon.leaflet-pelias-loading {
+	background-image: none;
+	font-size: 18px;
+	line-height: 44px;
+}
+
+.leaflet-bar .leaflet-pelias-search-icon:hover,
+.leaflet-touch .leaflet-bar .leaflet-pelias-search-icon:hover {
+	background-color: rgba(255, 255, 255, 0.25);
+}
+
+.leaflet-bar .leaflet-pelias-search-icon,
+.leaflet-bar .leaflet-pelias-search-icon:hover,
+.leaflet-pelias-input .leaflet-pelias-search-icon,
+.leaflet-touch .leaflet-pelias-control .leaflet-pelias-search-icon {
+	width: 40px;
+}
+
+.leaflet-pelias-search-icon .fa {
+	color: #fff;
+	line-height: 44px;
+}
+
+.leaflet-pelias-input {
+	padding-left: 35px;
+}
+
+.leaflet-pelias-close,
+.leaflet-pelias-expanded .leaflet-pelias-close {
+	background: transparent;
+	color: #fff;
+}
+
+.leaflet-pelias-message {
+	color: #fff;
+	background-color: rgba(23, 10, 38, 0.8);
+	border: none;
+}
+
+.leaflet-pelias-results,
+.leaflet-touch .leaflet-pelias-results {
+	box-shadow: none;
+}
+
+.leaflet-pelias-results.leaflet-bar,
+.leaflet-touch .leaflet-pelias-results.leaflet-bar {
+	border-radius: 4px;
+}
+
+.leaflet-popup-content-wrapper {
+	color: #fff;
+	background-color: rgba(23, 10, 38, 0.8);
+	border-radius: 4px;
+	box-shadow: none;
+}
+
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+	background-color: rgba(23, 10, 38, 0.8);
+	box-shadow: none;
+}
+
+.leaflet-popup-content {
+	margin: 13px 19px 13px 13px;
+}
+
+.leaflet-popup .icon-bg {
+	float: left;
+	font-size: 20px;
+	line-height: 40px;
+	padding: 0;
+	width: 40px;
+	height: 40px;
+	border-radius: 20px;
+	text-align: center;
+	margin-right: 5px;
+	cursor: pointer;
+}
+
+.leaflet-popup.editing .icon-bg,
+.leaflet-popup.editing .extra {
+	display: none;
+}
+
+.leaflet-popup .name {
+	float: left;
+	font-size: 14px;
+	font-weight: bold;
+	width: 160px;
+	margin-top: -5px;
+}
+
+.leaflet-popup .extra {
+	font-weight: normal;
+	font-size: 12px;
+	margin-left: 5px;
+}
+
+.leaflet-popup.editing .name {
+	float: none;
+}
+
+.leaflet-popup .name .inner {
+	padding: 5px;
+	display: inline-block;
+	word-break: break-all;
+}
+
+.leaflet-popup .name .inner:hover {
+	background-color: #170A26;
+	cursor: pointer;
+}
+
+.leaflet-popup.editing .name:hover {
+	background-color: inherit;
+	cursor: default;
+}
+
+.leaflet-popup .leaflet-popup-content-wrapper {
+	width: 238px;
+}
+
+.leaflet-popup input[type="text"] {
+	width: 203px;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+	color: #fff;
+}
+
+.leaflet-popup-pane {
+	z-index: 10001; /* why does this not work?? */
+}

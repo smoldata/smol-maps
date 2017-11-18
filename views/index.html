@@ -8,13 +8,33 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
 		<link rel="stylesheet" href="/lib/leaflet/dist/leaflet.css">
+		<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+		<link rel="stylesheet" href="/css/smol.menu.css">
+		<link rel="stylesheet" href="/css/smol.leaflet.css">
 		<link rel="stylesheet" href="/css/smol.maps.css">
 	</head>
 	<body>
-		<div id="map"></div>
+		<div id="app">
+			<div id="map"></div>
+			<div id="menu">
+				<span class="close"><span class="fa fa-close"></span></span>
+				<form action="/api/dotdata/config" method="post" id="config" class="menu-page">
+					<h1>Config</h1>
+					<label>
+						Mapzen API key
+						<input type="text" name="mapzen_api_key" id="config-api-key" value="">
+						<div class="help">You can register for a free API key at <a href="https://mapzen.com/dashboard" class="_blank">mapzen.com/dashboard</a></div>
+					</label>
+					<div class="headroom">
+						<input type="submit" name="action" class="btn btn-save" value="Save">
+					</div>
+				</form>
+			</div>
+		</div>
 		<script src="/lib/jquery/dist/jquery.min.js"></script>
 		<script src="/lib/leaflet/dist/leaflet.js"></script>
 		<script src="/lib/tangram/dist/tangram.min.js"></script>
 		<script src="/js/smol.maps.js"></script>
+		<script src="/js/smol.menu.js"></script>
 	</body>
 </html>

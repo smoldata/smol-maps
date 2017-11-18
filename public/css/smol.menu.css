@@ -1,0 +1,43 @@
+#menu {
+	position: fixed;
+	top: -100vh;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: #eee;
+	/*transition: top 0.25s ease-out;*/
+	overflow: auto;
+}
+
+#menu.active {
+	top: 0;
+}
+
+#menu .close {
+	display: none;
+	position: fixed;
+	top: 0;
+	right: 0;
+	font-size: 24px;
+	color: #170A26;
+	padding: 10px;
+	cursor: pointer;
+}
+
+#menu.active .close {
+	display: block;
+}
+
+#menu .menu-page {
+	display: none;
+	width: 100%;
+	max-width: 640px;
+	padding: 10px 10px 40px 10px;
+	margin: 0 auto;
+	min-height: 100vh;
+	position: relative;
+}
+
+#menu .menu-page.visible {
+	display: block;
+}
