@@ -1,6 +1,6 @@
 {
   "name": "smol-maps",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "An editable offline-friendly slippy map",
   "main": "server.js",
   "scripts": {
@@ -14,12 +14,13 @@
     "node": "8.x"
   },
   "repository": {
-    "url": "https://github.com/dphiffer/glitch-smol-maps"
+    "url": "https://github.com/smoldata/smol-maps"
   },
   "license": "MIT",
   "keywords": [
     "smol data",
     "maps",
+    "mapzen",
     "glitch"
   ]
 }
