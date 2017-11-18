@@ -13,7 +13,7 @@
 	top: 0;
 }
 
-#menu .close {
+#menu-close {
 	display: none;
 	position: fixed;
 	top: 0;
@@ -24,7 +24,7 @@
 	cursor: pointer;
 }
 
-#menu.active .close {
+#menu.active #menu-close {
 	display: block;
 }
 

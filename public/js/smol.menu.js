@@ -5,7 +5,7 @@ smol.menu = (function() {
 
 		init: function() {
 
-			$('#menu .close').click(self.hide);
+			$('#menu-close').click(self.hide);
 			$('.btn-cancel').click(function(e) {
 				e.preventDefault();
 				self.hide();
@@ -28,10 +28,14 @@ smol.menu = (function() {
 			$('#' + page).addClass('visible');
 			$('#menu').addClass('active');
 			$('#menu').scrollTop(0);
+			$('#menu').trigger(page + '-show');
 		},
 
 		hide: function() {
+			var $visible = $('.menu-page.visible');
+			var page = $visible.attr('id');
 			$('#menu').removeClass('active');
+			$('#menu').trigger(page + '-hide');
 		},
 
 		submit: function(e) {
@@ -42,8 +46,14 @@ smol.menu = (function() {
 			var data = $form.serialize();
 
 			var onsuccess = function() {
-				// Reload the page!
-				window.location = window.location.href;
+				var page = $form.attr('id');
+				var args = $form.serializeArray();
+				var data = {};
+				for (var i = 0; i < args.length; i++) {
+					var key = args[i].name;
+					data[key] = args[i].value;
+				}
+				$('#menu').trigger(page + '-submit', [data]);
 			};
 
 			var onerror = function(rsp) {

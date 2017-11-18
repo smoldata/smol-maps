@@ -7,6 +7,7 @@ smol.maps = (function() {
 		config: null,
 
 		init: function() {
+			self.setup_menu();
 			$.get('/api/dotdata/config').then(function(rsp) {
 				if (rsp.ok) {
 					self.config = rsp.data;
@@ -23,6 +24,24 @@ smol.maps = (function() {
 			Tangram.leafletLayer({
 				scene: self.tangram_scene()
 			}).addTo(self.map);
+		},
+
+		setup_menu: function() {
+
+			$('#menu').on('config-show', function() {
+				$('#menu-close').addClass('hidden');
+			});
+
+			$('#menu').on('config-hide', function() {
+				$('#menu-close').removeClass('hidden');
+			});
+
+			$('#menu').on('config-submit', function(e, data) {
+				if (typeof data.default_location == 'undefined') {
+					$('#config-default-location').removeClass('hidden');
+				}
+			});
+
 		},
 
 		tangram_scene: function() {
