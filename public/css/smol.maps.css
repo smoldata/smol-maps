@@ -8,7 +8,7 @@ html {
 }
 
 body {
-	font-family: sans-serif;
+	font-family: "Source Sans Pro", sans-serif;
 	margin: 0;
 }
 
@@ -17,7 +17,8 @@ a {
 }
 
 h1 {
-	font-size: 24px;
+	font-weight: lighter;
+	font-size: 30px;
 	margin-top: 30px;
 	margin-bottom: 30px;
 }
@@ -38,7 +39,8 @@ input[type="text"],
 textarea {
 	display: block;
 	font-size: 14px;
-	font-family: sans-serif;
+	line-height: 14px;
+	font-family: "Source Sans Pro", sans-serif;
 	padding: 10px;
 	border: 1px solid #ccc;
 	width: 100%;
@@ -54,7 +56,7 @@ textarea:focus {
 label {
 	display: block;
 	font-size: 14px;
-	font-weight: bold;
+	font-weight: 600;
 	margin-top: 20px;
 }
 
@@ -121,11 +123,12 @@ code {
 	color: #8442D5;
 	background: transparent;
 	border: 2px solid #8442D5;
-	font-size: 14px;
-	font-weight: bold;
+	font-size: 13px;
+	font-weight: 600;
 	padding: 10px 15px;
 	border-radius: 4px;
 	cursor: pointer;
+	text-transform: uppercase;
 }
 
 .btn:hover {

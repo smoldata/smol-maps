@@ -23,6 +23,7 @@
     "jquery": "^3.2.1",
     "leaflet-geocoder-mapzen": "^1.9.4",
     "leaflet.locatecontrol": "^0.62.0",
-    "tangram": "^0.14.2"
+    "tangram": "^0.14.2",
+    "source-sans-pro": "git://github.com/adobe-fonts/source-sans-pro.git#release"
   }
 }
