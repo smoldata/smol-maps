@@ -11,6 +11,7 @@
 		<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
 		<link rel="stylesheet" href="/lib/source-sans-pro/source-sans-pro.css">
 		<link rel="stylesheet" href="/css/smol.menu.css">
+		<link rel="stylesheet" href="/css/smol.menu.config.css">
 		<link rel="stylesheet" href="/css/smol.leaflet.css">
 		<link rel="stylesheet" href="/css/smol.maps.css">
 	</head>
@@ -28,21 +29,17 @@
 						<input type="text" name="mapzen_api_key" id="config-api-key" value="">
 						<div class="help">Register a free API key at <a href="https://mapzen.com/dashboard" target="_blank">mapzen.com/dashboard</a></div>
 					</label>
-					<label class="column">
-						Default latitude
-						<input type="text" name="default_latitude" id="config-latitude" placeholder="latitude">
-						<div class="help"><a href="#" id="config-geolocate">Detect location</a></div>
+					<label>
+						Default location
+						<input type="hidden" name="default_bbox" value="">
+						<input type="hidden" name="default_wof_id" value="">
+						<input type="text" id="config-location" placeholder="Search for a default location">
+						<div class="help"><a href="#" id="config-geolocate">Detect current location</a></div>
 					</label>
-					<label class="column">
-						Default longitude
-						<input type="text" name="default_longitude" id="config-longitude" placeholder="longitude">
-					</label>
-					<label class="column">
-						Default zoom level
-						<input type="text" name="default_zoom" id="config-zoom" value="14" placeholder="zoom">
-						<div class="help">ranges from 10 to 20</div>
-					</label>
-					<div class="clear"></div>
+					<div id="config-places">
+						<div id="config-places-random" class="place selected" data-bbox="" data-wof-id="-1"><span class="fa fa-check"></span> Pick randomly</div>
+						<div id="config-places-select"></div>
+					</div>
 					<div class="buttons">
 						<div class="response"></div>
 						<input type="submit" name="action" class="btn btn-save" value="Save">
