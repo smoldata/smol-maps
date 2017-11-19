@@ -1,0 +1,13 @@
+#config-places .place {
+	margin: 0.5em 0;
+	cursor: pointer;
+}
+
+#config-places .place .fa-check {
+	visibility: hidden;
+	margin-right: 5px;
+}
+
+#config-places .selected .fa-check {
+	visibility: visible;
+}
