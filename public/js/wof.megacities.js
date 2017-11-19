@@ -4,11 +4,10 @@ var wof = wof || {};
 // wof:megacity property set to 1. Presently I don't think it's possible to
 // generate this without direct access to the Elasticsearch database, which
 // means this doesn't have a convenient `make` target to regenerate the list.
-// You can browse the record here: https://whosonfirst.mapzen.com/spelunker/megacities/
+// You can browse the records here: https://whosonfirst.mapzen.com/spelunker/megacities/
 
-// Here's how I generated the JSON:
-/*
-   curl -s -X POST "internal-whosonfirst-elasticsearch-1139831451.us-east-1.elb.amazonaws.com:9200/spelunker/_search" \
+/* Here's how I generated the JSON below:
+   curl -s -X POST "hostname:9200/spelunker/_search" \
         -d '{"from": 0, "size": 400, "query": { "filtered": {"filter": {"and": [{"bool": {"must_not": [{"exists": {"field": "edtf:deprecated"}}]}}]}, "query": {"term": {"wof:megacity": "1"}}}}, "sort": [{"gn:population": {"mode": "max", "order": "desc"}}, {"geom:area": {"mode": "max", "order": "desc"}}]}' | jq '[.hits.hits[] | {"wof:name": ._source["wof:name"], "wof:id": ._source["wof:id"], "geom:bbox": ._source["geom:bbox"]}]' \
         > ~/megacities.json
 */
