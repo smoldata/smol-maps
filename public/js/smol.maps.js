@@ -23,8 +23,7 @@ smol.maps = (function() {
 
 			var default_bbox = self.config.default_bbox;
 			if (! default_bbox) {
-				self.random_bbox();
-				return;
+				default_bbox = self.random_megacity_bbox();
 			}
 			var coords = default_bbox.split(',');
 			var bbox = [
@@ -142,14 +141,12 @@ smol.maps = (function() {
 
 		},
 
-		random_bbox: function() {
-			$.get('/json/cities.json', function(megacities) {
-				var index = Math.floor(Math.random() * megacities.length);
-				var place = megacities[index];
-				self.config.default_bbox = place['geom:bbox'];
-				self.config.default_wof_id = place['wof:id'];
-				self.setup_map();
-			});
+		random_megacity_bbox: function() {
+			var index = Math.floor(Math.random() * wof.megacities.length);
+			var place = wof.megacities[index];
+			self.config.default_bbox = place['geom:bbox'];
+			self.config.default_wof_id = place['wof:id'];
+			return place['geom:bbox'];
 		},
 
 		tangram_scene: function() {
