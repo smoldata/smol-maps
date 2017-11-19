@@ -20,11 +20,20 @@ smol.maps = (function() {
 		},
 
 		setup_map: function() {
-			var lat = self.config.default_latitude || 0;
-			var lng = self.config.default_longitude || 0;
-			var zoom = self.config.default_zoom || 14;
+
+			var default_bbox = self.config.default_bbox;
+			if (! default_bbox) {
+				self.random_bbox();
+				return;
+			}
+			var coords = default_bbox.split(',');
+			var bbox = [
+				[coords[1], coords[0]],
+				[coords[3], coords[2]]
+			];
+
 			self.map = L.map('map');
-			self.map.setView([lat, lng], zoom);
+			self.map.fitBounds(bbox);
 			Tangram.leafletLayer({
 				scene: self.tangram_scene()
 			}).addTo(self.map);
@@ -93,10 +102,12 @@ smol.maps = (function() {
 									sources: 'wof',
 									api_key: api_key
 								})).then(function(rsp) {
-									$('#config-location').val(rsp.features[0].properties.label);
-									places_show(function() {
-										$('#config-places-select .place:first-child').trigger('click');
-									});
+									if (rsp.features && rsp.features.length > 0) {
+										$('#config-location').val(rsp.features[0].properties.label);
+										places_show(function() {
+											$('#config-places-select .place:first-child').trigger('click');
+										});
+									}
 								});
 							}
 						});
@@ -105,7 +116,9 @@ smol.maps = (function() {
 					}
 				});
 
-				places_show();
+				places_show(function() {
+					$('#config-places-select .place:first-child').trigger('click');
+				});
 				$('#config-location').keypress(function(e) {
 					setTimeout(places_show, 0);
 				});
@@ -127,6 +140,16 @@ smol.maps = (function() {
 				smol.menu.hide();
 			});
 
+		},
+
+		random_bbox: function() {
+			$.get('/json/cities.json', function(megacities) {
+				var index = Math.floor(Math.random() * megacities.length);
+				var place = megacities[index];
+				self.config.default_bbox = place['geom:bbox'];
+				self.config.default_wof_id = place['wof:id'];
+				self.setup_map();
+			});
 		},
 
 		tangram_scene: function() {
