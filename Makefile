@@ -8,7 +8,7 @@ node_packages:
 	npm install
 
 public-lib:
-	bower install
+	./node_modules/bower/bin/bower install
 
 public-scene:
 	@name=bubble-wrap version=$(BUBBLE_WRAP_VERSION) make scene
