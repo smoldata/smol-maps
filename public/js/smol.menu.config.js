@@ -36,6 +36,17 @@ smol.menu.config = (function() {
 			$('#menu-close').removeClass('hidden');
 		},
 
+		validate: function() {
+			if (! valid_api_key) {
+				return {
+					ok: 0,
+					error: 'API key is invalid.'
+				};
+			} else {
+				return { ok: 1 };
+			}
+		},
+
 		submit: function() {
 			smol.menu.hide();
 		},

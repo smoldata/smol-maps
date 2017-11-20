@@ -61,11 +61,20 @@ smol.menu = (function() {
 			e.preventDefault();
 
 			var $form = $(e.target);
+			var page = $form.attr('id');
 			var url = $form.attr('action');
 			var data = $form.serialize();
 
+			if (smol.menu[page] &&
+				typeof smol.menu[page].validate == 'function') {
+				var rsp = smol.menu[page].validate();
+				if (! rsp.ok) {
+					$form.find('.response').html(rsp.error);
+					return;
+				}
+			}
+
 			var onsuccess = function(rsp) {
-				var page = $form.attr('id');
 				var args = $form.serializeArray();
 				var data = {};
 				for (var i = 0; i < args.length; i++) {
