@@ -3,6 +3,8 @@ smol.menu = smol.menu || {};
 
 smol.menu.config = (function() {
 
+	var valid_api_key = null;
+
 	var self = {
 
 		init: function() {
@@ -17,7 +19,12 @@ smol.menu.config = (function() {
 			$('#config-location').keypress(function(e) {
 				setTimeout(self.places_show, 0);
 			});
-			$('#config-api-key').change(self.places_show);
+			$('#config-api-key').keypress(function(e) {
+				setTimeout(function() {
+					var api_key = $(e.target).val();
+					self.validate_api_key(api_key);
+				}, 0);
+			});
 		},
 
 		show: function() {
@@ -31,6 +38,30 @@ smol.menu.config = (function() {
 
 		submit: function() {
 			smol.menu.hide();
+		},
+
+		validate_api_key: function(api_key) {
+			var onerror = function() {
+				valid_api_key = false;
+				$('#config-location').attr('disabled', 'disabled');
+				$('#config-location').attr('placeholder', 'Search for a default location (requires valid API key)');
+			};
+			var onsuccess = function(rsp) {
+				if (rsp.stat == 'ok') {
+					valid_api_key = true;
+					$('#config-location').attr('disabled', null);
+					$('#config-location').attr('placeholder', 'Search for a default location');
+				} else {
+					onerror();
+				}
+			};
+			if (api_key == '') {
+				onerror();
+			}
+			$.get('https://places.mapzen.com/v1?' + $.param({
+				api_key: api_key,
+				method: 'api.test.echo'
+			})).then(onsuccess, onerror);
 		},
 
 		place_click: function(e) {
@@ -48,34 +79,31 @@ smol.menu.config = (function() {
 
 		places_show: function(cb) {
 			var api_key = $('#config-api-key').val();
-			if (api_key == '') {
-				$('#config-location').attr('disabled', 'disabled');
-				$('#config-location').attr('placeholder', 'Search for a default location (requires API key)');
-			} else {
-				$('#config-location').attr('disabled', null);
-				$('#config-location').attr('placeholder', 'Search for a default location');
-			}
-			var text = $('#config-location').val();
-			if (text == '') {
-				$('#config-places-select').html('');
-				$('#config-places-random').trigger('click');
-			} else {
-				$.get('https://search.mapzen.com/v1/autocomplete?' + $.param({
-					text: text,
-					sources: 'wof',
-					api_key: api_key
-				})).then(function(rsp) {
-					var $select = $('#config-places-select');
-					var places = '';
-					$.each(rsp.features, function(i, feature) {
-						places += '<div class="place" data-bbox="' + feature.bbox.join(',') + '"data-wof-id="' + feature.properties.id + '"><span class="fa fa-check"></span> ' + feature.properties.label + '</div>'
+			self.validate_api_key(api_key);
+
+			if (valid_api_key) {
+				var text = $('#config-location').val();
+				if (text == '') {
+					$('#config-places-select').html('');
+					$('#config-places-random').trigger('click');
+				} else {
+					$.get('https://search.mapzen.com/v1/autocomplete?' + $.param({
+						text: text,
+						sources: 'wof',
+						api_key: api_key
+					})).then(function(rsp) {
+						var $select = $('#config-places-select');
+						var places = '';
+						$.each(rsp.features, function(i, feature) {
+							places += '<div class="place" data-bbox="' + feature.bbox.join(',') + '"data-wof-id="' + feature.properties.id + '"><span class="fa fa-check"></span> ' + feature.properties.label + '</div>'
+						});
+						$select.html(places);
+						$('#config-places-select .place').click(self.place_click);
+						if (typeof cb == 'function') {
+							cb(rsp);
+						}
 					});
-					$select.html(places);
-					$('#config-places-select .place').click(self.place_click);
-					if (typeof cb == 'function') {
-						cb(rsp);
-					}
-				});
+				}
 			}
 		},
 
