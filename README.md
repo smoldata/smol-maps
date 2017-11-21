@@ -17,7 +17,11 @@ Note: this is a work in progress port from the more feature-complete [php-smol-m
 
 ## Installing node.js
 
-If you are installing on a Mac or Windows, use the installer available on the [node.js homepage](https://nodejs.org/en/). For Linux users installing via a package manager, you'll want to read the docs and [follow the instructions](https://nodejs.org/en/download/package-manager/) for your specific distribution (e.g., for [Debian-based distros, like Ubuntu](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)).
+If you are installing on a Mac or Windows, use the installer available on the [node.js homepage](https://nodejs.org/en/).
+
+For Linux users installing via a package manager, you'll want to read the docs and [follow the instructions](https://nodejs.org/en/download/package-manager/) for your specific distribution (e.g., for [Debian-based distros, like Ubuntu](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)).
+
+There is one more fun detail for Linux users. Depending on the distro you use, your node.js binary might be called `node` or `nodejs`. If you're running Ubuntu, for example, you use `nodejs`. If that's the case for you, instead of starting the server with `npm start` use `npm run-script startjs`.
 
 ## Setup
 
