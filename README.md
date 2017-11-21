@@ -15,6 +15,10 @@ Note: this is a work in progress port from the more feature-complete [php-smol-m
 * [curl](https://curl.haxx.se/)
 * [make](https://www.gnu.org/software/make/)
 
+## Installing node.js
+
+If you are installing on a Mac or Windows, use the installer available on the [node.js homepage](https://nodejs.org/en/). For Linux users installing via a package manager, you'll want to read the docs and [follow the instructions](https://nodejs.org/en/download/package-manager/) for your specific distribution (e.g., for [Debian-based distros, like Ubuntu](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)).
+
 ## Setup
 
 1. Register a free [Mapzen API key](https://mapzen.com/dashboard)
