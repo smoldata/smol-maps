@@ -7,7 +7,6 @@ smol.maps = (function() {
 		config: null,
 
 		init: function() {
-			self.setup_menu();
 			$.get('/api/dotdata/config').then(function(rsp) {
 				if (rsp.ok) {
 					self.config = rsp.data;
@@ -59,15 +58,6 @@ smol.maps = (function() {
 				e.preventDefault();
 				smol.menu.show('config');
 			});
-		},
-
-		setup_menu: function() {
-
-			$('#menu').on('config-submit', function(e, rsp) {
-				self.config = rsp.data;
-				self.setup_map();
-			});
-
 		},
 
 		tangram_scene: function() {

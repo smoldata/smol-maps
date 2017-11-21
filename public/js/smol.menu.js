@@ -14,9 +14,10 @@ smol.menu = (function() {
 			// Cancel button
 			$(window).keypress(function(e) {
 				if (e.keyCode == 27 &&
-				    $('#menu').hasClass('active')) {
+				    $('#menu').hasClass('active') &&
+				    ! $('#menu-close').hasClass('hidden')) {
 					e.preventDefault();
-					app.hide();
+					self.hide();
 				}
 			});
 
