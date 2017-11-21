@@ -10,6 +10,7 @@ node_packages:
 leaflet-geocoder:
 	cd public/lib/leaflet-geocoder-mapzen && npm install
 	cd public/lib/leaflet-geocoder-mapzen && npm run-script build
+	rm -rf public/lib/leaflet-geocoder-mapzen/node_modules
 
 public-lib:
 	./node_modules/bower/bin/bower install
