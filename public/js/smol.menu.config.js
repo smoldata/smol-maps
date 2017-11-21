@@ -27,6 +27,29 @@ smol.menu.config = (function() {
 			});
 		},
 
+		setup: function(config) {
+			$('#config-api-key').val(config.mapzen_api_key);
+			$('input[name="default_bbox"]').val(config.default_bbox);
+			$('input[name="default_wof_id"]').val(config.default_wof_id);
+
+			var onsuccess = function(rsp) {
+				var feature = rsp.place;
+				var bbox = feature['geom:bbox'];
+				var label = feature['wof:name'] + ', ' + feature['wof:country'];
+				var html = '<div class="place selected" data-bbox="' + bbox + '"data-wof-id="' + feature['wof:id'] + '"><span class="fa fa-check"></span> ' + label + '</div>';
+				$('#config-places-select').html(html);
+				$('#config-location').val(label);
+				$('#config-places-random').removeClass('selected');
+			};
+
+			$.get('https://places.mapzen.com/v1?' + $.param({
+				method: 'mapzen.places.getInfo',
+				id: config.default_wof_id,
+				extras: 'geom:bbox',
+				api_key: config.mapzen_api_key
+			})).then(onsuccess);
+		},
+
 		show: function() {
 			$('#menu-close').addClass('hidden');
 		},
@@ -106,7 +129,7 @@ smol.menu.config = (function() {
 						var $select = $('#config-places-select');
 						var places = '';
 						$.each(rsp.features, function(i, feature) {
-							places += '<div class="place" data-bbox="' + feature.bbox.join(',') + '"data-wof-id="' + feature.properties.id + '"><span class="fa fa-check"></span> ' + feature.properties.label + '</div>'
+							places += '<div class="place" data-bbox="' + feature.bbox.join(',') + '"data-wof-id="' + feature.properties.id + '"><span class="fa fa-check"></span> ' + feature.properties.label + '</div>';
 						});
 						$select.html(places);
 						$('#config-places-select .place').click(self.place_click);

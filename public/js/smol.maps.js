@@ -12,6 +12,7 @@ smol.maps = (function() {
 				if (rsp.ok) {
 					self.config = rsp.data;
 					self.setup_map();
+					smol.menu.config.setup(self.config);
 				} else {
 					$('#menu').addClass('no-animation');
 					smol.menu.show('config');
