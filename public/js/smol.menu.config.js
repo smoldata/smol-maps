@@ -16,10 +16,23 @@ smol.menu.config = (function() {
 			self.places_show(function() {
 				$('#config-places-select .place:first-child').trigger('click');
 			});
+			$('#config-location, #config-api-key').focus(function(e) {
+				console.log(e.target);
+				$(e.target).addClass('is-focused');
+			});
+			$('#config-location, #config-api-key').blur(function(e) {
+				$(e.target).removeClass('is-focused');
+			});
 			$('#config-location').keypress(function(e) {
+				if (! $('#config-location').hasClass('is-focused')) {
+					return;
+				}
 				setTimeout(self.places_show, 0);
 			});
 			$('#config-api-key').keypress(function(e) {
+				if (! $('#config-api-key').hasClass('is-focused')) {
+					return;
+				}
 				setTimeout(function() {
 					var api_key = $(e.target).val();
 					self.validate_api_key(api_key);
@@ -31,6 +44,7 @@ smol.menu.config = (function() {
 			$('#config-api-key').val(config.mapzen_api_key);
 			$('input[name="default_bbox"]').val(config.default_bbox);
 			$('input[name="default_wof_id"]').val(config.default_wof_id);
+			self.validate_api_key(config.mapzen_api_key);
 
 			var onsuccess = function(rsp) {
 				var feature = rsp.place;
@@ -113,7 +127,6 @@ smol.menu.config = (function() {
 
 		places_show: function(cb) {
 			var api_key = $('#config-api-key').val();
-			self.validate_api_key(api_key);
 
 			if (valid_api_key) {
 				var text = $('#config-location').val();
@@ -133,6 +146,10 @@ smol.menu.config = (function() {
 						});
 						$select.html(places);
 						$('#config-places-select .place').click(self.place_click);
+
+						if ($select.find('.selected').length == 0) {
+							$('#config-places-random').trigger('click');
+						}
 						if (typeof cb == 'function') {
 							cb(rsp);
 						}
