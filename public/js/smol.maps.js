@@ -53,6 +53,11 @@ smol.maps = (function() {
 				expanded: true,
 				attribution: '<a href="https://mapzen.com/" target="_blank">Mapzen</a> | <a href="https://openstreetmap.org/">OSM</a>'
 			}).addTo(self.map);
+			$('.leaflet-pelias-search-icon').html('<span class="fa fa-bars"></span>');
+			$('.leaflet-pelias-search-icon').click(function(e) {
+				e.preventDefault();
+				smol.menu.show('config');
+			});
 		},
 
 		setup_menu: function() {
