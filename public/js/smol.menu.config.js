@@ -147,9 +147,12 @@ smol.menu.config = (function() {
 						$select.html(places);
 						$('#config-places-select .place').click(self.place_click);
 
+						var wof_id = $('input[name="default_wof_id"]').val();
+						$('.place[data-wof-id="' + wof_id + '"]').trigger('click');
 						if ($select.find('.selected').length == 0) {
 							$('#config-places-random').trigger('click');
 						}
+
 						if (typeof cb == 'function') {
 							cb(rsp);
 						}
