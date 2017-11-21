@@ -1,6 +1,7 @@
 REFILL_VERSION = 9.0.1
 WALKABOUT_VERSION = 6.0.0
 BUBBLE_WRAP_VERSION = 8.0.0
+LEAFLET_GEOCODER_VERSION = 1.9.4
 
 all: node_packages leaflet-geocoder public-lib public-scene
 
@@ -8,9 +9,11 @@ node_packages:
 	npm install
 
 leaflet-geocoder:
-	cd public/lib/leaflet-geocoder-mapzen && npm install
-	cd public/lib/leaflet-geocoder-mapzen && npm run-script build
-	rm -rf public/lib/leaflet-geocoder-mapzen/node_modules
+	@echo "Instead of 'npm run-script build' we download Leaflet Geocoder assets from a CDN"
+	curl -s -o public/lib/leaflet-geocoder-mapzen/dist/leaflet-geocoder-mapzen.css https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.9.4/leaflet-geocoder-mapzen.css
+	curl -s -o public/lib/leaflet-geocoder-mapzen/dist/leaflet-geocoder-mapzen.min.css https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.9.4/leaflet-geocoder-mapzen.min.css
+	curl -s -o public/lib/leaflet-geocoder-mapzen/dist/leaflet-geocoder-mapzen.js https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.9.4/leaflet-geocoder-mapzen.js
+	curl -s -o public/lib/leaflet-geocoder-mapzen/dist/leaflet-geocoder-mapzen.min.js https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.9.4/leaflet-geocoder-mapzen.min.js
 
 public-lib:
 	./node_modules/bower/bin/bower install
