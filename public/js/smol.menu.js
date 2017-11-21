@@ -22,7 +22,6 @@ smol.menu = (function() {
 
 			$('#menu .menu-page').each(function(index, form) {
 				var page = $(form).attr('id');
-				$('#menu').trigger(page + '-setup', [form]);
 				if (smol.menu[page] &&
 				    typeof smol.menu[page].init == 'function') {
 					smol.menu[page].init();
@@ -38,7 +37,6 @@ smol.menu = (function() {
 			$('#menu').addClass('active');
 			$('#menu').scrollTop(0);
 
-			$('#menu').trigger(page + '-show');
 			if (smol.menu[page] &&
 			    typeof smol.menu[page].show == 'function') {
 				smol.menu[page].show();
@@ -50,7 +48,6 @@ smol.menu = (function() {
 			var page = $visible.attr('id');
 			$('#menu').removeClass('active');
 
-			$('#menu').trigger(page + '-hide');
 			if (smol.menu[page] &&
 			    typeof smol.menu[page].hide == 'function') {
 				smol.menu[page].hide();
@@ -82,7 +79,6 @@ smol.menu = (function() {
 					data[key] = args[i].value;
 				}
 
-				$('#menu').trigger(page + '-submit', [rsp, data]);
 				if (smol.menu[page] &&
 				    typeof smol.menu[page].submit == 'function') {
 					smol.menu[page].submit(data);
