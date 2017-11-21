@@ -2,10 +2,14 @@ REFILL_VERSION = 9.0.1
 WALKABOUT_VERSION = 6.0.0
 BUBBLE_WRAP_VERSION = 8.0.0
 
-all: node_packages public-lib public-scene
+all: node_packages leaflet-geocoder public-lib public-scene
 
 node_packages:
 	npm install
+
+leaflet-geocoder:
+	cd public/lib/leaflet-geocoder-mapzen && npm install
+	cd public/lib/leaflet-geocoder-mapzen && npm run-script build
 
 public-lib:
 	./node_modules/bower/bin/bower install
