@@ -31,10 +31,27 @@ smol.maps = (function() {
 				[coords[3], coords[2]]
 			];
 
-			self.map = L.map('map');
+			self.map = L.map('map', {
+				zoomControl: false
+			});
 			self.map.fitBounds(bbox);
+
+			if ($(document.body).width() > 640) {
+				L.control.zoom({
+					position: 'bottomleft'
+				}).addTo(self.map);
+				$('.leaflet-control-zoom-in').html('<span class="fa fa-plus"></span>');
+				$('.leaflet-control-zoom-out').html('<span class="fa fa-minus"></span>');
+				$('#map').addClass('has-zoom-controls');
+			}
+
 			Tangram.leafletLayer({
 				scene: self.tangram_scene()
+			}).addTo(self.map);
+
+			L.control.geocoder(self.config.mapzen_api_key, {
+				expanded: true,
+				attribution: '<a href="https://mapzen.com/" target="_blank">Mapzen</a> | <a href="https://openstreetmap.org/">OSM</a>'
 			}).addTo(self.map);
 		},
 
