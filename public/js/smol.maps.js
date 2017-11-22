@@ -7,6 +7,7 @@ smol.maps = (function() {
 		config: null,
 
 		init: function() {
+			self.setup_sidebar();
 			$.get('/api/dotdata/config').then(function(rsp) {
 				if (rsp.ok) {
 					self.config = rsp.data;
@@ -49,14 +50,26 @@ smol.maps = (function() {
 				attribution: '<a href="https://mapzen.com/" target="_blank">Mapzen</a> | <a href="https://openstreetmap.org/">OSM</a>'
 			}).addTo(self.map);
 			$('.leaflet-pelias-search-icon').html('<span class="fa fa-bars"></span>');
+
 			$('.leaflet-pelias-search-icon').click(function(e) {
 				e.preventDefault();
-				smol.menu.show('config');
+				$('#map').toggleClass('show-sidebar');
+				self.map.invalidateSize(false);
 			});
 
 			L.control.locate({
 				position: 'bottomleft'
 			}).addTo(self.map);
+		},
+
+		setup_sidebar: function() {
+			$('#sidebar-config').click(function() {
+				smol.menu.show('config');
+			});
+			$('#sidebar-close').click(function() {
+				$('#map').removeClass('show-sidebar');
+				self.map.invalidateSize(false);
+			});
 		},
 
 		tangram_scene: function() {
