@@ -6,6 +6,8 @@
 var express = require('express');
 var body_parser = require('body-parser');
 var dotdata = require('./dotdata');
+var sequence = require('./sequence');
+
 var app = express();
 
 dotdata.init();
@@ -21,6 +23,14 @@ app.get("/", function(request, response) {
 // http://expressjs.com/en/api.html#req.body
 app.use(body_parser.json()); // application/json
 app.use(body_parser.urlencoded({ extended: true })); // application/x-www-form-urlencoded
+
+// Inspired by Artisinal Integers, this just returns an incrementing integer
+app.get("/api/id", function(request, response) {
+	response.send({
+		ok: 1,
+		id: sequence.next()
+	});
+});
 
 // These next two API endpoints let people read and write to the .data folder.
 // You may notice that there's no access control here, and pretty minimal

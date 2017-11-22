@@ -101,17 +101,24 @@ smol.maps = (function() {
 		},
 
 		add_venue: function() {
-			var venue = {
-				coords: self.map.getCenter(),
-				color: '#8442D5',
-				icon: 'marker-stroked'
-			};
-			self.add_marker(venue);
-			smol.sidebar.add_venue(venue);
+			$.get('/api/id', function(rsp) {
+				var center = self.map.getCenter();
+				var venue = {
+					id: rsp.id,
+					latitude: center.lat,
+					longitude: center.lng,
+					color: '#8442D5',
+					icon: 'marker-stroked'
+				};
+				self.add_marker(venue);
+				smol.sidebar.add_venue(venue);
+				$.post('/api/dotdata/venue:' + rsp.id, venue);
+			});
 		},
 
 		add_marker: function(venue) {
-			var marker = new L.marker(venue.coords, {
+			var coords = [venue.latitude, venue.longitude];
+			var marker = new L.marker(coords, {
 				icon: self.map_marker_icon,
 				draggable: true,
 				riseOnHover: true
