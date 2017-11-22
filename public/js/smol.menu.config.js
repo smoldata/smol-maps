@@ -90,6 +90,8 @@ smol.menu.config = (function() {
 			smol.maps.config = config;
 			if (! smol.maps.map) {
 				smol.maps.setup_map();
+			} else {
+				smol.maps.set_bbox(config.default_bbox);
 			}
 			smol.menu.hide();
 			setTimeout(function() {

@@ -25,16 +25,11 @@ smol.maps = (function() {
 			if (! default_bbox) {
 				default_bbox = self.random_megacity_bbox();
 			}
-			var coords = default_bbox.split(',');
-			var bbox = [
-				[coords[1], coords[0]],
-				[coords[3], coords[2]]
-			];
 
 			self.map = L.map('map', {
 				zoomControl: false
 			});
-			self.map.fitBounds(bbox);
+			self.set_bbox(default_bbox);
 
 			if ($(document.body).width() > 640) {
 				L.control.zoom({
@@ -77,6 +72,14 @@ smol.maps = (function() {
 			self.config.default_bbox = place['geom:bbox'];
 			self.config.default_wof_id = place['wof:id'];
 			return place['geom:bbox'];
+		},
+
+		set_bbox(bbox) {
+			var coords = bbox.split(',');
+			self.map.fitBounds([
+				[coords[1], coords[0]],
+				[coords[3], coords[2]]
+			]);
 		}
 
 	};
