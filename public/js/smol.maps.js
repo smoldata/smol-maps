@@ -101,11 +101,13 @@ smol.maps = (function() {
 		},
 
 		add_venue: function() {
-			var marker = self.add_marker({
+			var venue = {
 				coords: self.map.getCenter(),
 				color: '#8442D5',
 				icon: 'marker-stroked'
-			});
+			};
+			self.add_marker(venue);
+			smol.sidebar.add_venue(venue);
 		},
 
 		add_marker: function(venue) {

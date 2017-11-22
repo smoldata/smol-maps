@@ -33,6 +33,14 @@ smol.sidebar = (function() {
 			} else {
 				self.show();
 			}
+		},
+
+		add_venue: function(venue) {
+			var hsl = smol.color.hex2hsl(venue.color);
+			var icon_inverted = (hsl.l < 0.66) ? ' inverted' : '';
+			var html = '<li><span class="icon-bg" style="background-color: ' + venue.color + ';">' +
+			           '<span class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + venue.icon + '.svg);"></span></span></li>';
+			$('#sidebar-items').prepend(html);
 		}
 	};
 
