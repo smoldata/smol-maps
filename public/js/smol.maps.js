@@ -11,7 +11,6 @@ smol.maps = (function() {
 		}),
 
 		init: function() {
-			self.setup_sidebar();
 			$.get('/api/dotdata/config').then(function(rsp) {
 				if (rsp.ok) {
 					self.config = rsp.data;
@@ -57,8 +56,7 @@ smol.maps = (function() {
 
 			$('.leaflet-pelias-search-icon').click(function(e) {
 				e.preventDefault();
-				$('#map').toggleClass('show-sidebar');
-				self.map.invalidateSize(false);
+				smol.sidebar.toggle();
 			});
 
 			L.control.locate({
@@ -73,16 +71,6 @@ smol.maps = (function() {
 			}).addTo(self.map);
 
 			slippymap.crosshairs.init(self.map);
-		},
-
-		setup_sidebar: function() {
-			$('#sidebar-config').click(function() {
-				smol.menu.show('config');
-			});
-			$('#sidebar-close').click(function() {
-				$('#map').removeClass('show-sidebar');
-				self.map.invalidateSize(false);
-			});
 		},
 
 		tangram_scene: function() {
