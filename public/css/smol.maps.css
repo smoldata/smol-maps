@@ -218,6 +218,16 @@ code {
 	text-align: center;
 }
 
+.map-marker {
+	background: #ccc;
+	width: 10px;
+	height: 10px;
+	border-radius: 10px;
+	border: 2px solid rgba(0, 0, 0, 0.9);
+	margin-left: -5px;
+	margin-top: -5px;
+}
+
 @media (min-width: 321px) {
 	.leaflet-touch .leaflet-control-add-venue a,
 	.leaflet-control-add-venue a:hover,

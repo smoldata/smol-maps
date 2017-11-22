@@ -6,6 +6,10 @@ smol.maps = (function() {
 		map: null,
 		config: null,
 
+		map_marker_icon: L.divIcon({
+			className: 'map-marker'
+		}),
+
 		init: function() {
 			self.setup_sidebar();
 			$.get('/api/dotdata/config').then(function(rsp) {
@@ -109,7 +113,17 @@ smol.maps = (function() {
 		},
 
 		add_venue: function() {
-			console.log('hey');
+			var ll = self.map.getCenter();
+			var marker = self.add_marker(ll);
+		},
+
+		add_marker: function(ll) {
+			var marker = new L.marker(ll, {
+				icon: self.map_marker_icon,
+				draggable: true,
+				riseOnHover: true
+			});
+			marker.addTo(self.map);
 		}
 
 	};
