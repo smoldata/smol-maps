@@ -3,7 +3,7 @@ WALKABOUT_VERSION = 6.0.0
 BUBBLE_WRAP_VERSION = 8.0.0
 LEAFLET_GEOCODER_VERSION = 1.9.4
 
-all: node_packages leaflet-geocoder public-lib public-scene
+all: node_packages public-lib leaflet-geocoder leaflet-hash slippymap-crosshairs public-scene
 
 node_packages:
 	npm install
@@ -14,6 +14,12 @@ leaflet-geocoder:
 	curl -s -o public/lib/leaflet-geocoder-mapzen/dist/leaflet-geocoder-mapzen.min.css https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.9.4/leaflet-geocoder-mapzen.min.css
 	curl -s -o public/lib/leaflet-geocoder-mapzen/dist/leaflet-geocoder-mapzen.js https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.9.4/leaflet-geocoder-mapzen.js
 	curl -s -o public/lib/leaflet-geocoder-mapzen/dist/leaflet-geocoder-mapzen.min.js https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.9.4/leaflet-geocoder-mapzen.min.js
+
+leaflet-hash:
+	curl -s -o public/lib/leaflet-hash.js https://raw.githubusercontent.com/mlevans/leaflet-hash/master/leaflet-hash.js
+
+slippymap-crosshairs:
+	curl -s -o public/lib/slippymap.crosshairs.js https://raw.githubusercontent.com/whosonfirst/js-slippymap-crosshairs/master/src/slippymap.crosshairs.js
 
 public-lib:
 	./node_modules/bower/bin/bower install

@@ -60,6 +60,15 @@ smol.maps = (function() {
 			L.control.locate({
 				position: 'bottomleft'
 			}).addTo(self.map);
+
+			new L.Hash(self.map);
+
+			L.control.addVenue({
+				position: 'bottomright',
+				click: self.add_venue
+			}).addTo(self.map);
+
+			slippymap.crosshairs.init(self.map);
 		},
 
 		setup_sidebar: function() {
@@ -97,6 +106,10 @@ smol.maps = (function() {
 				[coords[1], coords[0]],
 				[coords[3], coords[2]]
 			]);
+		},
+
+		add_venue: function() {
+			console.log('hey');
 		}
 
 	};
