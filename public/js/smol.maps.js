@@ -101,19 +101,39 @@ smol.maps = (function() {
 		},
 
 		add_venue: function() {
-			var ll = self.map.getCenter();
-			var marker = self.add_marker(ll);
+			var marker = self.add_marker({
+				coords: self.map.getCenter(),
+				color: '#8442D5',
+				icon: 'marker-stroked'
+			});
 		},
 
-		add_marker: function(ll) {
-			var marker = new L.marker(ll, {
+		add_marker: function(venue) {
+			var marker = new L.marker(venue.coords, {
 				icon: self.map_marker_icon,
 				draggable: true,
 				riseOnHover: true
 			});
 			marker.addTo(self.map);
-		}
+			self.update_marker(marker, venue);
+			marker.openPopup();
+		},
 
+		update_marker: function(marker, venue) {
+			marker.venue = venue;
+			var data_id = venue.id ? ' data-venue-id="' + venue.id + '"' : '';
+			var hsl = smol.color.hex2hsl(venue.color);
+			var icon_inverted = (hsl.l < 0.66) ? ' inverted' : '';
+			var html = '<div class="icon-bg" style="background-color: ' + venue.color + ';">' +
+					'<div class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + venue.icon + '.svg);"></div></div>';
+			marker.bindPopup(html);
+			var rgb = smol.color.hex2rgb(venue.color);
+			if (rgb && marker._icon) {
+				var rgba = [rgb.r, rgb.g, rgb.b, 0.7];
+				rgba = 'rgba(' + rgba.join(',') + ')';
+				marker._icon.style.backgroundColor = rgba;
+			}
+		}
 	};
 
 	$(document).ready(function() {
