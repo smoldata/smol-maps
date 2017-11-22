@@ -32,6 +32,36 @@ app.get("/api/id", function(request, response) {
 	});
 });
 
+app.get("/api/venues", function(request, response) {
+
+	var venues = [];
+	var onsuccess = function() {
+		response.send({
+			ok: 1,
+			venues: venues
+		});
+	};
+
+	var getvenue = function(id) {
+		return new Promise(function(resolve, reject) {
+			dotdata.get("venue:" + id).then(function(data) {
+				venues.push(data);
+				resolve(data);
+			}, function(err) {
+				reject(err);
+			});
+		});
+	};
+
+	dotdata.index('venue').then(function(index) {
+		var allvenues = [];
+		for (var i = 0; i < index.data.length; i++) {
+			allvenues.push(getvenue(index.data[i]));
+		}
+		Promise.all(allvenues).then(onsuccess);
+	});
+});
+
 // These next two API endpoints let people read and write to the .data folder.
 // You may notice that there's no access control here, and pretty minimal
 // validation in dotdata.js. This is a known-known, and needs to be addressed,
