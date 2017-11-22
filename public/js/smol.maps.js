@@ -53,6 +53,10 @@ smol.maps = (function() {
 				e.preventDefault();
 				smol.menu.show('config');
 			});
+
+			L.control.locate({
+				position: 'bottomleft'
+			}).addTo(self.map);
 		},
 
 		tangram_scene: function() {
