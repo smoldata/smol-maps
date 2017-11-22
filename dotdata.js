@@ -45,8 +45,46 @@ var dotdata = {
 					return reject(err);
 				}
 				resolve(data);
+				if (! filename.match(/\.index\.json$/)) {
+					dotdata.update_index(dir);
+				}
 			});
 		});
+	},
+
+	update_index: function(dir) {
+		fs.readdir(dir, function(err, files) {
+			var name = dir.replace(__dirname + '/.data', '')
+			              .replace(/\//g, ':') + ':.index';
+			if (name.substr(0, 1) == ':') {
+				name = name.substr(1);
+			}
+			var index = {
+				data: [],
+				dirs: []
+			};
+			for (var file, i = 0; i < files.length; i++) {
+				file = files[i];
+				if (file.substr(0, 1) == '.') {
+					continue;
+				} else if (file.substr(-5, 5) == '.json') {
+					index.data.push(file.substr(0, file.length - 5));
+				} else {
+					index.dirs.push(file);
+				}
+			}
+			dotdata.set(name, index);
+		});
+	},
+
+	index: function(name) {
+		if (! name) {
+			name = '';
+		} else {
+			name += ':';
+		}
+		name += '.index';
+		return dotdata.get(name);
 	},
 
 	filename: function(name) {
