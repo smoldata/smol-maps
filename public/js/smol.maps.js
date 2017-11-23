@@ -5,6 +5,7 @@ smol.maps = (function() {
 
 		map: null,
 		config: null,
+		data: null,
 
 		map_marker_icon: L.divIcon({
 			className: 'map-marker'
@@ -14,8 +15,8 @@ smol.maps = (function() {
 			$.get('/api/dotdata/config').then(function(rsp) {
 				if (rsp.ok) {
 					self.config = rsp.data;
-					self.setup_map();
 					smol.menu.config.setup(self.config);
+					self.setup_map();
 				} else {
 					$('#menu').addClass('no-animation');
 					smol.menu.show('config');
@@ -25,15 +26,19 @@ smol.maps = (function() {
 
 		setup_map: function() {
 
-			var default_bbox = self.config.default_bbox;
-			if (! default_bbox) {
-				default_bbox = self.random_megacity_bbox();
+			if (! self.data) {
+				return self.setup_data();
 			}
 
 			self.map = L.map('map', {
 				zoomControl: false
 			});
-			self.set_bbox(default_bbox);
+
+			var bbox = self.data.bbox;
+			if (! bbox) {
+				bbox = self.random_megacity_bbox();
+			}
+			self.set_bbox(bbox);
 
 			if ($(document.body).width() > 640) {
 				L.control.zoom({
@@ -73,6 +78,15 @@ smol.maps = (function() {
 			slippymap.crosshairs.init(self.map);
 		},
 
+		setup_data: function() {
+			var path = location.pathname.match(/^\/([a-z0-9-]+)\/?$/);
+			if (location.pathname == '/') {
+				self.add_map();
+			} else if (path) {
+				self.load_map(path);
+			}
+		},
+
 		tangram_scene: function() {
 			return {
 				global: {
@@ -98,6 +112,25 @@ smol.maps = (function() {
 				[coords[1], coords[0]],
 				[coords[3], coords[2]]
 			]);
+		},
+
+		add_map: function() {
+			var map = {
+				name: 'Untitled map',
+				bbox: self.config.default_bbox
+			};
+			$.post('/api/map', map).then(function(data) {
+				self.data = data;
+				history.pushState(data.map, 'Untitled map', '/' + data.map.slug);
+				self.setup_map();
+			});
+		},
+
+		load_map: function(path) {
+			$.get('/api/map/' + path[1], function(data) {
+				self.data = data;
+				self.setup_map();
+			});
 		},
 
 		add_venue: function() {

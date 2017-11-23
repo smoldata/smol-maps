@@ -4,9 +4,10 @@ var path = require('path');
 var dotdata = {
 
 	init: function() {
-		var path = __dirname + '/.data';
-		if (! fs.existsSync(path)) {
-			fs.mkdirSync(path, 0o755);
+		var root = path.dirname(__dirname);
+		var datadir = root + '/.data';
+		if (! fs.existsSync(datadir)) {
+			fs.mkdirSync(datadir, 0o755);
 		}
 	},
 
@@ -54,7 +55,8 @@ var dotdata = {
 
 	update_index: function(dir) {
 		fs.readdir(dir, function(err, files) {
-			var name = dir.replace(__dirname + '/.data', '')
+			var root = path.dirname(__dirname);
+			var name = dir.replace(root + '/.data', '')
 			              .replace(/\//g, ':') + ':.index';
 			if (name.substr(0, 1) == ':') {
 				name = name.substr(1);
@@ -95,7 +97,8 @@ var dotdata = {
 			return null;
 		}
 		name = name.replace(/:/g, '/');
-		filename = __dirname + '/.data/' + name + '.json';
+		var root = path.dirname(__dirname);
+		filename = root + '/.data/' + name + '.json';
 		return filename;
 	}
 };

@@ -5,8 +5,11 @@
 
 var express = require('express');
 var body_parser = require('body-parser');
+var path = require('path');
+var fs = require('fs');
 var dotdata = require('./dotdata');
 var sequence = require('./sequence');
+var url_words = require('./url_words');
 
 var app = express();
 
@@ -17,7 +20,13 @@ app.use(express.static('public'));
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function(request, response) {
-	response.sendFile(__dirname + '/views/index.html');
+	var root = path.dirname(__dirname);
+	response.sendFile(root + '/views/index.html');
+});
+
+app.get("/:id", function(request, response) {
+	var root = path.dirname(__dirname);
+	response.sendFile(root + '/views/index.html');
 });
 
 // http://expressjs.com/en/api.html#req.body
@@ -32,33 +41,66 @@ app.get("/api/id", function(request, response) {
 	});
 });
 
-app.get("/api/venues", function(request, response) {
+app.post("/api/map", function(request, response) {
 
-	var venues = [];
-	var onsuccess = function() {
-		response.send({
-			ok: 1,
-			venues: venues
-		});
-	};
-
-	var getvenue = function(id) {
-		return new Promise(function(resolve, reject) {
-			dotdata.get("venue:" + id).then(function(data) {
-				venues.push(data);
-				resolve(data);
-			}, function(err) {
-				reject(err);
+	var save_map = function() {
+		var slug = url_words.random();
+		var root = path.dirname(__dirname);
+		var filename = root + '/.data/map/' + slug + '.json';
+		fs.stat(filename, function(err, stats) {
+			if (! err || err.code != 'ENOENT') {
+				return save_map();
+			}
+			var map = request.body;
+			map.id = sequence.next();
+			map.slug = slug;
+			dotdata.set('map:' + slug, map);
+			var dir = root + '/.data/map' + map.id;
+			fs.mkdir(dir, 0o755, function() {
+				response.send({
+					ok: 1,
+					map: map,
+					venues: []
+				});
 			});
 		});
 	};
+	save_map();
 
-	dotdata.index('venue').then(function(index) {
-		var allvenues = [];
-		for (var i = 0; i < index.data.length; i++) {
-			allvenues.push(getvenue(index.data[i]));
-		}
-		Promise.all(allvenues).then(onsuccess);
+});
+
+app.get("/api/map/:id", function(request, response) {
+
+	dotdata.get('map:' + request.params.id).then(function(data) {
+
+		var venues = [];
+		var onsuccess = function() {
+			response.send({
+				ok: 1,
+				map: data,
+				venues: venues
+			});
+		};
+
+		var getvenue = function(id) {
+			return new Promise(function(resolve, reject) {
+				dotdata.get("map" + data.id + ":" + id).then(function(data) {
+					venues.push(data);
+					resolve(data);
+				}, function(err) {
+					reject(err);
+				});
+			});
+		};
+
+		dotdata.index("map" + data.id).then(function(index) {
+			var allvenues = [];
+			for (var i = 0; i < index.data.length; i++) {
+				allvenues.push(getvenue(index.data[i]));
+			}
+			Promise.all(allvenues).then(onsuccess);
+		});
+
 	});
 });
 
