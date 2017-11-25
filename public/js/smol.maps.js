@@ -49,7 +49,7 @@ smol.maps = (function() {
 				$('#map').addClass('has-zoom-controls');
 			}
 
-			Tangram.leafletLayer({
+			self.tangram = Tangram.leafletLayer({
 				scene: self.tangram_scene()
 			}).addTo(self.map);
 
@@ -81,9 +81,14 @@ smol.maps = (function() {
 
 			slippymap.crosshairs.init(self.map);
 
-			$.each(self.data.venues, function(i, venue) {
-				self.add_marker(venue);
+			self.tangram.scene.subscribe({
+				view_complete: function () {
+					for (var i = 0; i < self.data.venues.length; i++) {
+						self.add_marker(self.data.venues[i]);
+					}
+				}
 			});
+
 		},
 
 		setup_data: function() {
