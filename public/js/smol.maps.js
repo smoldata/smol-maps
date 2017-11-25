@@ -191,8 +191,16 @@ smol.maps = (function() {
 			var data_id = venue.id ? ' data-venue-id="' + venue.id + '"' : '';
 			var hsl = smol.color.hex2hsl(venue.color);
 			var icon_inverted = (hsl.l < 0.66) ? ' inverted' : '';
+			var name = venue.name;
+			if (! name) {
+				var lat = parseFloat(venue.latitude).toFixed(6);
+				var lng = parseFloat(venue.longitude).toFixed(6);
+				name = lat + ', ' + lng;
+			}
 			var html = '<div class="icon-bg" style="background-color: ' + venue.color + ';">' +
-					'<div class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + venue.icon + '.svg);"></div></div>';
+					'<div class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + venue.icon + '.svg);"></div></div>' +
+					'<div class="name"><span class="inner">' + name + '</span></div>' +
+					'<br class="clear">';
 			marker.bindPopup(html);
 			var rgb = smol.color.hex2rgb(venue.color);
 			if (rgb && marker._icon) {
