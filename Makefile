@@ -3,7 +3,11 @@ WALKABOUT_VERSION = 6.0.0
 BUBBLE_WRAP_VERSION = 8.0.0
 LEAFLET_GEOCODER_VERSION = 1.9.4
 
-all: node_packages public-lib leaflet-geocoder leaflet-hash slippymap-crosshairs public-scene
+all: node_packages \
+     leaflet-geocoder \
+     leaflet-hash \
+     slippymap-crosshairs \
+     public-scene
 
 node_packages:
 	npm install
