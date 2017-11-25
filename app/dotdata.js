@@ -80,13 +80,34 @@ var dotdata = {
 	},
 
 	index: function(name) {
-		if (! name) {
-			name = '';
-		} else {
-			name += ':';
-		}
-		name += '.index';
-		return dotdata.get(name);
+
+		return new Promise(function(resolve, reject) {
+
+			var onsuccess = function(data) {
+				resolve(data);
+			};
+
+			var onerror = function(err) {
+				if (err.code == 'ENOENT') {
+					resolve({
+						data: [],
+						dirs: []
+					});
+				} else {
+					reject(err);
+				}
+			};
+
+			if (! name) {
+				name = '';
+			} else {
+				name += ':';
+			}
+			name += '.index';
+
+			dotdata.get(name).then(onsuccess, onerror);
+
+		});
 	},
 
 	filename: function(name) {

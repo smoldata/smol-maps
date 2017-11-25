@@ -41,75 +41,7 @@ app.get("/api/id", function(request, response) {
 	});
 });
 
-app.post("/api/map", function(request, response) {
-
-	var save_map = function() {
-		var slug = url_words.random();
-		var root = path.dirname(__dirname);
-		var filename = root + '/.data/map/' + slug + '.json';
-		fs.stat(filename, function(err, stats) {
-			if (! err || err.code != 'ENOENT') {
-				return save_map();
-			}
-			var map = request.body;
-			map.id = sequence.next();
-			map.slug = slug;
-			dotdata.set('map:' + slug, map);
-			var dir = root + '/.data/map' + map.id;
-			fs.mkdir(dir, 0o755, function() {
-				response.send({
-					ok: 1,
-					map: map,
-					venues: []
-				});
-			});
-		});
-	};
-	save_map();
-
-});
-
-app.get("/api/map/:id", function(request, response) {
-
-	dotdata.get('map:' + request.params.id).then(function(data) {
-
-		var venues = [];
-		var onsuccess = function() {
-			response.send({
-				ok: 1,
-				map: data,
-				venues: venues
-			});
-		};
-
-		var getvenue = function(id) {
-			return new Promise(function(resolve, reject) {
-				dotdata.get("map" + data.id + ":" + id).then(function(data) {
-					venues.push(data);
-					resolve(data);
-				}, function(err) {
-					reject(err);
-				});
-			});
-		};
-
-		dotdata.index("map" + data.id).then(function(index) {
-			var allvenues = [];
-			for (var i = 0; i < index.data.length; i++) {
-				allvenues.push(getvenue(index.data[i]));
-			}
-			Promise.all(allvenues).then(onsuccess);
-		});
-
-	});
-});
-
-// These next two API endpoints let people read and write to the .data folder.
-// You may notice that there's no access control here, and pretty minimal
-// validation in dotdata.js. This is a known-known, and needs to be addressed,
-// just not today. (20171117/dphiffer)
-
-app.get("/api/dotdata/:name", function(request, response) {
+app.get("/api/config", function(request, response) {
 	var onsuccess = function(data) {
 		response.send({
 			ok: 1,
@@ -123,11 +55,11 @@ app.get("/api/dotdata/:name", function(request, response) {
 			data: {}
 		});
 	};
-	dotdata.get(request.params.name)
+	dotdata.get("config")
 	       .then(onsuccess, onerror);
 });
 
-app.post("/api/dotdata/:name", function(request, response) {
+app.post("/api/config", function(request, response) {
 	var onsuccess = function(data) {
 		response.send({
 			ok: 1,
@@ -142,7 +74,91 @@ app.post("/api/dotdata/:name", function(request, response) {
 			data: {}
 		}).status(400);
 	};
-	dotdata.set(request.params.name, request.body)
+	dotdata.set("config", request.body)
+	       .then(onsuccess, onerror);
+});
+
+// Create a new map
+app.post("/api/map", function(request, response) {
+	var save_map = function() {
+		var slug = url_words.random();
+		var root = path.dirname(__dirname);
+		var filename = root + '/.data/maps/' + slug + '.json';
+		fs.stat(filename, function(err, stats) {
+			if (! err || err.code != 'ENOENT') {
+				return save_map();
+			}
+			var map = request.body;
+			map.id = sequence.next();
+			map.slug = slug;
+			dotdata.set('maps:' + slug, map);
+			var dir = root + '/.data/maps/' + map.id;
+			fs.mkdir(dir, 0o755, function() {
+				response.send({
+					ok: 1,
+					map: map,
+					venues: []
+				});
+			});
+		});
+	};
+	save_map();
+});
+
+// Load a map
+app.get("/api/map/:slug", function(request, response) {
+
+	dotdata.get('maps:' + request.params.slug).then(function(map) {
+
+		var venues = [];
+		var onsuccess = function() {
+			response.send({
+				ok: 1,
+				map: map,
+				venues: venues
+			});
+		};
+
+		var get_venue = function(id) {
+			return new Promise(function(resolve, reject) {
+				dotdata.get("maps:" + map.id + ":" + id).then(function(venue) {
+					venues.push(venue);
+					resolve(venue);
+				}, function(err) {
+					reject(err);
+				});
+			});
+		};
+
+		dotdata.index("maps:" + map.id).then(function(index) {
+			var venue_promises = [];
+			for (var i = 0; i < index.data.length; i++) {
+				venue_promises.push(get_venue(index.data[i]));
+			}
+			Promise.all(venue_promises).then(onsuccess);
+		});
+
+	});
+});
+
+// Save a venue
+app.post("/api/venue", function(request, response) {
+	var onsuccess = function(data) {
+		response.send({
+			ok: 1,
+			data: data
+		});
+	};
+	var onerror = function(err) {
+		response.body({
+			ok: 0,
+			error: 'Error saving data.',
+			details: err,
+			data: {}
+		}).status(400);
+	};
+	var data = request.body;
+	dotdata.set("maps:" + data.map_id + ":" + data.id, data)
 	       .then(onsuccess, onerror);
 });
 

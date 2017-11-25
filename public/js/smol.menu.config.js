@@ -88,11 +88,7 @@ smol.menu.config = (function() {
 
 		submit: function(config) {
 			smol.maps.config = config;
-			if (! smol.maps.map) {
-				smol.maps.setup_map();
-			} else {
-				smol.maps.set_bbox(config.default_bbox);
-			}
+			smol.maps.setup_data();
 			smol.menu.hide();
 			setTimeout(function() {
 				$('#menu-close').removeClass('hidden');

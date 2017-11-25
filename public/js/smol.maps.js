@@ -12,7 +12,7 @@ smol.maps = (function() {
 		}),
 
 		init: function() {
-			$.get('/api/dotdata/config').then(function(rsp) {
+			$.get('/api/config').then(function(rsp) {
 				if (rsp.ok) {
 					self.config = rsp.data;
 					smol.menu.config.setup(self.config);
@@ -34,7 +34,7 @@ smol.maps = (function() {
 				zoomControl: false
 			});
 
-			var bbox = self.data.bbox;
+			var bbox = self.data.map.bbox;
 			if (! bbox) {
 				bbox = self.random_megacity_bbox();
 			}
@@ -72,16 +72,24 @@ smol.maps = (function() {
 
 			L.control.addVenue({
 				position: 'bottomright',
-				click: self.add_venue
+				click: function() {
+					self.create_venue(function(marker) {
+						marker.openPopup();
+					});
+				}
 			}).addTo(self.map);
 
 			slippymap.crosshairs.init(self.map);
+
+			$.each(self.data.venues, function(i, venue) {
+				self.add_marker(venue);
+			});
 		},
 
 		setup_data: function() {
 			var path = location.pathname.match(/^\/([a-z0-9-]+)\/?$/);
 			if (location.pathname == '/') {
-				self.add_map();
+				self.create_map();
 			} else if (path) {
 				self.load_map(path);
 			}
@@ -114,7 +122,7 @@ smol.maps = (function() {
 			]);
 		},
 
-		add_map: function() {
+		create_map: function() {
 			var map = {
 				name: 'Untitled map',
 				bbox: self.config.default_bbox
@@ -133,19 +141,22 @@ smol.maps = (function() {
 			});
 		},
 
-		add_venue: function() {
+		create_venue: function(cb) {
 			$.get('/api/id', function(rsp) {
 				var center = self.map.getCenter();
 				var venue = {
 					id: rsp.id,
+					map_id: self.data.map.id,
 					latitude: center.lat,
 					longitude: center.lng,
 					color: '#8442D5',
 					icon: 'marker-stroked'
 				};
-				self.add_marker(venue);
-				smol.sidebar.add_venue(venue);
-				$.post('/api/dotdata/venue:' + rsp.id, venue);
+				var marker = self.add_marker(venue);
+				$.post('/api/venue', venue);
+				if (typeof cb == 'function') {
+					cb(marker);
+				}
 			});
 		},
 
@@ -158,7 +169,8 @@ smol.maps = (function() {
 			});
 			marker.addTo(self.map);
 			self.update_marker(marker, venue);
-			marker.openPopup();
+			smol.sidebar.add_venue(venue);
+			return marker;
 		},
 
 		update_marker: function(marker, venue) {
