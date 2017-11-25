@@ -81,10 +81,14 @@ smol.maps = (function() {
 
 			slippymap.crosshairs.init(self.map);
 
+			var initial_load = true;
 			self.tangram.scene.subscribe({
 				view_complete: function () {
-					for (var i = 0; i < self.data.venues.length; i++) {
-						self.add_marker(self.data.venues[i]);
+					if (initial_load) {
+						initial_load = false;
+						for (var i = 0; i < self.data.venues.length; i++) {
+							self.add_marker(self.data.venues[i]);
+						}
 					}
 				}
 			});
