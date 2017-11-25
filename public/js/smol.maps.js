@@ -133,12 +133,13 @@ smol.maps = (function() {
 
 		create_map: function() {
 			var map = {
-				name: 'Untitled map',
+				name: self.config.default_map_name || 'Untitled map',
 				bbox: self.config.default_bbox
 			};
-			$.post('/api/map', map).then(function(data) {
+			var slug = self.config.default_map_slug || '';
+			$.post('/api/map/' + slug, map).then(function(data) {
 				self.data = data;
-				history.pushState(data.map, 'Untitled map', '/' + data.map.slug);
+				history.pushState(data.map, map.name, '/' + slug);
 				self.setup_map();
 			});
 		},

@@ -78,31 +78,44 @@ app.post("/api/config", function(request, response) {
 	       .then(onsuccess, onerror);
 });
 
-// Create a new map
-app.post("/api/map", function(request, response) {
-	var save_map = function() {
+var save_map = function(request, response) {
+	if (request.params.slug) {
+		var slug = request.params.slug;
+	} else {
 		var slug = url_words.random();
-		var root = path.dirname(__dirname);
-		var filename = root + '/.data/maps/' + slug + '.json';
-		fs.stat(filename, function(err, stats) {
-			if (! err || err.code != 'ENOENT') {
-				return save_map();
-			}
-			var map = request.body;
-			map.id = sequence.next();
-			map.slug = slug;
-			dotdata.set('maps:' + slug, map);
-			var dir = root + '/.data/maps/' + map.id;
-			fs.mkdir(dir, 0o755, function() {
-				response.send({
-					ok: 1,
-					map: map,
-					venues: []
-				});
+	}
+	var root = path.dirname(__dirname);
+	var filename = root + '/.data/maps/' + slug + '.json';
+	fs.stat(filename, function(err, stats) {
+		if (! request.params.slug &&
+			(! err || err.code != 'ENOENT')) {
+			// We were trying to pick a random URL slug, but accidentally picked
+			// one that already exists!
+			return save_map(request, response);
+		}
+		var map = request.body;
+		map.id = sequence.next();
+		map.slug = slug;
+		dotdata.set('maps:' + slug, map);
+		var dir = root + '/.data/maps/' + map.id;
+		fs.mkdir(dir, 0o755, function() {
+			response.send({
+				ok: 1,
+				map: map,
+				venues: []
 			});
 		});
-	};
-	save_map();
+	});
+};
+
+// Create a new map
+app.post("/api/map", function(request, response) {
+	save_map(request, response);
+});
+
+// Update a map
+app.post("/api/map/:slug", function(request, response) {
+	save_map(request, response);
 });
 
 // Load a map

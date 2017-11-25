@@ -17,10 +17,14 @@ smol.menu.config = (function() {
 				$('#config-places-select .place:first-child').trigger('click');
 			});
 			$('#config-location, #config-api-key').focus(function(e) {
-				$(e.target).addClass('is-focused');
+				if (e && e.target) {
+					$(e.target).addClass('is-focused');
+				}
 			});
 			$('#config-location, #config-api-key').blur(function(e) {
-				$(e.target).removeClass('is-focused');
+				if (e && e.target) {
+					$(e.target).removeClass('is-focused');
+				}
 			});
 			$('#config-location').keypress(function(e) {
 				if (! $('#config-location').hasClass('is-focused')) {
@@ -32,10 +36,12 @@ smol.menu.config = (function() {
 				if (! $('#config-api-key').hasClass('is-focused')) {
 					return;
 				}
-				setTimeout(function() {
-					var api_key = $(e.target).val();
-					self.validate_api_key(api_key);
-				}, 0);
+				if (e && e.target) {
+					setTimeout(function() {
+						var api_key = $(e.target).val();
+						self.validate_api_key(api_key);
+					}, 0);
+				}
 			});
 		},
 
@@ -131,6 +137,24 @@ smol.menu.config = (function() {
 			var wof_id = $place.data('wof-id');
 			$('input[name="default_bbox"]').val(bbox);
 			$('input[name="default_wof_id"]').val(wof_id);
+
+			if (wof_id && wof_id != -1 &&
+			    valid_api_key) {
+				$.get('https://places.mapzen.com/v1?' + $.param({
+					method: 'mapzen.places.getInfo',
+					id: wof_id,
+					api_key: $('#config-api-key').val()
+				})).then(function(rsp) {
+					if (rsp['place'] &&
+					    rsp['place']['wof:name']) {
+						var default_map_slug = rsp['place']['wof:name'];
+						default_map_slug = default_map_slug.toLowerCase();
+						default_map_slug = default_map_slug.replace(/\s+/g, '-');
+						$('input[name="default_map_slug"]').val(default_map_slug);
+						$('input[name="default_map_name"]').val(default_map_slug);
+					}
+				});
+			}
 		},
 
 		places_show: function(cb) {
