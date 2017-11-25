@@ -170,6 +170,14 @@ smol.maps = (function() {
 			marker.addTo(self.map);
 			self.update_marker(marker, venue);
 			smol.sidebar.add_venue(venue);
+
+			marker.on('moveend', function() {
+				var ll = marker.getLatLng();
+				venue.latitude = ll.lat;
+				venue.longitude = ll.lng;
+				$.post('/api/venue', venue);
+			});
+
 			return marker;
 		},
 
