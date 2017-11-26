@@ -173,17 +173,50 @@
 	cursor: pointer;
 }
 
-.leaflet-popup.editing .icon-bg,
-.leaflet-popup.editing .extra {
-	display: none;
-}
-
 .leaflet-popup .name {
 	float: left;
 	font-size: 14px;
 	font-weight: bold;
 	width: 160px;
 	margin-top: -5px;
+}
+
+.leaflet-popup .name .display {
+	padding: 5px;
+	display: inline-block;
+	word-break: break-all;
+}
+
+.leaflet-popup .name input[type="text"] {
+	width: 100%;
+}
+
+.leaflet-popup .name input {
+	display: none;
+}
+
+.leaflet-popup .name .buttons {
+	margin-top: 10px;
+	text-align: right;
+}
+
+.leaflet-popup .name .btn {
+	color: #fff;
+	border-color: #fff;
+	font-size: 10px;
+	padding: 7px 12px;
+	border-width: 1px;
+}
+
+.leaflet-popup .name .btn:hover {
+	color: #8442D5;
+	background: #fff;
+	border-color: #fff;
+}
+
+.leaflet-popup .name .btn-save {
+	margin-left: 5px;
+	border-color: #8442D5;
 }
 
 .leaflet-popup .extra {
@@ -193,16 +226,18 @@
 }
 
 .leaflet-popup.editing .name {
-	float: none;
+	margin-top: -8px;
 }
 
-.leaflet-popup .name .inner {
-	padding: 5px;
+.leaflet-popup.editing .display {
+	display: none;
+}
+
+.leaflet-popup.editing input {
 	display: inline-block;
-	word-break: break-all;
 }
 
-.leaflet-popup .name .inner:hover {
+.leaflet-popup .name .display:hover {
 	background-color: #170A26;
 	cursor: pointer;
 }
@@ -214,10 +249,6 @@
 
 .leaflet-popup .leaflet-popup-content-wrapper {
 	width: 238px;
-}
-
-.leaflet-popup input[type="text"] {
-	width: 203px;
 }
 
 .leaflet-container a.leaflet-popup-close-button:hover {

@@ -6,6 +6,7 @@ smol.maps = (function() {
 		map: null,
 		config: null,
 		data: null,
+		markers: {},
 
 		map_marker_icon: L.divIcon({
 			className: 'map-marker'
@@ -177,6 +178,7 @@ smol.maps = (function() {
 					color: '#8442D5',
 					icon: 'marker-stroked'
 				};
+				self.data.venues.push(venue);
 				var marker = self.add_marker(venue);
 				$.post('/api/venue', venue);
 				if (typeof cb == 'function') {
@@ -186,14 +188,18 @@ smol.maps = (function() {
 		},
 
 		add_marker: function(venue) {
+
 			var coords = [venue.latitude, venue.longitude];
 			var marker = new L.marker(coords, {
 				icon: self.map_marker_icon,
 				draggable: true,
 				riseOnHover: true
 			});
+
+			self.markers[venue.id] = marker;
+
 			marker.addTo(self.map);
-			self.update_marker(marker, venue);
+			self.update_marker(venue);
 			smol.sidebar.add_venue(venue);
 
 			marker.on('popupopen', function() {
@@ -217,7 +223,7 @@ smol.maps = (function() {
 				if (! venue.name) {
 					// Since this is labelled with lat/lng, we should update
 					// the lat/lngs.
-					self.update_marker(marker, venue);
+					self.update_marker(venue);
 					smol.sidebar.update_venue(venue);
 				}
 				$.post('/api/venue', venue);
@@ -230,8 +236,11 @@ smol.maps = (function() {
 			return marker;
 		},
 
-		update_marker: function(marker, venue) {
+		update_marker: function(venue) {
+
+			var marker = self.markers[venue.id];
 			marker.venue = venue;
+
 			var data_id = venue.id ? ' data-venue-id="' + venue.id + '"' : '';
 			var hsl = smol.color.hex2hsl(venue.color);
 			var icon_inverted = (hsl.l < 0.66) ? ' inverted' : '';
@@ -244,10 +253,18 @@ smol.maps = (function() {
 			var html = '<form action="/api/venue" class="venue"' + data_id + ' onsubmit="smol.maps.venue_edit_name_save(); return false;">' +
 					'<div class="icon-bg" style="background-color: ' + venue.color + ';">' +
 					'<div class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + venue.icon + '.svg);"></div></div>' +
-					'<div class="name"><span class="inner">' + name + '</span></div>' +
+					'<div class="name">' +
+					'<span class="display">' + name + '</span>' +
+					'<input type="text" name="name" value="' + name + '">' +
+					'<div class="buttons">' +
+					'<input type="button" value="Cancel" class="btn btn-cancel">' +
+					'<input type="submit" value="Save" class="btn btn-save">' +
+					'</div>' +
+					'</div>' +
 					'<br class="clear">' +
 					'</form>';
 			marker.bindPopup(html);
+
 			var rgb = smol.color.hex2rgb(venue.color);
 			if (rgb && marker._icon) {
 				var rgba = [rgb.r, rgb.g, rgb.b, 0.7];
@@ -262,17 +279,19 @@ smol.maps = (function() {
 		},
 
 		venue_edit_name: function($venue) {
-			console.log('edit_name', $venue);
 			if ($venue.length == 0) {
 				return;
 			}
 			$venue.closest('.leaflet-popup').addClass('editing');
-			console.log($venue.find('.name .inner'));
-			var name = $venue.find('.name .inner').html();
-			$venue.find('.name').html('<input type="text" class="edit-name">');
-			$venue.find('.name input').val(name);
-			$venue.find('.name input')[0].select();
-			console.log($venue.find('.name input'));
+			var name = $venue.find('.name .display').html();
+			$venue.find('.name input[type="text"]').val(name);
+			$venue.find('.name input[type="text"]')[0].select();
+
+			$venue.find('.btn-cancel').click(function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				$(e.target).closest('.leaflet-popup').removeClass('editing');
+			});
 		},
 
 		venue_edit_name_save: function() {
@@ -285,7 +304,6 @@ smol.maps = (function() {
 				if (smol.maps.data.venues[i].id == id) {
 					venue = smol.maps.data.venues[i];
 					venue.name = name;
-					console.log('updated smol.maps.data', venue);
 					break;
 				}
 			}
@@ -296,18 +314,10 @@ smol.maps = (function() {
 			}
 
 			$.post('/api/venue', venue).then(function(rsp) {
-				if (rsp.error) {
-					console.error(rsp.error);
-					return;
-				} else if (! rsp.data) {
-					console.error('Oops, something went wrong while saving. Try again?');
-					return;
-				} else {
-					$('.leaflet-popup .name').html('<span class="inner">' + name + '</span>');
-					$('.leaflet-popup').removeClass('editing');
-					smol.sidebar.update_venue(venue);
-					console.log('updated db', rsp);
-				}
+				$('.leaflet-popup .name .display').html(name);
+				$('.leaflet-popup').removeClass('editing');
+				smol.sidebar.update_venue(venue);
+				self.update_marker(venue);
 			});
 		}
 	};

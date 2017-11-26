@@ -188,6 +188,33 @@ code {
 	text-align: center;
 }
 
+.btn {
+	border: none;
+	color: #8442D5;
+	background: transparent;
+	border: 2px solid #8442D5;
+	font-size: 13px;
+	font-weight: 600;
+	padding: 10px 15px;
+	border-radius: 4px;
+	cursor: pointer;
+	text-transform: uppercase;
+	margin-left: 5px;
+}
+
+.btn:hover {
+	color: #fff;
+	background: #000;
+	border-color: #000;
+}
+
+.btn-save {
+	color: #fff;
+	background-color: #8442D5;
+	border-color: #8442D5;
+	margin-left: 0;
+}
+
 .map-marker {
 	background: #ccc;
 	width: 10px;
