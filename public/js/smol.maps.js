@@ -196,6 +196,20 @@ smol.maps = (function() {
 			self.update_marker(marker, venue);
 			smol.sidebar.add_venue(venue);
 
+			marker.on('popupopen', function() {
+				this.unbindTooltip();
+			});
+
+			marker.on('popupclose', function() {
+				if (this.venue.name) {
+					this.bindTooltip(this.venue.name);
+				}
+			});
+
+			marker.on('movestart', function() {
+				this.unbindTooltip();
+			});
+
 			marker.on('moveend', function() {
 				var ll = marker.getLatLng();
 				venue.latitude = ll.lat;
@@ -207,6 +221,10 @@ smol.maps = (function() {
 					smol.sidebar.update_venue(venue);
 				}
 				$.post('/api/venue', venue);
+
+				if (this.venue.name) {
+					this.bindTooltip(this.venue.name);
+				}
 			});
 
 			return marker;
@@ -235,6 +253,11 @@ smol.maps = (function() {
 				var rgba = [rgb.r, rgb.g, rgb.b, 0.7];
 				rgba = 'rgba(' + rgba.join(',') + ')';
 				marker._icon.style.backgroundColor = rgba;
+			}
+			if (venue.name) {
+				marker.bindTooltip(venue.name);
+			} else {
+				marker.unbindTooltip();
 			}
 		},
 
