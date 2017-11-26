@@ -191,6 +191,12 @@ smol.maps = (function() {
 				var ll = marker.getLatLng();
 				venue.latitude = ll.lat;
 				venue.longitude = ll.lng;
+				if (! venue.name) {
+					// Since this is labelled with lat/lng, we should update
+					// the lat/lngs.
+					self.update_marker(marker, venue);
+					smol.sidebar.update_venue(venue);
+				}
 				$.post('/api/venue', venue);
 			});
 

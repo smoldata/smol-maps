@@ -38,6 +38,11 @@ smol.sidebar = (function() {
 		},
 
 		add_venue: function(venue) {
+			$('#sidebar-items').prepend('<li id="sidebar-venue-' + venue.id + '"></li>');
+			self.update_venue(venue);
+		},
+
+		update_venue(venue) {
 			var hsl = smol.color.hex2hsl(venue.color);
 			var icon_inverted = (hsl.l < 0.66) ? ' inverted' : '';
 			var name = venue.name;
@@ -46,13 +51,12 @@ smol.sidebar = (function() {
 				var lng = parseFloat(venue.longitude).toFixed(6);
 				name = lat + ', ' + lng;
 			}
-			var html = '<li>' +
+			var html =
 				'<span class="icon-bg" style="background-color: ' + venue.color + ';">' +
 				'<span class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + venue.icon + '.svg);"></span></span>' +
 				'<span class="name"><span class="inner">' + name + '</span></span>' +
-				'<br class="clear">' +
-				'</li>';
-			$('#sidebar-items').prepend(html);
+				'<br class="clear">';
+			$('#sidebar-venue-' + venue.id).html(html);
 		}
 	};
 
