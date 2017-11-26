@@ -93,6 +93,12 @@ smol.maps = (function() {
 				}
 			});
 
+			if (self.data.map.name) {
+				document.title = self.data.map.name;
+			} else {
+				document.title = self.data.map.slug;
+			}
+
 		},
 
 		setup_data: function() {
@@ -133,7 +139,7 @@ smol.maps = (function() {
 
 		create_map: function() {
 			var map = {
-				name: self.config.default_map_name || 'Untitled map',
+				name: self.config.default_map_name || null,
 				bbox: self.config.default_bbox
 			};
 			var slug = self.config.default_map_slug || '';

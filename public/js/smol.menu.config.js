@@ -147,11 +147,11 @@ smol.menu.config = (function() {
 				})).then(function(rsp) {
 					if (rsp['place'] &&
 					    rsp['place']['wof:name']) {
-						var default_map_slug = rsp['place']['wof:name'];
-						default_map_slug = default_map_slug.toLowerCase();
+						var default_map_name = rsp['place']['wof:name'];
+						default_map_slug = default_map_name.toLowerCase();
 						default_map_slug = default_map_slug.replace(/\s+/g, '-');
 						$('input[name="default_map_slug"]').val(default_map_slug);
-						$('input[name="default_map_name"]').val(default_map_slug);
+						$('input[name="default_map_name"]').val(default_map_name);
 					}
 				});
 			}
