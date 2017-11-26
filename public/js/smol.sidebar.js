@@ -19,12 +19,14 @@ smol.sidebar = (function() {
 			$('#sidebar').addClass('active');
 			$('#map').addClass('show-sidebar');
 			smol.maps.map.invalidateSize(false);
+			slippymap.crosshairs.draw_crosshairs('map');
 		},
 
 		hide: function() {
 			$('#sidebar').removeClass('active');
 			$('#map').removeClass('show-sidebar');
 			smol.maps.map.invalidateSize(false);
+			slippymap.crosshairs.draw_crosshairs('map');
 		},
 
 		toggle: function() {

@@ -41,6 +41,7 @@ app.get("/api/id", function(request, response) {
 	});
 });
 
+// Load config
 app.get("/api/config", function(request, response) {
 	var onsuccess = function(data) {
 		response.send({
@@ -59,6 +60,7 @@ app.get("/api/config", function(request, response) {
 	       .then(onsuccess, onerror);
 });
 
+// Save config
 app.post("/api/config", function(request, response) {
 	var onsuccess = function(data) {
 		response.send({
