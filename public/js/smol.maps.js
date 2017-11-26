@@ -99,6 +99,15 @@ smol.maps = (function() {
 				document.title = self.data.map.slug;
 			}
 
+			$('#map').click(function(e) {
+				if ($(e.target).hasClass('name') ||
+				    $(e.target).closest('.name').length > 0 &&
+				    ! $(e.target).closest('.leaflet-popup').hasClass('editing')) {
+					self.venue_edit_name($(e.target).closest('.venue'));
+					e.preventDefault();
+				}
+			});
+
 		},
 
 		setup_data: function() {
@@ -214,10 +223,12 @@ smol.maps = (function() {
 				var lng = parseFloat(venue.longitude).toFixed(6);
 				name = lat + ', ' + lng;
 			}
-			var html = '<div class="icon-bg" style="background-color: ' + venue.color + ';">' +
+			var html = '<form action="/api/venue" class="venue"' + data_id + ' onsubmit="smol.maps.venue_edit_name_save(); return false;">' +
+					'<div class="icon-bg" style="background-color: ' + venue.color + ';">' +
 					'<div class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + venue.icon + '.svg);"></div></div>' +
 					'<div class="name"><span class="inner">' + name + '</span></div>' +
-					'<br class="clear">';
+					'<br class="clear">' +
+					'</form>';
 			marker.bindPopup(html);
 			var rgb = smol.color.hex2rgb(venue.color);
 			if (rgb && marker._icon) {
@@ -225,6 +236,56 @@ smol.maps = (function() {
 				rgba = 'rgba(' + rgba.join(',') + ')';
 				marker._icon.style.backgroundColor = rgba;
 			}
+		},
+
+		venue_edit_name: function($venue) {
+			console.log('edit_name', $venue);
+			if ($venue.length == 0) {
+				return;
+			}
+			$venue.closest('.leaflet-popup').addClass('editing');
+			console.log($venue.find('.name .inner'));
+			var name = $venue.find('.name .inner').html();
+			$venue.find('.name').html('<input type="text" class="edit-name">');
+			$venue.find('.name input').val(name);
+			$venue.find('.name input')[0].select();
+			console.log($venue.find('.name input'));
+		},
+
+		venue_edit_name_save: function() {
+
+			var name = $('.leaflet-popup input').val();
+			var id = $('.leaflet-popup form').data('venue-id');
+			var venue = null;
+
+			for (var i = 0; i < smol.maps.data.venues.length; i++) {
+				if (smol.maps.data.venues[i].id == id) {
+					venue = smol.maps.data.venues[i];
+					venue.name = name;
+					console.log('updated smol.maps.data', venue);
+					break;
+				}
+			}
+
+			if (! venue) {
+				console.error('could not save name for id ' + id);
+				return;
+			}
+
+			$.post('/api/venue', venue).then(function(rsp) {
+				if (rsp.error) {
+					console.error(rsp.error);
+					return;
+				} else if (! rsp.data) {
+					console.error('Oops, something went wrong while saving. Try again?');
+					return;
+				} else {
+					$('.leaflet-popup .name').html('<span class="inner">' + name + '</span>');
+					$('.leaflet-popup').removeClass('editing');
+					smol.sidebar.update_venue(venue);
+					console.log('updated db', rsp);
+				}
+			});
 		}
 	};
 
