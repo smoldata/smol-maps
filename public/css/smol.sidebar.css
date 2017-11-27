@@ -39,8 +39,11 @@
 }
 
 #sidebar-items li {
+	position: relative;
 	margin-top: 15px;
 	padding: 0 10px;
+	height: 40px;
+	overflow: hidden;
 }
 
 #sidebar .icon-bg {
@@ -57,7 +60,11 @@
 }
 
 #sidebar .name {
-	float: left;
+	position: absolute;
+	left: 60px;
+	top: 50%;
+	transform: translateY(-50%);
 	font-size: 14px;
 	font-weight: bold;
+	width: calc(100% - 70px);
 }

@@ -54,7 +54,7 @@ smol.sidebar = (function() {
 			var html =
 				'<span class="icon-bg" style="background-color: ' + venue.color + ';">' +
 				'<span class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + venue.icon + '.svg);"></span></span>' +
-				'<span class="name"><span class="inner">' + name + '</span></span>' +
+				'<span class="name">' + name + '</span>' +
 				'<br class="clear">';
 			$('#sidebar-venue-' + venue.id).html(html);
 		}

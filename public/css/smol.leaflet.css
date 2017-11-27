@@ -181,10 +181,13 @@
 	margin-top: -5px;
 }
 
+.leaflet-popup .name.single-line {
+	margin-top: 4px;
+}
+
 .leaflet-popup .name .display {
 	padding: 5px;
-	display: inline-block;
-	word-break: break-all;
+	overflow-wrap: break-word;
 }
 
 .leaflet-popup .name input[type="text"] {

@@ -263,7 +263,7 @@ smol.maps = (function() {
 					'<div class="icon-bg" style="background-color: ' + venue.color + ';">' +
 					'<div class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + venue.icon + '.svg);"></div></div>' +
 					'<div class="name">' +
-					'<span class="display">' + name + '</span>' +
+					'<div class="display">' + name + '</div>' +
 					'<input type="text" name="name" value="' + name + '">' +
 					'<div class="buttons">' +
 					'<input type="button" value="Cancel" class="btn btn-cancel">' +
@@ -285,6 +285,15 @@ smol.maps = (function() {
 			} else {
 				marker.unbindTooltip();
 			}
+
+			marker.on('popupopen', function(e) {
+				var h = $('.leaflet-popup .name').height();
+				if (h < 30) {
+					$('.leaflet-popup .name').addClass('single-line');
+				} else {
+					$('.leaflet-popup .name').removeClass('single-line');
+				}
+			});
 
 			marker.on('popupclose', function(e) {
 				$('.leaflet-popup.editing').removeClass('editing');
@@ -331,6 +340,13 @@ smol.maps = (function() {
 				$('.leaflet-popup').removeClass('editing');
 				smol.sidebar.update_venue(venue);
 				self.update_marker(venue);
+
+				var h = $('.leaflet-popup .name').height();
+				if (h < 30) {
+					$('.leaflet-popup .name').addClass('single-line');
+				} else {
+					$('.leaflet-popup .name').removeClass('single-line');
+				}
 			});
 		}
 	};
