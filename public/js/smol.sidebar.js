@@ -57,6 +57,11 @@ smol.sidebar = (function() {
 				'<span class="name">' + name + '</span>' +
 				'<br class="clear">';
 			$('#sidebar-venue-' + venue.id).html(html);
+
+			$('#sidebar-venue-' + venue.id + ' .name').click(function(e) {
+				e.preventDefault();
+				smol.maps.markers[venue.id].openPopup();
+			});
 		}
 	};
 

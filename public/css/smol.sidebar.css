@@ -67,4 +67,5 @@
 	font-size: 14px;
 	font-weight: bold;
 	width: calc(100% - 70px);
+	cursor: pointer;
 }
