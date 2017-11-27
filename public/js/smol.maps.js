@@ -285,6 +285,10 @@ smol.maps = (function() {
 			} else {
 				marker.unbindTooltip();
 			}
+
+			marker.on('popupclose', function(e) {
+				$('.leaflet-popup.editing').removeClass('editing');
+			});
 		},
 
 		venue_edit_name: function($venue) {

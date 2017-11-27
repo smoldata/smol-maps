@@ -196,6 +196,7 @@
 }
 
 .leaflet-popup .name .buttons {
+	display: none;
 	margin-top: 10px;
 	text-align: right;
 }
@@ -235,6 +236,10 @@
 
 .leaflet-popup.editing input {
 	display: inline-block;
+}
+
+.leaflet-popup.editing .buttons {
+	display: block;
 }
 
 .leaflet-popup .name .display:hover {
