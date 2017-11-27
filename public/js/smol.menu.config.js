@@ -38,7 +38,7 @@ smol.menu.config = (function() {
 				}
 				if (e && e.target) {
 					setTimeout(function() {
-						var api_key = $(e.target).val();
+						var api_key = $(e.target).val().trim();
 						self.validate_api_key(api_key);
 					}, 0);
 				}
@@ -140,10 +140,11 @@ smol.menu.config = (function() {
 
 			if (wof_id && wof_id != -1 &&
 			    valid_api_key) {
+				var api_key = $('#config-api-key').val().trim();
 				$.get('https://places.mapzen.com/v1?' + $.param({
 					method: 'mapzen.places.getInfo',
 					id: wof_id,
-					api_key: $('#config-api-key').val()
+					api_key: api_key
 				})).then(function(rsp) {
 					if (rsp['place'] &&
 					    rsp['place']['wof:name']) {
@@ -158,7 +159,8 @@ smol.menu.config = (function() {
 		},
 
 		places_show: function(cb) {
-			var api_key = $('#config-api-key').val();
+
+			var api_key = $('#config-api-key').val().trim();
 
 			if (valid_api_key) {
 				var text = $('#config-location').val();
@@ -196,7 +198,7 @@ smol.menu.config = (function() {
 		geolocate: function() {
 			if ('geolocation' in navigator){
 				navigator.geolocation.getCurrentPosition(function(position) {
-					var api_key = $('#config-api-key').val();
+					var api_key = $('#config-api-key').val().trim();
 					if (api_key != '') {
 						$.get('https://search.mapzen.com/v1/reverse?' + $.param({
 							'point.lat': position.coords.latitude,
