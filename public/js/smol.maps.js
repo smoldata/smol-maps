@@ -287,6 +287,13 @@ smol.maps = (function() {
 			}
 
 			marker.on('popupopen', function(e) {
+
+				// This is misguided, and doesn't work 100% of the time.
+				// Replace me with a CSS-only approach, please! The sidebar
+				// version is close, but it relies on a fixed container height
+				// which isn't the case here.
+				// (20171117/dphiffer)
+
 				var h = $('.leaflet-popup .name').height();
 				if (h < 30) {
 					$('.leaflet-popup .name').addClass('single-line');
@@ -340,6 +347,9 @@ smol.maps = (function() {
 				$('.leaflet-popup').removeClass('editing');
 				smol.sidebar.update_venue(venue);
 				self.update_marker(venue);
+
+				// See comment above, in the popupopen handler, about doing this
+				// CSS-only.
 
 				var h = $('.leaflet-popup .name').height();
 				if (h < 30) {
