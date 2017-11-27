@@ -35,11 +35,14 @@ smol.maps = (function() {
 				zoomControl: false
 			});
 
-			var bbox = self.data.map.bbox;
-			if (! bbox) {
-				bbox = self.random_megacity_bbox();
+			var hash = location.hash.match(/^#([0-9.]+)\/(-?[0-9.]+)\/(-?[0-9.]+)$/);
+			if (! hash) {
+				var bbox = self.data.map.bbox;
+				if (! bbox) {
+					bbox = self.random_megacity_bbox();
+				}
+				self.set_bbox(bbox);
 			}
-			self.set_bbox(bbox);
 
 			if ($(document.body).width() > 640) {
 				L.control.zoom({
@@ -113,11 +116,32 @@ smol.maps = (function() {
 
 		setup_data: function() {
 			var path = location.pathname.match(/^\/([a-z0-9-]+)\/?$/);
-			if (location.pathname == '/') {
-				self.create_map();
-			} else if (path) {
-				self.load_map(path);
+			if (path) {
+				var slug = path[1];
+			} else {
+				var slug = self.config.default_slug;
 			}
+			self.load_map(slug);
+		},
+
+		load_map: function(slug) {
+			$.get('/api/map/' + slug, function(data) {
+				self.data = data;
+				self.setup_map();
+				if (location.pathname != '/' + data.map.slug) {
+					history.pushState(data.map, data.map.name, '/' + data.map.slug);
+				}
+			});
+		},
+
+		create_map: function() {
+			var map = {
+				name: self.config.default_name || null,
+				bbox: self.config.default_bbox || null
+			};
+			$.post('/api/map', map).then(function(data) {
+				history.pushState(data.map, data.map.name, '/' + data.map.slug);
+			});
 		},
 
 		tangram_scene: function() {
@@ -145,26 +169,6 @@ smol.maps = (function() {
 				[coords[1], coords[0]],
 				[coords[3], coords[2]]
 			]);
-		},
-
-		create_map: function() {
-			var map = {
-				name: self.config.default_map_name || null,
-				bbox: self.config.default_bbox
-			};
-			var slug = self.config.default_map_slug || '';
-			$.post('/api/map/' + slug, map).then(function(data) {
-				self.data = data;
-				history.pushState(data.map, map.name, '/' + slug);
-				self.setup_map();
-			});
-		},
-
-		load_map: function(path) {
-			$.get('/api/map/' + path[1], function(data) {
-				self.data = data;
-				self.setup_map();
-			});
 		},
 
 		create_venue: function(cb) {

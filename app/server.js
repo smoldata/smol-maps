@@ -92,11 +92,13 @@ var save_map = function(request, response) {
 		if (! request.params.slug &&
 			(! err || err.code != 'ENOENT')) {
 			// We were trying to pick a random URL slug, but accidentally picked
-			// one that already exists!
+			// one that already exists! Try again...
 			return save_map(request, response);
 		}
 		var map = request.body;
-		map.id = sequence.next();
+		if (! map.id) {
+			map.id = sequence.next();
+		}
 		map.slug = slug;
 		dotdata.set('maps:' + slug, map);
 		var dir = root + '/.data/maps/' + map.id;
@@ -122,6 +124,17 @@ app.post("/api/map/:slug", function(request, response) {
 
 // Load a map
 app.get("/api/map/:slug", function(request, response) {
+
+	var onerror = function() {
+		// Doesn't exist? Presto, now it does!
+		dotdata.get('config').then(function(config) {
+			request.body = {
+				name: config.default_name || request.params.slug,
+				bbox: config.default_bbox
+			};
+			save_map(request, response);
+		});
+	};
 
 	dotdata.get('maps:' + request.params.slug).then(function(map) {
 
@@ -150,10 +163,10 @@ app.get("/api/map/:slug", function(request, response) {
 			for (var i = 0; i < index.data.length; i++) {
 				venue_promises.push(get_venue(index.data[i]));
 			}
-			Promise.all(venue_promises).then(onsuccess);
-		});
+			Promise.all(venue_promises).then(onsuccess, onerror);
+		}, onerror);
 
-	});
+	}, onerror);
 });
 
 // Save a venue
