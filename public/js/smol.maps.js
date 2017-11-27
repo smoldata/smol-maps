@@ -36,7 +36,12 @@ smol.maps = (function() {
 			});
 
 			var hash = location.hash.match(/^#([0-9.]+)\/(-?[0-9.]+)\/(-?[0-9.]+)$/);
-			if (! hash) {
+			if (hash) {
+				var zoom = parseFloat(hash[1]);
+				var lat = parseFloat(hash[2]);
+				var lng = parseFloat(hash[3]);
+				self.map.setView([lat, lng], zoom);
+			} else {
 				var bbox = self.data.map.bbox;
 				if (! bbox) {
 					bbox = self.random_megacity_bbox();
@@ -104,7 +109,7 @@ smol.maps = (function() {
 			}
 
 			$('#map').click(function(e) {
-				if ($(e.target).hasClass('name') ||
+				if ($(e.target).hasClass('display') &&
 				    $(e.target).closest('.name').length > 0 &&
 				    ! $(e.target).closest('.leaflet-popup').hasClass('editing')) {
 					self.venue_edit_name($(e.target).closest('.venue'));
