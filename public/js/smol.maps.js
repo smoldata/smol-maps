@@ -123,8 +123,13 @@ smol.maps = (function() {
 			var path = location.pathname.match(/^\/([a-z0-9-]+)\/?$/);
 			if (path) {
 				var slug = path[1];
-			} else {
+			} else if (self.config.default_slug) {
 				var slug = self.config.default_slug;
+			} else if (self.config.random_slug) {
+				var slug = self.config.random_slug;
+			} else {
+				// In theory this should never get used...
+				var slug = 'map';
 			}
 			self.load_map(slug);
 		},

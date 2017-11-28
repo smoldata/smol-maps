@@ -44,6 +44,9 @@ app.get("/api/id", function(request, response) {
 // Load config
 app.get("/api/config", function(request, response) {
 	var onsuccess = function(data) {
+		if (! data.default_slug) {
+			data.random_slug = url_words.random();
+		}
 		response.send({
 			ok: 1,
 			data: data
