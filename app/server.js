@@ -153,7 +153,9 @@ app.get("/api/map/:slug", function(request, response) {
 		var get_venue = function(id) {
 			return new Promise(function(resolve, reject) {
 				dotdata.get("maps:" + map.id + ":" + id).then(function(venue) {
-					venues.push(venue);
+					if (venue.active != "0") { // This is a kludge, the value should be 0 not "0"
+						venues.push(venue);
+					}
 					resolve(venue);
 				}, function(err) {
 					reject(err);

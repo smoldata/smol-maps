@@ -209,6 +209,7 @@ smol.maps = (function() {
 				var venue = {
 					id: rsp.id,
 					map_id: self.data.map.id,
+					active: 1,
 					latitude: center.lat,
 					longitude: center.lng,
 					color: color,

@@ -209,17 +209,18 @@ smol.menu.venue = (function() {
 				}
 			});
 
-			$('.edit-rsp').html('Deleting...');
-			$('.edit-rsp').removeClass('error');
+			$('.response').html('Deleting...');
+			$('.response').removeClass('error');
 
 			delete_venue.active = 0;
+
 			$.post('/api/venue', delete_venue).then(function(rsp) {
 				if (rsp.error) {
-					$('.edit-rsp').html(rsp.error);
-					$('.edit-rsp').addClass('error');
+					$('.response').html(rsp.error);
+					$('.response').addClass('error');
 					return;
 				}
-				$('.edit-rsp').html('');
+				$('.response').html('');
 				smol.menu.hide();
 			});
 		}
