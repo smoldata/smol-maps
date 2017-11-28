@@ -40,14 +40,17 @@
 
 #sidebar-items li {
 	position: relative;
-	margin-top: 15px;
-	padding: 0 10px;
-	height: 40px;
+	padding: 7.5px 10px;
+	height: 55px;
 	overflow: hidden;
+	cursor: pointer;
+}
+
+#sidebar-items li:hover {
+	background: rgba(255, 255, 255, 0.1);
 }
 
 #sidebar .icon-bg {
-	float: left;
 	font-size: 20px;
 	line-height: 40px;
 	padding: 0;
@@ -68,5 +71,4 @@
 	line-height: 1.25;
 	font-weight: bold;
 	width: calc(100% - 70px);
-	cursor: pointer;
 }

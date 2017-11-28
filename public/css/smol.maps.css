@@ -39,9 +39,9 @@ input[type="text"],
 textarea {
 	display: block;
 	font-size: 14px;
-	line-height: 14px;
+	line-height: 34px;
 	font-family: "Source Sans Pro", sans-serif;
-	padding: 10px;
+	padding: 0 10px;
 	border: 1px solid #ccc;
 	width: 100%;
 	margin: 10px 0 0 0;

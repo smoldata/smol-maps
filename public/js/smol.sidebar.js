@@ -58,7 +58,7 @@ smol.sidebar = (function() {
 				'<br class="clear">';
 			$('#sidebar-venue-' + venue.id).html(html);
 
-			$('#sidebar-venue-' + venue.id + ' .name').click(function(e) {
+			$('#sidebar-venue-' + venue.id).click(function(e) {
 				e.preventDefault();
 				smol.maps.markers[venue.id].openPopup();
 			});
