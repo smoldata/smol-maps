@@ -1,3 +1,7 @@
+.leaflet-container {
+	font: 14px/1.5 "Source Sans Pro", sans-serif;
+}
+
 .leaflet-pelias-input {
 	background: #170A26;
 	opacity: 0.8;
