@@ -47,7 +47,7 @@
 }
 
 #menu .buttons {
-	margin-top: 20px;
+	margin: 20px 0;
 	border-top: 1px solid #ccc;
 }
 
@@ -56,4 +56,13 @@
 	font-weight: bold;
 	padding-top: 10px;
 	padding-bottom: 10px;
+}
+
+#menu .edit-delete {
+	color: #DE2B32;
+	margin-left: 10px;
+}
+
+#menu .edit-delete:hover {
+	color: #000;
 }

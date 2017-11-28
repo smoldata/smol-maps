@@ -1,0 +1,48 @@
+#venue .edit-delete {
+	margin-left: 0;
+}
+
+#venue-icon-preview-holder,
+#venue-recent-icons {
+	margin-top: 0.5em;
+}
+
+#venue-recent-icons .holder {
+	margin: 0.5em 0;
+	width: calc(100% + 10px);
+}
+
+#venue-icons {
+	width: calc(100% + 10px);
+}
+
+#venue-recent-icons .icon-bg,
+#venue-icons .icon-bg {
+	background-color: #ccc;
+	margin-bottom: 1em;
+}
+
+#venue-recent-icons .icon,
+#venue-icons .icon {
+	opacity: 0.5;
+}
+
+#venue-recent-icons .icon-bg:hover .icon,
+#venue-icons .icon-bg:hover .icon {
+	opacity: 1;
+}
+
+#venue-icons-holder {
+	margin-top: 0.5em;
+}
+
+#venue-icons a {
+	margin-top: 10px;
+}
+
+#venue-colors a {
+	float: left;
+	height: 24px;
+	width: calc(9.0909% - 1px);
+	margin-right: 1px;
+}

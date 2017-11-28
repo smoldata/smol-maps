@@ -17,6 +17,7 @@
 		<link rel="stylesheet" href="/lib/leaflet.locatecontrol/dist/L.Control.Locate.css">
 		<link rel="stylesheet" href="/css/smol.menu.css">
 		<link rel="stylesheet" href="/css/smol.menu.config.css">
+		<link rel="stylesheet" href="/css/smol.menu.venue.css">
 		<link rel="stylesheet" href="/css/smol.sidebar.css">
 		<link rel="stylesheet" href="/css/smol.leaflet.css">
 		<link rel="stylesheet" href="/css/smol.maps.css">
@@ -62,6 +63,77 @@
 					</div>
 				</form>
 
+				<form action="/api/venue" method="post" id="venue" class="menu-page">
+					<h1>Edit venue</h1>
+					<input type="hidden" name="id" id="venue-id" value="">
+					<input type="hidden" name="map_id" id="venue-map-id" value="">
+					<input type="hidden" name="latitude" id="venue-latitude" value="">
+					<input type="hidden" name="longitude" id="venue-longitude" value="">
+					<label>
+						Name
+						<input type="text" name="name" id="venue-name" value="">
+					</label>
+					<label>
+						Address
+						<input type="text" name="address" id="venue-address" value="">
+					</label>
+					<label for="venue-icon">
+						Icon
+					</label>
+					<div id="venue-icon-preview-holder">
+						<div id="venue-icon-preview" class="icon-bg"><div class="icon"></div></div>
+						<small><a href="#" id="venue-default-icon">set as default</a></small>
+					</div>
+					<div id="venue-recent-icons">
+						<label>Choose an icon</label>
+						<div class="holder"></div>
+						<small><a href="#" id="venue-show-icons">show all icons</a></small>
+					</div>
+					<div id="venue-icons-holder">
+						<div id="venue-icons" class="hidden"></div>
+					</div>
+					<input name="icon" type="hidden" id="venue-icon">
+					<label>
+						Color
+						<input type="text" name="color" id="venue-color" value="">
+						<div id="venue-colors">
+							<a href="#" data-color="#9e0142"></a>
+							<a href="#" data-color="#d53e4f"></a>
+							<a href="#" data-color="#f46d43"></a>
+							<a href="#" data-color="#fdae61"></a>
+							<a href="#" data-color="#fee08b"></a>
+							<a href="#" data-color="#ffffbf"></a>
+							<a href="#" data-color="#e6f598"></a>
+							<a href="#" data-color="#abdda4"></a>
+							<a href="#" data-color="#66c2a5"></a>
+							<a href="#" data-color="#3288bd"></a>
+							<a href="#" data-color="#5e4fa2"></a>
+							<br class="clear">
+						</div>
+						<div class="help"><a href="https://en.wikipedia.org/wiki/Web_colors" target="_blank">hex color</a> code, for inspiration check out <a href="http://colorbrewer2.org/" target="_blank">Color Brewer</a></div>
+					</label>
+					<label>
+						Tags
+						<div class="help">comma separated: <code>public space, park</code></div>
+						<input type="text" name="tags" id="venue-tags" value="">
+					</label>
+					<label>
+						URL
+						<input type="text" name="url" id="venue-url" value="">
+					</label>
+					<label>
+						Venue description
+						<textarea name="description" id="venue-description" cols="60" rows="5"></textarea>
+						<div class="help">add some context about this venue</div>
+					</label>
+					<div class="buttons">
+						<div class="response"></div>
+						<input type="submit" name="action" class="btn btn-save" value="Save">
+						<input type="submit" name="action" class="btn btn-cancel" value="Cancel">
+					</div>
+					<a href="#" class="edit-delete">Delete this venue?</a>
+				</form>
+
 			</div>
 		</div>
 		<script src="/lib/jquery/dist/jquery.min.js"></script>
@@ -76,6 +148,7 @@
 		<script src="/js/smol.maps.js"></script>
 		<script src="/js/smol.menu.js"></script>
 		<script src="/js/smol.menu.config.js"></script>
+		<script src="/js/smol.menu.venue.js"></script>
 		<script src="/js/smol.sidebar.js"></script>
 		<script src="/js/smol.color.js"></script>
 	</body>

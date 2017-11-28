@@ -114,9 +114,15 @@ smol.maps = (function() {
 				    ! $(e.target).closest('.leaflet-popup').hasClass('editing')) {
 					self.venue_edit_name($(e.target).closest('.venue'));
 					e.preventDefault();
+				} else if ($(e.target).hasClass('icon') ||
+				           $(e.target).closest('.icon').length > 0) {
+					var venue_id = $(e.target).closest('.venue').data('venue-id');
+					smol.menu.venue.edit(venue_id);
+					e.preventDefault();
 				}
 			});
 
+			self.setup_add_venue();
 		},
 
 		setup_data: function() {
@@ -132,6 +138,20 @@ smol.maps = (function() {
 				var slug = 'map';
 			}
 			self.load_map(slug);
+		},
+
+		setup_add_venue: function() {
+			var color = self.config.default_color || '#8442D5';
+			var icon = self.config.default_icon || 'marker-stroked';
+			var image = 'url(/img/icons/' + icon + '.svg)';
+			$('.leaflet-control-add-venue .icon-bg').css('background-color', color);
+			$('.leaflet-control-add-venue .icon').css('background-image', image);
+			var hsl = smol.color.hex2hsl(color);
+			if (hsl.l < 0.66) {
+				$('.leaflet-control-add-venue .icon').addClass('inverted');
+			} else {
+				$('.leaflet-control-add-venue .icon').removeClass('inverted');
+			}
 		},
 
 		load_map: function(slug) {
@@ -184,13 +204,15 @@ smol.maps = (function() {
 		create_venue: function(cb) {
 			$.get('/api/id', function(rsp) {
 				var center = self.map.getCenter();
+				var color = self.config.default_color || '#8442D5';
+				var icon = self.config.default_icon || 'marker-stroked';
 				var venue = {
 					id: rsp.id,
 					map_id: self.data.map.id,
 					latitude: center.lat,
 					longitude: center.lng,
-					color: '#8442D5',
-					icon: 'marker-stroked'
+					color: color,
+					icon: icon
 				};
 				self.data.venues.push(venue);
 				var marker = self.add_marker(venue);

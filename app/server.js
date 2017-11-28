@@ -193,6 +193,26 @@ app.post("/api/venue", function(request, response) {
 	       .then(onsuccess, onerror);
 });
 
+// List the available icons
+app.get("/api/icons", function(request, response) {
+	var icons_dir = path.dirname(__dirname) + '/public/img/icons';
+	fs.readdir(icons_dir, function(err, files) {
+		var icons = [];
+		var icon;
+		for (var i = 0; i < files.length; i++) {
+			icon = files[i].match(/(.+)\.svg/);
+			if (icon) {
+				icons.push(icon[1]);
+			}
+		}
+		icons.sort();
+		response.json({
+			ok: 1,
+			icons: icons
+		});
+	});
+});
+
 // listen for requests :)
 var port = process.env.PORT || 4321;
 var listener = app.listen(port, function() {
