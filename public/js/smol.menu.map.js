@@ -8,14 +8,7 @@ smol.menu.map = (function() {
 		init: function() {
 			$('#map-set-view').click(function(e) {
 				e.preventDefault();
-				var bounds = smol.maps.map.getBounds();
-				var bbox = [
-					bounds._southWest.lng.toFixed(6),
-					bounds._southWest.lat.toFixed(6),
-					bounds._northEast.lng.toFixed(6),
-					bounds._northEast.lat.toFixed(6)
-				];
-				$('#map-bbox').val(bbox.join(','));
+				self.update_bbox();
 			});
 		},
 
@@ -26,7 +19,11 @@ smol.menu.map = (function() {
 			$('#map-author').val(map.author);
 			$('#map-slug').val(map.slug);
 			$('#map-description').val(map.description);
-			$('#map-bbox').val(map.bbox);
+			if (! map.bbox) {
+				self.update_bbox();
+			} else {
+				$('#map-bbox').val(map.bbox);
+			}
 		},
 
 		submit: function(map) {
@@ -37,6 +34,17 @@ smol.menu.map = (function() {
 			smol.maps.data.map = map;
 			smol.sidebar.update_map(map);
 			smol.menu.hide();
+		},
+
+		update_bbox: function() {
+			var bounds = smol.maps.map.getBounds();
+			var bbox = [
+				bounds._southWest.lng.toFixed(6),
+				bounds._southWest.lat.toFixed(6),
+				bounds._northEast.lng.toFixed(6),
+				bounds._northEast.lat.toFixed(6)
+			];
+			$('#map-bbox').val(bbox.join(','));
 		}
 
 	}
