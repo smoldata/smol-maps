@@ -55,7 +55,7 @@ smol.maps = (function() {
 				}).addTo(self.map);
 				$('.leaflet-control-zoom-in').html('<span class="fa fa-plus"></span>');
 				$('.leaflet-control-zoom-out').html('<span class="fa fa-minus"></span>');
-				$('#map').addClass('has-zoom-controls');
+				$('#leaflet').addClass('has-zoom-controls');
 			}
 
 			self.tangram = Tangram.leafletLayer({
@@ -108,7 +108,7 @@ smol.maps = (function() {
 				document.title = self.data.map.slug;
 			}
 
-			$('#map').click(function(e) {
+			$('#leaflet').click(function(e) {
 				if ($(e.target).hasClass('display') &&
 				    $(e.target).closest('.name').length > 0 &&
 				    ! $(e.target).closest('.leaflet-popup').hasClass('editing')) {
