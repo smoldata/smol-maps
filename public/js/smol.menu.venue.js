@@ -90,6 +90,7 @@ smol.menu.venue = (function() {
 					smol.maps.data.venues[i] = venue;
 				}
 			}
+			smol.sidebar.update_venue(venue);
 			smol.maps.update_marker(venue);
 			self.add_recent_icon(venue.icon);
 			smol.menu.hide();
