@@ -34,6 +34,7 @@ smol.menu.map = (function() {
 			smol.maps.data.map = map;
 			smol.sidebar.update_map(map);
 			smol.menu.hide();
+			document.title = map.name || map.slug;
 		},
 
 		update_bbox: function() {
