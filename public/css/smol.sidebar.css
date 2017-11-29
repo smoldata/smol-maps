@@ -35,7 +35,7 @@
 }
 
 #sidebar-items {
-	margin: 30px 0;
+	margin: 10px 0 30px 0;
 }
 
 #sidebar-items li {
@@ -71,4 +71,26 @@
 	line-height: 1.25;
 	font-weight: bold;
 	width: calc(100% - 70px);
+}
+
+#sidebar-map {
+	padding: 0 10px;
+}
+
+#sidebar a:hover {
+	color: #fff;
+}
+
+#sidebar h1 {
+	margin: 20px 0 10px 0;
+}
+
+#sidebar-map-author::before {
+	content: "by ";
+}
+
+#sidebar-map-author,
+#sidebar-map-description {
+	margin-bottom: 10px;
+	line-height: 1.5;
 }

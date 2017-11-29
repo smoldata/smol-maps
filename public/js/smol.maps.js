@@ -31,7 +31,7 @@ smol.maps = (function() {
 				return self.setup_data();
 			}
 
-			self.map = L.map('map', {
+			self.map = L.map('leaflet', {
 				zoomControl: false
 			});
 
@@ -158,6 +158,8 @@ smol.maps = (function() {
 			$.get('/api/map/' + slug, function(data) {
 				self.data = data;
 				self.setup_map();
+				smol.sidebar.update_map(data.map);
+				smol.menu.map.setup(data.map);
 				if (location.pathname != '/' + data.map.slug) {
 					history.pushState(data.map, data.map.name, '/' + data.map.slug);
 				}

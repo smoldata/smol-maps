@@ -83,65 +83,12 @@ app.post("/api/config", function(request, response) {
 	       .then(onsuccess, onerror);
 });
 
-var save_map = function(request, response) {
-	if (request.params.slug) {
-		var slug = request.params.slug;
-	} else {
-		var slug = url_words.random();
-	}
-	var root = path.dirname(__dirname);
-	var filename = root + '/.data/maps/' + slug + '.json';
-	fs.stat(filename, function(err, stats) {
-		if (! request.params.slug &&
-			(! err || err.code != 'ENOENT')) {
-			// We were trying to pick a random URL slug, but accidentally picked
-			// one that already exists! Try again...
-			return save_map(request, response);
-		}
-		var map = request.body;
-		if (! map.id) {
-			map.id = sequence.next();
-		}
-		map.slug = slug;
-		dotdata.set('maps:' + slug, map);
-		var dir = root + '/.data/maps/' + map.id;
-		fs.mkdir(dir, 0o755, function() {
-			response.send({
-				ok: 1,
-				map: map,
-				venues: []
-			});
-		});
-	});
-};
+function load_map(slug, response, onerror) {
 
-// Create a new map
-app.post("/api/map", function(request, response) {
-	save_map(request, response);
-});
-
-// Update a map
-app.post("/api/map/:slug", function(request, response) {
-	save_map(request, response);
-});
-
-// Load a map
-app.get("/api/map/:slug", function(request, response) {
-
-	var onerror = function() {
-		// Doesn't exist? Presto, now it does!
-		dotdata.get('config').then(function(config) {
-			request.body = {
-				name: config.default_name || request.params.slug,
-				bbox: config.default_bbox
-			};
-			save_map(request, response);
-		});
-	};
-
-	dotdata.get('maps:' + request.params.slug).then(function(map) {
+	dotdata.get('maps:' + slug).then(function(map) {
 
 		var venues = [];
+
 		var onsuccess = function() {
 			response.send({
 				ok: 1,
@@ -172,6 +119,85 @@ app.get("/api/map/:slug", function(request, response) {
 		}, onerror);
 
 	}, onerror);
+}
+
+var save_map = function(request, response) {
+
+	if (request.params.slug) {
+		var slug = request.params.slug;
+	} else {
+		var slug = url_words.random();
+	}
+
+	var root = path.dirname(__dirname);
+	var filename = root + '/.data/maps/' + slug + '.json';
+	fs.stat(filename, function(err, stats) {
+
+		var exists = (! err || err.code != 'ENOENT');
+		if (! request.params.slug && exists) {
+			// We were trying to pick a random URL slug, but accidentally picked
+			// one that already exists! Try again...
+			return save_map(request, response);
+		}
+		var map = request.body;
+		if (! map.id) {
+			map.id = sequence.next();
+		}
+		if (! map.slug) {
+			map.slug = slug;
+		}
+
+		var onerror = function() {
+			response.send({
+				ok: 0,
+				error: 'Error saving map.'
+			});
+		};
+
+		var onsuccess = function() {
+			if (map.slug != slug) {
+				// Rename the data to match the new slug...
+				var from = 'maps:' + slug;
+				var to = 'maps:' + map.slug;
+				dotdata.rename(from, to).then(function() {
+					load_map(map.slug, response, onerror);
+				}, onerror);
+			} else {
+				load_map(map.slug, response, onerror);
+			}
+		};
+
+		dotdata.set('maps:' + slug, map).then(onsuccess, onerror);
+	});
+};
+
+// Create a new map
+app.post("/api/map", function(request, response) {
+	save_map(request, response);
+});
+
+// Update a map
+app.post("/api/map/:slug", function(request, response) {
+	save_map(request, response);
+});
+
+// Load a map
+app.get("/api/map/:slug", function(request, response) {
+
+	var onerror = function() {
+
+		// Doesn't exist? Presto, now it does!
+
+		dotdata.get('config').then(function(config) {
+			request.body = {
+				name: config.default_name || request.params.slug,
+				bbox: config.default_bbox
+			};
+			save_map(request, response);
+		});
+	};
+
+	load_map(request.params.slug, response, onerror);
 });
 
 // Save a venue

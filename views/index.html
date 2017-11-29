@@ -17,6 +17,7 @@
 		<link rel="stylesheet" href="/lib/leaflet.locatecontrol/dist/L.Control.Locate.css">
 		<link rel="stylesheet" href="/css/smol.menu.css">
 		<link rel="stylesheet" href="/css/smol.menu.config.css">
+		<link rel="stylesheet" href="/css/smol.maps.map.css">
 		<link rel="stylesheet" href="/css/smol.menu.venue.css">
 		<link rel="stylesheet" href="/css/smol.sidebar.css">
 		<link rel="stylesheet" href="/css/smol.leaflet.css">
@@ -27,11 +28,17 @@
 			<div id="sidebar">
 
 				<span id="sidebar-close"><span class="fa fa-close"></span></span>
+				<div id="sidebar-map">
+					<h1 id="sidebar-map-name"></h1>
+					<div id="sidebar-map-author"></div>
+					<div id="sidebar-map-description"></div>
+					<a href="#" id="sidebar-map-edit">Edit map</a>
+				</div>
 				<ul id="sidebar-items"></ul>
 				<span id="sidebar-config"><span class="fa fa-cog"></span></span>
 
 			</div>
-			<div id="map"></div>
+			<div id="leaflet"></div>
 			<div id="menu">
 
 				<span id="menu-close"><span class="fa fa-close"></span></span>
@@ -60,6 +67,143 @@
 						<div class="response"></div>
 						<input type="submit" name="action" class="btn btn-save" value="Save">
 						<input id="config-cancel" type="button" class="btn btn-cancel" value="Cancel">
+					</div>
+				</form>
+
+				<form action="/api/map" method="post" id="map" class="menu-page">
+					<h1>Edit map</h1>
+					<input type="hidden" name="id" id="map-id" value="">
+					<label>
+						Name
+						<input type="text" name="name" id="map-name" value="">
+					</label>
+					<label>
+						Author(s)
+						<input type="text" name="author" id="map-authors" value="">
+					</label>
+					<label>
+						URL<br>
+						<div id="map-slug-holder"><pre id="map-base-url"></pre><input type="text" name="slug" id="map-slug" value=""></div>
+						<div class="help" id="map-url-feedback">use letters, numbers, and hyphens</div>
+					</label>
+					<!--<label>
+						<input type="checkbox" name="public" value="1" id="map-public"> Include in the list of public maps
+					</label>-->
+					<label>
+						Description
+						<textarea name="description" id="map-description" cols="60" rows="5"></textarea>
+					</label>
+					<label>
+						Default bounding box
+						<input type="text" name="bbox" id="map-bbox" value="">
+						<div class="help"><a href="#" id="map-set-view">Use current map view as the default</a></div>
+					</label>
+					<!--<div class="headroom">
+						<div class="column column-map-preview">
+							<img id="map-preview" src="/img/preview-refill-black.jpg">
+						</div>
+						<div class="column column-map-controls">
+							<label class="no-headroom">
+								Base map
+								<select name="scene" id="map-base">
+									<option>refill-style</option>
+									<option>walkabout-style</option>
+									<option>bubble-wrap</option>
+								</select>
+							</label>
+							<label>
+								<input type="checkbox" id="map-transit">
+								Show transit overlay
+							</label>
+							<div id="map-options-refill" class="map-options">
+								<label>
+									Map theme
+									<select id="map-refill-theme">
+										<option>black</option>
+										<option>blue</option>
+										<option>blue-gray</option>
+										<option>brown-orange</option>
+										<option>gray</option>
+										<option>gray-gold</option>
+										<option>high-contrast</option>
+										<option>inverted</option>
+										<option>pink</option>
+										<option>pink-yellow</option>
+										<option>purple-green</option>
+										<option>sepia</option>
+										<option>zinc</option>
+									</select>
+								</label>
+								<label>
+									Level of detail
+									<select id="map-refill-detail">
+										<option>0</option>
+										<option>1</option>
+										<option>2</option>
+										<option>3</option>
+										<option>4</option>
+										<option>5</option>
+										<option>6</option>
+										<option>7</option>
+										<option>8</option>
+										<option>9</option>
+										<option>10</option>
+										<option>11</option>
+									</select>
+								</label>
+								<label>
+									Label density
+									<select id="map-refill-label">
+										<option>0</option>
+										<option>1</option>
+										<option>2</option>
+										<option>3</option>
+										<option>4</option>
+										<option>5</option>
+										<option>6</option>
+										<option>7</option>
+										<option>8</option>
+										<option>9</option>
+										<option>10</option>
+										<option>11</option>
+									</select>
+								</label>
+							</div>
+							<div id="map-options-walkabout" class="map-options">
+								<div class="checkbox">
+									<input type="checkbox" name="walkabout_path" id="map-walkabout-path">
+									<label for="map-walkabout-path">
+										Show trail overlay
+									</label>
+								</div>
+								<div class="checkbox">
+									<input type="checkbox" name="walkabout_bike" id="map-walkabout-bike">
+									<label for="map-walkabout-bike">
+										Show bike overlay
+									</label>
+								</div>
+							</div>
+							<div id="map-options-bubble-wrap" class="map-options">
+								<label>
+									Labels
+									<select id="map-bubble-wrap-labels">
+										<option>no-labels</option>
+										<option>normal</option>
+										<option>more-labels</option>
+									</select>
+								</label>
+							</div>
+						</div>
+						<div class="clear"></div>
+					</div>-->
+					<div class="buttons">
+						<div class="response"></div>
+						<input type="submit" name="action" class="btn btn-save" value="Save">
+						<input type="submit" name="action" class="btn btn-cancel" value="Cancel">
+					</div>
+					<div id="map-links">
+						<a href="#" id="map-print" target="_blank">Print this map</a>
+						<a href="#" class="edit-delete">Delete this map?</a>
 					</div>
 				</form>
 
@@ -148,6 +292,7 @@
 		<script src="/js/smol.maps.js"></script>
 		<script src="/js/smol.menu.js"></script>
 		<script src="/js/smol.menu.config.js"></script>
+		<script src="/js/smol.menu.map.js"></script>
 		<script src="/js/smol.menu.venue.js"></script>
 		<script src="/js/smol.sidebar.js"></script>
 		<script src="/js/smol.color.js"></script>

@@ -13,20 +13,25 @@ smol.sidebar = (function() {
 			$('#sidebar-close').click(function() {
 				self.hide();
 			});
+
+			$('#sidebar-map-edit').click(function(e) {
+				e.preventDefault();
+				smol.menu.show('map');
+			});
 		},
 
 		show: function() {
 			$('#sidebar').addClass('active');
-			$('#map').addClass('show-sidebar');
+			$('#leaflet').addClass('show-sidebar');
 			smol.maps.map.invalidateSize(false);
-			slippymap.crosshairs.draw_crosshairs('map');
+			slippymap.crosshairs.draw_crosshairs('leaflet');
 		},
 
 		hide: function() {
 			$('#sidebar').removeClass('active');
-			$('#map').removeClass('show-sidebar');
+			$('#leaflet').removeClass('show-sidebar');
 			smol.maps.map.invalidateSize(false);
-			slippymap.crosshairs.draw_crosshairs('map');
+			slippymap.crosshairs.draw_crosshairs('leaflet');
 		},
 
 		toggle: function() {
@@ -34,6 +39,22 @@ smol.sidebar = (function() {
 				self.hide();
 			} else {
 				self.show();
+			}
+		},
+
+		update_map: function(map) {
+			$('#sidebar-map-name').html(map.name || map.slug);
+			if (map.author) {
+				$('#sidebar-map-author').html(map.author);
+				$('#sidebar-map-author').removeClass('hidden');
+			} else {
+				$('#sidebar-map-author').addClass('hidden');
+			}
+			if (map.description) {
+				$('#sidebar-map-description').html(map.description);
+				$('#sidebar-map-description').removeClass('hidden');
+			} else {
+				$('#sidebar-map-description').addClass('hidden');
 			}
 		},
 

@@ -13,7 +13,7 @@ var dotdata = {
 
 	get: function(name) {
 		return new Promise(function(resolve, reject) {
-			filename = dotdata.filename(name);
+			var filename = dotdata.filename(name);
 			if (! filename) {
 				return reject({
 					error: 'Invalid name: ' + name
@@ -31,7 +31,7 @@ var dotdata = {
 	set: function(name, data) {
 		var json = JSON.stringify(data, null, 4);
 		return new Promise(function(resolve, reject) {
-			filename = dotdata.filename(name);
+			var filename = dotdata.filename(name);
 			if (! filename) {
 				return reject({
 					error: 'Invalid name: ' + name
@@ -48,6 +48,34 @@ var dotdata = {
 				resolve(data);
 				if (! filename.match(/\.index\.json$/)) {
 					dotdata.update_index(dir);
+				}
+			});
+		});
+	},
+
+	rename: function(from, to) {
+		return new Promise(function(resolve, reject) {
+			var from_filename = dotdata.filename(from);
+			var to_filename = dotdata.filename(to);
+			if (! from_filename) {
+				return reject({
+					error: 'Invalid name: ' + from
+				});
+			}
+			if (! to_filename) {
+				return reject({
+					error: 'Invalid name: ' + to
+				});
+			}
+			fs.rename(from_filename, to_filename, function(err) {
+				if (err) {
+					return reject({
+						error: 'Could not rename ' + from + '.',
+						details: err
+					});
+				} else {
+					dotdata.update_index(path.dirname(to_filename));
+					return resolve();
 				}
 			});
 		});

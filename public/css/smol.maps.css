@@ -48,6 +48,11 @@ textarea {
 	border-radius: 2px;
 }
 
+textarea {
+	padding: 10px;
+	line-height: 21px;
+}
+
 input[type="text"]:focus,
 textarea:focus {
 	border-color: #170A26;
@@ -117,7 +122,7 @@ code {
 	height: 100vh;
 }
 
-#map {
+#leaflet {
 	position: fixed;
 	top: 0;
 	right: 0;
@@ -125,7 +130,7 @@ code {
 	left: 0;
 }
 
-#map.show-sidebar {
+#leaflet.show-sidebar {
 	left: 300px;
 }
 
