@@ -29,7 +29,7 @@ var dotdata = {
 	},
 
 	set: function(name, data) {
-		var json = JSON.stringify(data);
+		var json = JSON.stringify(data, null, 4);
 		return new Promise(function(resolve, reject) {
 			filename = dotdata.filename(name);
 			if (! filename) {
