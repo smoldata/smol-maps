@@ -96,7 +96,8 @@
 					<label>
 						Default bounding box
 						<input type="text" name="bbox" id="map-bbox" value="">
-						<div class="help"><a href="#" id="map-set-view">Use current map view as the default</a></div>
+						<div class="help">min longitude, min latitude, max longitude, max latitude</div>
+						<a href="#" id="map-set-view">Use current map view as the default</a>
 					</label>
 					<!--<div class="headroom">
 						<div class="column column-map-preview">
@@ -201,10 +202,10 @@
 						<input type="submit" name="action" class="btn btn-save" value="Save">
 						<input type="submit" name="action" class="btn btn-cancel" value="Cancel">
 					</div>
-					<div id="map-links">
+					<!--<div id="map-links">
 						<a href="#" id="map-print" target="_blank">Print this map</a>
 						<a href="#" class="edit-delete">Delete this map?</a>
-					</div>
+					</div>-->
 				</form>
 
 				<form action="/api/venue" method="post" id="venue" class="menu-page">

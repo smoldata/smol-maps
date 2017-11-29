@@ -5,6 +5,20 @@ smol.menu.map = (function() {
 
 	var self = {
 
+		init: function() {
+			$('#map-set-view').click(function(e) {
+				e.preventDefault();
+				var bounds = smol.maps.map.getBounds();
+				var bbox = [
+					bounds._southWest.lng.toFixed(6),
+					bounds._southWest.lat.toFixed(6),
+					bounds._northEast.lng.toFixed(6),
+					bounds._northEast.lat.toFixed(6)
+				];
+				$('#map-bbox').val(bbox.join(','));
+			});
+		},
+
 		setup: function(map) {
 			$('#map').attr('action', '/api/map/' + map.slug);
 			$('#map-id').val(map.id);
