@@ -1,0 +1,10 @@
+#map-slug-holder pre {
+	display: inline-block;
+	font-family: menlo, monospace;
+	font-size: 12px;
+}
+
+#map-slug {
+	display: inline-block;
+	width: 160px;
+}

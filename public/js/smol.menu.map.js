@@ -10,6 +10,8 @@ smol.menu.map = (function() {
 				e.preventDefault();
 				self.update_bbox();
 			});
+			var base_url = location.href.match(/https?:\/\/.+?\//)[0];
+			$('#map-base-url').html(base_url);
 		},
 
 		setup: function(map) {
