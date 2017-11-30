@@ -174,7 +174,9 @@ smol.maps = (function() {
 		create_map: function() {
 			var map = {
 				name: self.config.default_name || null,
-				bbox: self.config.default_bbox || null
+				bbox: self.config.default_bbox || null,
+				style: 'refill-style',
+				theme: 'black'
 			};
 			$.post('/api/map', map).then(function(data) {
 				history.pushState(data.map, data.map.name, '/' + data.map.slug);
@@ -185,14 +187,39 @@ smol.maps = (function() {
 		},
 
 		tangram_scene: function() {
-			return {
+
+			var scene = {
 				global: {
 					sdk_mapzen_api_key: self.config.mapzen_api_key
 				},
-				import: [
-					"/scene/refill-style/refill-style.yaml"
-				]
+				import: []
 			};
+
+			var map = self.data.map;
+
+			if (map.style == 'refill-style') {
+				scene.import = [
+					'/scene/refill-style/refill-style.yaml',
+					'/scene/refill-style/themes/color-' + map.theme + '.yaml',
+					'/scene/refill-style/themes/detail-' + map.detail + '.yaml',
+					'/scene/refill-style/themes/label-' + map.labels + '.yaml'
+				];
+			} else if (map.style == 'walkabout-style') {
+				scene.import = [
+					'/scene/walkabout-style/walkabout-style.yaml',
+					'/scene/walkabout-style/themes/label-' + map.labels + '.yaml'
+				];
+			} else {
+				scene.import = [
+					'/scene/bubble-wrap/bubble-wrap-style.yaml',
+					'/scene/bubble-wrap/themes/label-' + map.labels + '.yaml'
+				];
+			}
+			scene.global.sdk_transit_overlay = (map.transit_overlay == "1");
+			scene.global.sdk_path_overlay = (map.trail_overlay == "1");
+			scene.global.sdk_bike_overlay = (map.bike_overlay == "1");
+
+			return scene;
 		},
 
 		random_megacity_bbox: function() {

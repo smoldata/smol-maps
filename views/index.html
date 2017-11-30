@@ -82,6 +82,10 @@
 						<input type="text" name="author" id="map-authors" value="">
 					</label>
 					<label>
+						Description
+						<textarea name="description" id="map-description" cols="60" rows="3"></textarea>
+					</label>
+					<label>
 						URL<br>
 						<div id="map-slug-holder"><pre id="map-base-url"></pre><input type="text" name="slug" id="map-slug" value=""></div>
 						<div class="help" id="map-url-feedback">use letters, numbers, and hyphens</div>
@@ -89,114 +93,93 @@
 					<!--<label>
 						<input type="checkbox" name="public" value="1" id="map-public"> Include in the list of public maps
 					</label>-->
-					<label>
-						Description
-						<textarea name="description" id="map-description" cols="60" rows="5"></textarea>
-					</label>
+
 					<label>
 						Default bounding box
 						<input type="text" name="bbox" id="map-bbox" value="">
 						<div class="help">min longitude, min latitude, max longitude, max latitude</div>
 						<a href="#" id="map-set-view">Use current map view as the default</a>
 					</label>
-					<!--<div class="headroom">
-						<div class="column column-map-preview">
-							<img id="map-preview" src="/img/preview-refill-black.jpg">
-						</div>
-						<div class="column column-map-controls">
+					<div class="headroom">
+						<div id="map-base" class="column">
 							<label class="no-headroom">
 								Base map
-								<select name="scene" id="map-base">
+								<select name="style" id="map-style">
 									<option>refill-style</option>
 									<option>walkabout-style</option>
 									<option>bubble-wrap</option>
 								</select>
 							</label>
+							<label class="style-specific refill-style">
+								Theme
+								<select name="theme" id="map-theme">
+									<option>black</option>
+									<option>blue</option>
+									<option>blue-gray</option>
+									<option>brown-orange</option>
+									<option>gray</option>
+									<option>gray-gold</option>
+									<option>high-contrast</option>
+									<option>inverted</option>
+									<option>pink</option>
+									<option>pink-yellow</option>
+									<option>purple-green</option>
+									<option>sepia</option>
+									<option>zinc</option>
+								</select>
+							</label>
 							<label>
-								<input type="checkbox" id="map-transit">
+								Label density
+								<select name="labels" id="map-labels">
+									<option>0</option>
+									<option>1</option>
+									<option>2</option>
+									<option>3</option>
+									<option>4</option>
+									<option>5</option>
+									<option>6</option>
+									<option>7</option>
+									<option>8</option>
+									<option>9</option>
+									<option>10</option>
+									<option>11</option>
+								</select>
+							</label>
+							<label class="style-specific refill-style">
+								Level of detail
+								<select name="detail" id="map-detail">
+									<option>0</option>
+									<option>1</option>
+									<option>2</option>
+									<option>3</option>
+									<option>4</option>
+									<option>5</option>
+									<option>6</option>
+									<option>7</option>
+									<option>8</option>
+									<option>9</option>
+									<option>10</option>
+									<option>11</option>
+								</select>
+							</label>
+							<label class="checkbox">
+								<input type="checkbox" name="transit_overlay" value="1" id="map-transit_overlay">
 								Show transit overlay
 							</label>
-							<div id="map-options-refill" class="map-options">
-								<label>
-									Map theme
-									<select id="map-refill-theme">
-										<option>black</option>
-										<option>blue</option>
-										<option>blue-gray</option>
-										<option>brown-orange</option>
-										<option>gray</option>
-										<option>gray-gold</option>
-										<option>high-contrast</option>
-										<option>inverted</option>
-										<option>pink</option>
-										<option>pink-yellow</option>
-										<option>purple-green</option>
-										<option>sepia</option>
-										<option>zinc</option>
-									</select>
-								</label>
-								<label>
-									Level of detail
-									<select id="map-refill-detail">
-										<option>0</option>
-										<option>1</option>
-										<option>2</option>
-										<option>3</option>
-										<option>4</option>
-										<option>5</option>
-										<option>6</option>
-										<option>7</option>
-										<option>8</option>
-										<option>9</option>
-										<option>10</option>
-										<option>11</option>
-									</select>
-								</label>
-								<label>
-									Label density
-									<select id="map-refill-label">
-										<option>0</option>
-										<option>1</option>
-										<option>2</option>
-										<option>3</option>
-										<option>4</option>
-										<option>5</option>
-										<option>6</option>
-										<option>7</option>
-										<option>8</option>
-										<option>9</option>
-										<option>10</option>
-										<option>11</option>
-									</select>
-								</label>
-							</div>
-							<div id="map-options-walkabout" class="map-options">
-								<div class="checkbox">
-									<input type="checkbox" name="walkabout_path" id="map-walkabout-path">
-									<label for="map-walkabout-path">
-										Show trail overlay
-									</label>
-								</div>
-								<div class="checkbox">
-									<input type="checkbox" name="walkabout_bike" id="map-walkabout-bike">
-									<label for="map-walkabout-bike">
-										Show bike overlay
-									</label>
-								</div>
-							</div>
-							<div id="map-options-bubble-wrap" class="map-options">
-								<label>
-									Labels
-									<select id="map-bubble-wrap-labels">
-										<option>no-labels</option>
-										<option>normal</option>
-										<option>more-labels</option>
-									</select>
-								</label>
-							</div>
+							<label class="checkbox style-specific walkabout-style">
+								<input type="checkbox" name="trail_overlay" value="1" id="map-trail_overlay">
+								Show trail overlay
+							</label>
+							<label class="checkbox style-specific walkabout-style">
+								<input type="checkbox" name="bike_overlay" value="1" id="map-bike_overlay">
+								Show trail overlay
+							</label>
+						</div>
+						<div id="map-preview" class="column">
+							<img src="/img/preview/refill-black.jpg">
 						</div>
 						<div class="clear"></div>
-					</div>-->
+					</div>
 					<div class="buttons">
 						<div class="response"></div>
 						<input type="submit" name="action" class="btn btn-save" value="Save">

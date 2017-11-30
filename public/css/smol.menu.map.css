@@ -8,3 +8,42 @@
 	display: inline-block;
 	width: 160px;
 }
+
+#map-preview {
+	float: right;
+	width: 236px;
+}
+
+#map-base {
+	width: calc(100% - 256px);
+	margin-right: 0;
+}
+
+#map-preview img {
+	width: 100%;
+	height: auto;
+	border: 10px solid #fff;
+	border-radius: 4px;
+}
+
+#map-base .style-specific {
+	display: none;
+}
+
+#map-base .selected {
+	display: block;
+}
+
+#map-base .checkbox {
+	margin-top: 20px;
+}
+
+#map-base .checkbox label {
+	display: inline;
+}
+
+#map-base select {
+	display: block;
+	font-size: 14px;
+	margin-top: 10px;
+}
