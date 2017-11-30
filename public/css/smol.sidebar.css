@@ -94,3 +94,27 @@
 	margin-bottom: 10px;
 	line-height: 1.5;
 }
+
+#sidebar-config-utility {
+	position: absolute;
+	font-size: 14px;
+	line-height: 14px;
+	background: rgba(255, 255, 255, 0.75);
+	padding: 5px 0;
+	border-radius: 4px;
+	width: 160px;
+	right: 0;
+	bottom: 5px;
+}
+
+#sidebar-config-utility a {
+	display: block;
+	padding: 7px 10px;
+	color: #170A26;
+	text-decoration: none;
+}
+
+#sidebar-config-utility a:hover {
+	color: #fff;
+	background: #8442D5;
+}

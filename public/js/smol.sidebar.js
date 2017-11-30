@@ -6,8 +6,9 @@ smol.sidebar = (function() {
 
 		init: function() {
 
-			$('#sidebar-config').click(function() {
-				smol.menu.show('config');
+			$('#sidebar-config').click(function(e) {
+				e.stopPropagation();
+				$('#sidebar-config-utility').toggleClass('hidden');
 			});
 
 			$('#sidebar-close').click(function() {
@@ -17,6 +18,15 @@ smol.sidebar = (function() {
 			$('#sidebar-map-edit').click(function(e) {
 				e.preventDefault();
 				smol.menu.show('map');
+			});
+
+			$('#utility-config').click(function(e) {
+				e.preventDefault();
+				smol.menu.show('config');
+			});
+
+			$(document.body).click(function(e) {
+				$('#sidebar-config-utility').addClass('hidden');
 			});
 		},
 
