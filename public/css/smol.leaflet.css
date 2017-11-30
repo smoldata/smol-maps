@@ -194,6 +194,12 @@
 	overflow-wrap: break-word;
 }
 
+.leaflet-popup .name .response {
+	font-size: 14px;
+	font-weight: bold;
+	padding-top: 10px;
+}
+
 .leaflet-popup .name input[type="text"] {
 	width: 100%;
 }

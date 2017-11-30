@@ -75,7 +75,6 @@ app.post("/api/config", function(request, response) {
 		response.body({
 			ok: 0,
 			error: 'Error saving data.',
-			details: err,
 			data: {}
 		}).status(400);
 	};

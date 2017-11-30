@@ -22,6 +22,8 @@ smol.maps = (function() {
 					$('#menu').addClass('no-animation');
 					smol.menu.show('config');
 				}
+			}, function(rsp) {
+				alert('Error: could not load config.');
 			});
 		},
 
@@ -155,7 +157,7 @@ smol.maps = (function() {
 		},
 
 		load_map: function(slug) {
-			$.get('/api/map/' + slug, function(data) {
+			$.get('/api/map/' + slug).then(function(data) {
 				self.data = data;
 				self.setup_map();
 				smol.sidebar.update_map(data.map);
@@ -163,6 +165,8 @@ smol.maps = (function() {
 				if (location.pathname != '/' + data.map.slug) {
 					history.pushState(data.map, data.map.name, '/' + data.map.slug);
 				}
+			}, function(rsp) {
+				alert("Error: could not load map '" + slug + "'.");
 			});
 		},
 
@@ -173,6 +177,9 @@ smol.maps = (function() {
 			};
 			$.post('/api/map', map).then(function(data) {
 				history.pushState(data.map, data.map.name, '/' + data.map.slug);
+			}, function(rsp) {
+				var error = rsp.error || 'Error: Could not create map.';
+				alert(error);
 			});
 		},
 
@@ -204,7 +211,7 @@ smol.maps = (function() {
 		},
 
 		create_venue: function(cb) {
-			$.get('/api/id', function(rsp) {
+			$.get('/api/id').then(function(rsp) {
 				var center = self.map.getCenter();
 				var color = self.config.default_color || '#8442D5';
 				var icon = self.config.default_icon || 'marker-stroked';
@@ -217,12 +224,22 @@ smol.maps = (function() {
 					color: color,
 					icon: icon
 				};
-				self.data.venues.push(venue);
-				var marker = self.add_marker(venue);
-				$.post('/api/venue', venue);
-				if (typeof cb == 'function') {
-					cb(marker);
-				}
+
+				var onsuccess = function() {
+					self.data.venues.push(venue);
+					var marker = self.add_marker(venue);
+					if (typeof cb == 'function') {
+						cb(marker);
+					}
+				};
+
+				var onerror = function() {
+					alert('Error: Could not create a new venue.');
+				};
+
+				$.post('/api/venue', venue).then(onsuccess, onerror);
+			}, function() {
+				alert('Error: Could not load a new ID.')
 			});
 		},
 
@@ -265,7 +282,13 @@ smol.maps = (function() {
 					self.update_marker(venue);
 					smol.sidebar.update_venue(venue);
 				}
-				$.post('/api/venue', venue);
+
+				var onsuccess = function() {};
+				var onerror = function() {
+					alert('Error: Could not save updated marker position.');
+				};
+
+				$.post('/api/venue', venue).then(onsuccess, onerror);
 
 				if (this.venue.name) {
 					this.bindTooltip(this.venue.name);
@@ -295,6 +318,7 @@ smol.maps = (function() {
 					'<div class="name">' +
 					'<div class="display">' + name + '</div>' +
 					'<input type="text" name="name" value="' + name + '">' +
+					'<div class="response hidden"></div>' +
 					'<div class="buttons">' +
 					'<input type="button" value="Cancel" class="btn btn-cancel">' +
 					'<input type="submit" value="Save" class="btn btn-save">' +
@@ -387,6 +411,9 @@ smol.maps = (function() {
 				} else {
 					$('.leaflet-popup .name').removeClass('single-line');
 				}
+			}, function() {
+				$('.leaflet-popup form .response').removeClass('hidden');
+				$('.leaflet-popup form .response').html('Error: Could not save venue name.');
 			});
 		}
 	};
