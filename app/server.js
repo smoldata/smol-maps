@@ -147,10 +147,11 @@ var save_map = function(request, response) {
 			map.slug = slug;
 		}
 
-		var onerror = function() {
+		var onerror = function(details) {
+			var error = details.error || 'Error saving map.';
 			response.send({
 				ok: 0,
-				error: 'Error saving map.'
+				error: error
 			});
 		};
 
@@ -166,6 +167,15 @@ var save_map = function(request, response) {
 				load_map(map.slug, response, onerror);
 			}
 		};
+
+		if (map.slug != slug) {
+			var rename_to = dotdata.filename('maps:' + map.slug);
+			if (fs.existsSync(rename_to)) {
+				return onerror({
+					error: "The map '" + map.slug + "' already exists. Please choose another URL slug."
+				});
+			}
+		}
 
 		dotdata.set('maps:' + slug, map).then(onsuccess, onerror);
 	});

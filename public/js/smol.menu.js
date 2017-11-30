@@ -72,7 +72,17 @@ smol.menu = (function() {
 				}
 			}
 
+			var onerror = function(rsp) {
+				var error = rsp.error || 'Error submitting data.';
+				$form.find('.response').html(error);
+			};
+
 			var onsuccess = function(rsp) {
+
+				if (! rsp.ok) {
+					return onerror(rsp);
+				}
+
 				var args = $form.serializeArray();
 				var data = {};
 				for (var i = 0; i < args.length; i++) {
@@ -84,11 +94,6 @@ smol.menu = (function() {
 				    typeof smol.menu[page].submit == 'function') {
 					smol.menu[page].submit(data);
 				}
-			};
-
-			var onerror = function(rsp) {
-				var error = rsp.error || 'Error submitting data.';
-				$form.find('.response').html(error);
 			};
 
 			$.post(url, data).then(onsuccess, onerror);

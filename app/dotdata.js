@@ -29,27 +29,60 @@ var dotdata = {
 	},
 
 	set: function(name, data) {
-		var json = JSON.stringify(data, null, 4);
+
 		return new Promise(function(resolve, reject) {
+
+			var json = JSON.stringify(data, null, 4);
 			var filename = dotdata.filename(name);
+
 			if (! filename) {
 				return reject({
 					error: 'Invalid name: ' + name
 				});
 			}
-			var dir = path.dirname(filename);
-			if (! fs.existsSync(dir)) {
-				fs.mkdirSync(dir, 0o755);
+
+			var write_to_disk = function() {
+				var dir = path.dirname(filename);
+				if (! fs.existsSync(dir)) {
+					fs.mkdirSync(dir, 0o755);
+				}
+				fs.writeFile(filename, json, 'utf8', function(err) {
+					if (err) {
+						return reject(err);
+					}
+					resolve(data);
+					if (! filename.match(/\.index\.json$/)) {
+						dotdata.update_index(dir);
+					}
+				});
 			}
-			fs.writeFile(filename, json, 'utf8', function(err) {
-				if (err) {
-					return reject(err);
+
+			// This is a little weird: if a document exists already, and it has
+			// the wrong 'id' property, then we treat that as an error. However,
+			// not all documents have 'id' properties, so this won't catch all
+			// cases of document clobbering. (20171129/dphiffer)
+
+			var onsuccess = function(existing) {
+
+				if (existing.id && data.id &&
+				    existing.id != data.id) {
+					return reject({
+						error: name + ' exists with a different id number.'
+					});
 				}
-				resolve(data);
-				if (! filename.match(/\.index\.json$/)) {
-					dotdata.update_index(dir);
-				}
-			});
+
+				write_to_disk();
+			};
+
+			var onerror = function() {
+
+				// We don't actually care that we hit an error here, it just
+				// means the document doesn't exist yet. (20171129/dphiffer)
+
+				write_to_disk();
+			}
+
+			dotdata.get(name).then(onsuccess, onerror);
 		});
 	},
 
@@ -65,6 +98,11 @@ var dotdata = {
 			if (! to_filename) {
 				return reject({
 					error: 'Invalid name: ' + to
+				});
+			}
+			if (fs.existsSync(to_filename)) {
+				return reject({
+					error: "'" + to + "' already exists."
 				});
 			}
 			fs.rename(from_filename, to_filename, function(err) {
