@@ -24,6 +24,7 @@ smol.menu.map = (function() {
 			} else {
 				$('#map-bbox').val(map.bbox);
 			}
+			$('#map .response').html('');
 		},
 
 		submit: function(map) {

@@ -76,6 +76,8 @@ smol.menu.venue = (function() {
 				$('#venue-icon-preview .icon').removeClass('inverted');
 			}
 
+			$('#venue .response').html('');
+
 			self.setup_icons();
 			smol.menu.show('venue');
 		},

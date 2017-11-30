@@ -86,6 +86,7 @@ smol.maps = (function() {
 				click: function() {
 					self.create_venue(function(marker) {
 						marker.openPopup();
+						self.venue_edit_name($('.leaflet-popup .venue'));
 					});
 				}
 			}).addTo(self.map);

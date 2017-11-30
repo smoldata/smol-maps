@@ -200,6 +200,10 @@
 	padding-top: 10px;
 }
 
+.leaflet-popup.editing .name .response {
+	display: none;
+}
+
 .leaflet-popup .name input[type="text"] {
 	width: 100%;
 }
