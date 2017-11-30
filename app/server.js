@@ -200,9 +200,7 @@ app.get("/api/map/:slug", function(request, response) {
 		dotdata.get('config').then(function(config) {
 			request.body = {
 				name: config.default_name || request.params.slug,
-				bbox: config.default_bbox,
-				style: 'refill-style',
-				theme: 'black'
+				bbox: config.default_bbox
 			};
 			save_map(request, response);
 		});
