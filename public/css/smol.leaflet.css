@@ -195,13 +195,14 @@
 }
 
 .leaflet-popup .name .response {
+	display: none;
 	font-size: 14px;
 	font-weight: bold;
 	padding-top: 10px;
 }
 
 .leaflet-popup.editing .name .response {
-	display: none;
+	display: block;
 }
 
 .leaflet-popup .name input[type="text"] {
