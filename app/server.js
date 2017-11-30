@@ -82,42 +82,47 @@ app.post("/api/config", function(request, response) {
 	       .then(onsuccess, onerror);
 });
 
-function load_map(slug, response, onerror) {
+function load_map(slug) {
 
-	dotdata.get('maps:' + slug).then(function(map) {
+	return new Promise(function(load_resolve, load_reject) {
 
-		var venues = [];
+		dotdata.get('maps:' + slug).then(function(map) {
 
-		var onsuccess = function() {
-			response.send({
-				ok: 1,
-				map: map,
-				venues: venues
-			});
-		};
+			var venues = [];
 
-		var get_venue = function(id) {
-			return new Promise(function(resolve, reject) {
-				dotdata.get("maps:" + map.id + ":" + id).then(function(venue) {
-					if (venue.active != "0") { // This is a kludge, the value should be 0 not "0"
-						venues.push(venue);
-					}
-					resolve(venue);
-				}, function(err) {
-					reject(err);
+			var ready = function() {
+				load_resolve({
+					ok: 1,
+					map: map,
+					venues: venues
 				});
-			});
-		};
+			};
 
-		dotdata.index("maps:" + map.id).then(function(index) {
-			var venue_promises = [];
-			for (var i = 0; i < index.data.length; i++) {
-				venue_promises.push(get_venue(index.data[i]));
-			}
-			Promise.all(venue_promises).then(onsuccess, onerror);
-		}, onerror);
+			var get_venue = function(id) {
+				return new Promise(function(resolve, reject) {
+					var name = "maps:" + map.id + ":" + id;
+					dotdata.get(name).then(function(venue) {
+						if (venue.active != "0") { // This is a kludge, the value should be 0 not "0"
+							venues.push(venue);
+						}
+						resolve(venue);
+					}, function(err) {
+						reject(err);
+					});
+				});
+			};
 
-	}, onerror);
+			dotdata.index("maps:" + map.id).then(function(index) {
+				var venue_promises = [];
+				for (var i = 0; i < index.data.length; i++) {
+					venue_promises.push(get_venue(index.data[i]));
+				}
+				Promise.all(venue_promises).then(ready, load_reject);
+			}, load_reject);
+
+		}, load_reject);
+
+	});
 }
 
 var save_map = function(request, response) {
@@ -154,16 +159,24 @@ var save_map = function(request, response) {
 			});
 		};
 
+		var respond = function(data) {
+			response.send({
+				ok: 1,
+				map: data.map,
+				venues: data.venues
+			});
+		};
+
 		var onsuccess = function() {
 			if (map.slug != slug) {
 				// Rename the data to match the new slug...
 				var from = 'maps:' + slug;
 				var to = 'maps:' + map.slug;
 				dotdata.rename(from, to).then(function() {
-					load_map(map.slug, response, onerror);
+					load_map(map.slug).then(respond, onerror);
 				}, onerror);
 			} else {
-				load_map(map.slug, response, onerror);
+				load_map(map.slug).then(respond, onerror);
 			}
 		};
 
@@ -193,6 +206,14 @@ app.post("/api/map/:slug", function(request, response) {
 // Load a map
 app.get("/api/map/:slug", function(request, response) {
 
+	var onsuccess = function(data) {
+		response.send({
+			ok: 1,
+			map: data.map,
+			venues: data.venues
+		});
+	};
+
 	var onerror = function() {
 
 		// Doesn't exist? Presto, now it does!
@@ -206,7 +227,7 @@ app.get("/api/map/:slug", function(request, response) {
 		});
 	};
 
-	load_map(request.params.slug, response, onerror);
+	load_map(request.params.slug).then(onsuccess, onerror);
 });
 
 // Save a venue
