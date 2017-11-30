@@ -112,7 +112,7 @@ smol.menu.venue = (function() {
 				'shop'
 			];
 
-			var recent = smol.maps.data.recent_icons || [];
+			var recent = smol.maps.config.recent_icons || [];
 			for (var icon, i = 0; i < default_recent.length; i++) {
 				icon = default_recent[i];
 				if (recent.indexOf(icon) == -1) {
@@ -182,7 +182,7 @@ smol.menu.venue = (function() {
 			if ($(this).closest('#venue-icons').length > 0) {
 				$('#venue-icons').addClass('hidden');
 				$('#venue-show-icons').html('show all icons');
-				var scroll_offset = $('label[for="edit-venue-icon"]').offset().top - 20;
+				var scroll_offset = $('label[for="venue-icon"]').offset().top - 20;
 				if (scroll_offset < 0) {
 					$('#menu').animate({
 						scrollTop: $('#menu').scrollTop() + scroll_offset
