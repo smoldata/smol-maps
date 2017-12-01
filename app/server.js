@@ -230,6 +230,81 @@ app.get("/api/map/:slug", function(request, response) {
 	load_map(request.params.slug).then(onsuccess, onerror);
 });
 
+// Export a map
+app.get("/api/export/:slug", function(request, response) {
+
+	var onsuccess = function(data) {
+		var features = [],
+		    props, props_list, prefix, key, value,
+		    lat, lon, bbox, geom;
+		for (var i = 0; i < data.venues.length; i++) {
+			props_list = [];
+			lat = parseFloat(data.venues[i].latitude);
+			lon = parseFloat(data.venues[i].longitude);
+			for (prop in data.venues[i]) {
+				value = data.venues[i][prop];
+				if (prop == 'latitude' ||
+				    prop == 'longitude') {
+					prefix = 'geom';
+					value = parseFloat(value);
+				} else if (prop == 'name') {
+					prefix = 'wof';
+				} else if (prop == 'address') {
+					prefix = 'addr';
+					prop = 'full';
+				} else {
+					prefix = 'smol';
+				}
+				key = prefix + ':' + prop;
+				props_list.push({
+					key: key,
+					value: value
+				});
+			}
+			props_list.sort(function(a, b) {
+				return (a.key < b.key) ? -1 : 1;
+			});
+			props = {};
+			for (var j = 0; j < props_list.length; j++) {
+				key = props_list[j].key;
+				value = props_list[j].value;
+				props[key] = value;
+			}
+			bbox = [lon, lat, lon, lat];
+			geom = {
+				type: "Point",
+				coordinates: [lon, lat]
+			};
+			features.push({
+				type: "Feature",
+				properties: props,
+				bbox: bbox,
+				geometry: geom
+			});
+		}
+		var filename = dotdata.filename('maps:' + request.params.slug);
+		filename = filename.replace(/\.json$/, '.geojson');
+		var geojson = JSON.stringify({
+			type: "FeatureCollection",
+			features: features,
+			smol: data.map
+		}, null, 4);
+		fs.writeFile(filename, geojson, function(err) {
+			if (err) {
+				response.status(500).send("Oops, something has gone wrong.");
+			} else {
+				response.download(filename);
+			}
+		});
+	};
+
+	var onerror = function() {
+		response.status(500).send("Oops, something has gone wrong!");
+	};
+
+	load_map(request.params.slug).then(onsuccess, onerror);
+});
+
 // Save a venue
 app.post("/api/venue", function(request, response) {
 	var onsuccess = function(data) {
