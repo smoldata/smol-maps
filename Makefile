@@ -40,3 +40,6 @@ scene:
 	@rm -rf public/scene/$(name)
 	@mv $(name)-$(version) public/scene/$(name)
 	@mv $(name).zip public/scene/$(name)/$(name)-$(version).zip
+
+tiles:
+	bin/tilepack.sh public/tiles
