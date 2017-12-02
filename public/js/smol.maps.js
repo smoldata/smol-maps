@@ -241,9 +241,9 @@ smol.maps = (function() {
 		tangram_sources: function() {
 
 			var tiles = self.config.tiles_url;
-			var tiles_mvt = tiles_url.replace(/\{format\}/g, 'mvt');
-			var tiles_topojson = tiles_url.replace(/\{format\}/g, 'topojson');
-			var tiles_terrain = tiles_url.replace(/\{format\}/g, 'terrain');
+			var tiles_mvt = tiles.replace(/\{format\}/g, 'mvt');
+			var tiles_topojson = tiles.replace(/\{format\}/g, 'topojson');
+			var tiles_terrain = tiles.replace(/\{format\}/g, 'terrain');
 			tiles_terrain = tiles_terrain.replace(/\.terrain$/, '.png');
 
 			var sources = {
