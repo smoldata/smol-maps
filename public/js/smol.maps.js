@@ -95,7 +95,21 @@ smol.maps = (function() {
 
 			var initial_load = true;
 			self.tangram.scene.subscribe({
-				view_complete: function () {
+				load: function() {
+					if (self.config.tiles_url) {
+						var sources = self.tangram_sources();
+						for (var source in sources) {
+							if (sources[source].url.substr(0, 24) == 'https://tile.mapzen.com/') {
+								sources[source].url_params = {
+									api_key: self.config.mapzen_api_key
+								};
+							}
+							self.tangram.scene.setDataSource(source, sources[source]);
+						}
+						self.tangram.scene.updateConfig();
+					}
+				},
+				view_complete: function() {
 					if (initial_load) {
 						initial_load = false;
 						for (var i = 0; i < self.data.venues.length; i++) {
@@ -222,6 +236,49 @@ smol.maps = (function() {
 			scene.global.sdk_bike_overlay = (map.bike_overlay == "1");
 
 			return scene;
+		},
+
+		tangram_sources: function() {
+
+			var tiles = self.config.tiles_url;
+			var tiles_mvt = tiles_url.replace(/\{format\}/g, 'mvt');
+			var tiles_topojson = tiles_url.replace(/\{format\}/g, 'topojson');
+			var tiles_terrain = tiles_url.replace(/\{format\}/g, 'terrain');
+			tiles_terrain = tiles_terrain.replace(/\.terrain$/, '.png');
+
+			var sources = {
+				"refill-style": {
+					"mapzen": {
+						"type": "TopoJSON",
+						"url": tiles_topojson,
+						"max_zoom": 16
+					}
+				},
+				"walkabout-style": {
+					"mapzen": {
+						"type": "MVT",
+						"url": tiles_mvt,
+						"rasters": ["normals"],
+						"max_zoom": 16
+					},
+					"normals": {
+						"type": "Raster",
+						"url": tiles_terrain,
+						"max_zoom": 15
+					}
+				},
+				"bubble-wrap": {
+					"mapzen": {
+						"type": "MVT",
+						"url": tiles_mvt,
+						"max_zoom": 16
+					}
+				}
+			};
+
+			var map = self.data.map;
+			var style = map.style || 'refill-style';
+			return sources[style];
 		},
 
 		random_megacity_bbox: function() {
