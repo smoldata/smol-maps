@@ -47,6 +47,8 @@ smol.maps = (function() {
 				var bbox = self.data.map.bbox;
 				if (! bbox) {
 					bbox = self.random_megacity_bbox();
+					self.data.map.bbox = bbox;
+					$.post('/api/map/' + self.data.map.slug, self.data.map);
 				}
 				self.set_bbox(bbox);
 			}
