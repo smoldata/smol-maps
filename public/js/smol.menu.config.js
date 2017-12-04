@@ -51,22 +51,24 @@ smol.menu.config = (function() {
 			$('input[name="default_wof_id"]').val(config.default_wof_id);
 			self.validate_api_key(config.mapzen_api_key);
 
-			var onsuccess = function(rsp) {
-				var feature = rsp.place;
-				var bbox = feature['geom:bbox'];
-				var label = feature['wof:name'] + ', ' + feature['wof:country'];
-				var html = '<div class="place selected" data-bbox="' + bbox + '"data-wof-id="' + feature['wof:id'] + '"><span class="fa fa-check"></span> ' + label + '</div>';
-				$('#config-places-select').html(html);
-				$('#config-location').val(label);
-				$('#config-places-random').removeClass('selected');
-			};
+			if (parseInt(config.default_wof_id) != -1) {
+				var onsuccess = function(rsp) {
+					var feature = rsp.place;
+					var bbox = feature['geom:bbox'];
+					var label = feature['wof:name'] + ', ' + feature['wof:country'];
+					var html = '<div class="place selected" data-bbox="' + bbox + '"data-wof-id="' + feature['wof:id'] + '"><span class="fa fa-check"></span> ' + label + '</div>';
+					$('#config-places-select').html(html);
+					$('#config-location').val(label);
+					$('#config-places-random').removeClass('selected');
+				};
 
-			$.get('https://places.mapzen.com/v1?' + $.param({
-				method: 'mapzen.places.getInfo',
-				id: config.default_wof_id,
-				extras: 'geom:bbox',
-				api_key: config.mapzen_api_key
-			})).then(onsuccess);
+				$.get('https://places.mapzen.com/v1?' + $.param({
+					method: 'mapzen.places.getInfo',
+					id: config.default_wof_id,
+					extras: 'geom:bbox',
+					api_key: config.mapzen_api_key
+				})).then(onsuccess);
+			}
 		},
 
 		show: function() {

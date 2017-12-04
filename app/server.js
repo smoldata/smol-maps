@@ -230,6 +230,112 @@ app.get("/api/map/:slug", function(request, response) {
 	load_map(request.params.slug).then(onsuccess, onerror);
 });
 
+function hex2rgb(hex) {
+	var rgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return rgb ? [
+		parseInt(rgb[1], 16),
+		parseInt(rgb[2], 16),
+		parseInt(rgb[3], 16)
+	] : null;
+}
+
+// Load Tangram venues layer (used for print)
+app.get("/api/tangram/:slug", function(request, response) {
+
+	var onsuccess = function(data) {
+
+		var yaml =
+			"styles:\n" +
+			"    _points:\n" +
+			"        base: points\n" +
+			"        blend: overlay\n" +
+			"        blend_order: 3\n" +
+			"sources:\n";
+
+		var venue;
+		for (var i = 0; i < data.venues.length; i++) {
+			venue = data.venues[i];
+			yaml += "    _venue_source_" + i + ":\n";
+			yaml += "        type: GeoJSON\n";
+			yaml += "        url: /api/geojson/" + data.map.id + "/" + venue.id + "\n";
+		}
+
+		yaml += "layers:\n";
+		var color;
+		for (var i = 0; i < data.venues.length; i++) {
+
+			venue = data.venues[i];
+			color = hex2rgb(venue.color);
+			color = color.join(', ');
+
+			yaml += "    _venue_layer_" + i + ":\n";
+			yaml += "        data: { source: _venue_source_" + i + " }\n";
+			yaml += "        _dots:\n";
+			yaml += "            draw:\n";
+			yaml += "                _points:\n";
+			yaml += "                    color: rgba(" + color + ", 0.7)\n";
+			yaml += "                    size: 12px\n";
+			yaml += "                    outline:\n";
+			yaml += "                        width: 2px\n";
+			yaml += "                        color: \"" + venue.color + "\"\n";
+			yaml += "                    text:\n";
+			yaml += "                        text_source: name\n";
+			yaml += "                        font:\n";
+			yaml += "                            family: global.text_font_family\n";
+			yaml += "                            weight: bold\n";
+			yaml += "                            fill: black\n";
+			yaml += "                            size: 10pt\n";
+			yaml += "                            stroke:\n";
+			yaml += "                                width: 5px\n";
+			yaml += "                                color: white\n";
+		}
+
+		response.set('Content-Type', 'text/plain');
+		response.send(yaml);
+	};
+
+	var onerror = function() {
+		response.status(500).send('Error loading Tangram venues');
+	};
+
+	load_map(request.params.slug).then(onsuccess, onerror);
+
+});
+
+// Load Tangram venues layer (used for print)
+app.get("/api/geojson/:map_id/:id", function(request, response) {
+
+	var onsuccess = function(data) {
+
+		var feature = {
+			type: 'Feature',
+			properties: {
+				name: data.name
+			},
+			geometry: {
+				type: 'Point',
+				coordinates: [
+					parseFloat(data.longitude),
+					parseFloat(data.latitude)
+				]
+			}
+		};
+		var collection = {
+			type: 'FeatureCollection',
+			features: [feature]
+		}
+		response.json(collection);
+	};
+
+	var onerror = function() {
+		response.status(500).send('Error loading venue GeoJSON');
+	};
+
+	var name = "maps:" + request.params.map_id + ":" + request.params.id;
+	dotdata.get(name).then(onsuccess, onerror);
+
+});
+
 // Export a map
 app.get("/api/export/:slug", function(request, response) {
 

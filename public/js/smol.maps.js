@@ -37,6 +37,49 @@ smol.maps = (function() {
 				zoomControl: false
 			});
 
+			self.tangram = Tangram.leafletLayer({
+				scene: self.tangram_scene()
+			}).addTo(self.map);
+
+			var initial_load = true;
+			self.tangram.scene.subscribe({
+				load: function() {
+					if (self.config.tiles_url) {
+						var sources = self.tangram_sources();
+						for (var source in sources) {
+							if (sources[source].url.substr(0, 24) == 'https://tile.mapzen.com/') {
+								sources[source].url_params = {
+									api_key: self.config.mapzen_api_key
+								};
+							}
+							self.tangram.scene.setDataSource(source, sources[source]);
+						}
+						self.tangram.scene.updateConfig();
+					}
+				},
+				view_complete: function() {
+					if (initial_load) {
+						initial_load = false;
+						if (location.search.indexOf('save') !== -1) {
+							setTimeout(function() {
+								// Wait 1s... to account for venues fading in
+								self.screengrab();
+							}, 1000);
+						} else {
+							for (var i = 0; i < self.data.venues.length; i++) {
+								self.add_marker(self.data.venues[i]);
+							}
+						}
+					}
+				}
+			});
+
+			if (self.data.map.name) {
+				document.title = self.data.map.name;
+			} else {
+				document.title = self.data.map.slug;
+			}
+
 			var hash = location.hash.match(/^#([0-9.]+)\/(-?[0-9.]+)\/(-?[0-9.]+)$/);
 			if (hash) {
 				var zoom = parseFloat(hash[1]);
@@ -53,6 +96,11 @@ smol.maps = (function() {
 				self.set_bbox(bbox);
 			}
 
+			if (location.search.indexOf('save') !== -1) {
+				// If we are saving a static map image, we're all done!
+				return;
+			}
+
 			if ($(document.body).width() > 640) {
 				L.control.zoom({
 					position: 'bottomleft'
@@ -61,10 +109,6 @@ smol.maps = (function() {
 				$('.leaflet-control-zoom-out').html('<span class="fa fa-minus"></span>');
 				$('#leaflet').addClass('has-zoom-controls');
 			}
-
-			self.tangram = Tangram.leafletLayer({
-				scene: self.tangram_scene()
-			}).addTo(self.map);
 
 			L.control.geocoder(self.config.mapzen_api_key, {
 				expanded: true,
@@ -94,38 +138,6 @@ smol.maps = (function() {
 			}).addTo(self.map);
 
 			slippymap.crosshairs.init(self.map);
-
-			var initial_load = true;
-			self.tangram.scene.subscribe({
-				load: function() {
-					if (self.config.tiles_url) {
-						var sources = self.tangram_sources();
-						for (var source in sources) {
-							if (sources[source].url.substr(0, 24) == 'https://tile.mapzen.com/') {
-								sources[source].url_params = {
-									api_key: self.config.mapzen_api_key
-								};
-							}
-							self.tangram.scene.setDataSource(source, sources[source]);
-						}
-						self.tangram.scene.updateConfig();
-					}
-				},
-				view_complete: function() {
-					if (initial_load) {
-						initial_load = false;
-						for (var i = 0; i < self.data.venues.length; i++) {
-							self.add_marker(self.data.venues[i]);
-						}
-					}
-				}
-			});
-
-			if (self.data.map.name) {
-				document.title = self.data.map.name;
-			} else {
-				document.title = self.data.map.slug;
-			}
 
 			$('#leaflet').click(function(e) {
 				if ($(e.target).hasClass('display') &&
@@ -236,6 +248,10 @@ smol.maps = (function() {
 			scene.global.sdk_transit_overlay = (map.transit_overlay == "1");
 			scene.global.sdk_path_overlay = (map.trail_overlay == "1");
 			scene.global.sdk_bike_overlay = (map.bike_overlay == "1");
+
+			if (location.search.indexOf('save') !== -1) {
+				scene.import.push('/api/tangram/' + map.slug);
+			}
 
 			return scene;
 		},
@@ -503,6 +519,14 @@ smol.maps = (function() {
 			}, function() {
 				$('.leaflet-popup form .response').removeClass('hidden');
 				$('.leaflet-popup form .response').html('Error: Could not save venue name.');
+			});
+		},
+
+		screengrab: function() {
+			self.tangram.scene.screenshot().then(function(sh) {
+				var prefix = self.data.map.slug;
+				var fname = prefix + '-' + (new Date().getTime()) + '.png';
+				saveAs(sh.blob, fname);
 			});
 		}
 	};

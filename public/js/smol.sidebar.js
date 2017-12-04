@@ -35,6 +35,7 @@ smol.sidebar = (function() {
 			$('#leaflet').addClass('show-sidebar');
 			smol.maps.map.invalidateSize(false);
 			slippymap.crosshairs.draw_crosshairs('leaflet');
+			$('#utility-save').attr('href', '/' + smol.maps.data.map.slug + '?save=1' + location.hash);
 			$('#utility-export').attr('href', '/api/export/' + smol.maps.data.map.slug);
 		},
 

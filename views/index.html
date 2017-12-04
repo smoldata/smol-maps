@@ -40,7 +40,8 @@
 						<div id="sidebar-config-utility" class="hidden">
 							<ul>
 								<!--<li><a href="#" id="utility-import">Import map GeoJSON</a></li>-->
-								<li><a href="#" id="utility-export">Export map GeoJSON</a></li>
+								<li><a href="#" id="utility-save">Save as static image</a></li>
+								<li><a href="#" id="utility-export">Export GeoJSON</a></li>
 								<li><a href="#" id="utility-config">Configure Smol Maps</a></li>
 							</ul>
 						</div>
@@ -201,10 +202,7 @@
 						<input type="submit" name="action" class="btn btn-save" value="Save">
 						<input type="submit" name="action" class="btn btn-cancel" value="Cancel">
 					</div>
-					<!--<div id="map-links">
-						<a href="#" id="map-print" target="_blank">Print this map</a>
-						<a href="#" class="edit-delete">Delete this map?</a>
-					</div>-->
+					<!-- <a href="#" class="edit-delete">Delete map</a> -->
 				</form>
 
 				<form action="/api/venue" method="post" id="venue" class="menu-page">
@@ -287,6 +285,7 @@
 		<script src="/lib/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
 		<script src="/lib/leaflet-hash.js"></script>
 		<script src="/lib/slippymap.crosshairs.js"></script>
+		<script src="/lib/file-saver/FileSaver.min.js"></script>
 		<script src="/js/leaflet-add-venue.js"></script>
 		<script src="/js/wof.megacities.js"></script>
 		<script src="/js/smol.maps.js"></script>
