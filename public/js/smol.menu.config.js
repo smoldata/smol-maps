@@ -16,12 +16,12 @@ smol.menu.config = (function() {
 			self.places_show(function() {
 				$('#config-places-select .place:first-child').trigger('click');
 			});
-			$('#config-location, #config-api-key').focus(function(e) {
+			$('#config-location').focus(function(e) {
 				if (e && e.target) {
 					$(e.target).addClass('is-focused');
 				}
 			});
-			$('#config-location, #config-api-key').blur(function(e) {
+			$('#config-location').blur(function(e) {
 				if (e && e.target) {
 					$(e.target).removeClass('is-focused');
 				}
@@ -32,16 +32,18 @@ smol.menu.config = (function() {
 				}
 				setTimeout(self.places_show, 0);
 			});
-			$('#config-api-key').keypress(function(e) {
-				if (! $('#config-api-key').hasClass('is-focused')) {
-					return;
-				}
-				if (e && e.target) {
-					setTimeout(function() {
-						var api_key = $(e.target).val().trim();
-						self.validate_api_key(api_key);
-					}, 0);
-				}
+			$('#config-api-key').change(function() {
+				var api_key = $('#config-api-key').val();
+				api_key = api_key.trim();
+				self.validate_api_key(api_key, function(rsp) {
+					if (rsp.stat == 'ok') {
+						valid_api_key = true;
+					} else {
+						valid_api_key = false;
+					}
+				}, function(rsp) {
+					valid_api_key = false;
+				});
 			});
 		},
 
@@ -49,7 +51,6 @@ smol.menu.config = (function() {
 			$('#config-api-key').val(config.mapzen_api_key);
 			$('input[name="default_bbox"]').val(config.default_bbox);
 			$('input[name="default_wof_id"]').val(config.default_wof_id);
-			self.validate_api_key(config.mapzen_api_key);
 
 			if (parseInt(config.default_wof_id) != -1) {
 				var onsuccess = function(rsp) {
@@ -84,13 +85,13 @@ smol.menu.config = (function() {
 		},
 
 		validate: function() {
-			if (! valid_api_key) {
+			if (valid_api_key) {
+				return { ok: 1 };
+			} else {
 				return {
 					ok: 0,
-					error: 'API key is invalid.'
+					error: 'Invalid API key.'
 				};
-			} else {
-				return { ok: 1 };
 			}
 		},
 
@@ -104,24 +105,7 @@ smol.menu.config = (function() {
 			}, 2000);
 		},
 
-		validate_api_key: function(api_key) {
-			var onerror = function() {
-				valid_api_key = false;
-				$('#config-location').attr('disabled', 'disabled');
-				$('#config-location').attr('placeholder', 'Search for a default location (requires valid API key)');
-			};
-			var onsuccess = function(rsp) {
-				if (rsp.stat == 'ok') {
-					valid_api_key = true;
-					$('#config-location').attr('disabled', null);
-					$('#config-location').attr('placeholder', 'Search for a default location');
-				} else {
-					onerror();
-				}
-			};
-			if (api_key == '') {
-				onerror();
-			}
+		validate_api_key: function(api_key, onsuccess, onerror) {
 			$.get('https://places.mapzen.com/v1?' + $.param({
 				api_key: api_key,
 				method: 'api.test.echo'
@@ -140,8 +124,7 @@ smol.menu.config = (function() {
 			$('input[name="default_bbox"]').val(bbox);
 			$('input[name="default_wof_id"]').val(wof_id);
 
-			if (wof_id && wof_id != -1 &&
-			    valid_api_key) {
+			if (wof_id && wof_id != -1) {
 				var api_key = $('#config-api-key').val().trim();
 				$.get('https://places.mapzen.com/v1?' + $.param({
 					method: 'mapzen.places.getInfo',
@@ -164,36 +147,36 @@ smol.menu.config = (function() {
 
 			var api_key = $('#config-api-key').val().trim();
 
-			if (valid_api_key) {
-				var text = $('#config-location').val();
-				if (text == '') {
-					$('#config-places-select').html('');
-					$('#config-places-random').trigger('click');
-				} else {
-					$.get('https://search.mapzen.com/v1/autocomplete?' + $.param({
-						text: text,
-						sources: 'wof',
-						api_key: api_key
-					})).then(function(rsp) {
-						var $select = $('#config-places-select');
-						var places = '';
-						$.each(rsp.features, function(i, feature) {
-							places += '<div class="place" data-bbox="' + feature.bbox.join(',') + '"data-wof-id="' + feature.properties.id + '"><span class="fa fa-check"></span> ' + feature.properties.label + '</div>';
-						});
-						$select.html(places);
-						$('#config-places-select .place').click(self.place_click);
-
-						var wof_id = $('input[name="default_wof_id"]').val();
-						$('.place[data-wof-id="' + wof_id + '"]').trigger('click');
-						if ($select.find('.selected').length == 0) {
-							$('#config-places-random').trigger('click');
-						}
-
-						if (typeof cb == 'function') {
-							cb(rsp);
-						}
+			var text = $('#config-location').val();
+			if (text == '') {
+				$('#config-places-select').html('');
+				$('#config-places-random').trigger('click');
+			} else {
+				$.get('https://search.mapzen.com/v1/autocomplete?' + $.param({
+					text: text,
+					sources: 'wof',
+					api_key: api_key
+				})).then(function(rsp) {
+					var $select = $('#config-places-select');
+					var places = '';
+					$.each(rsp.features, function(i, feature) {
+						places += '<div class="place" data-bbox="' + feature.bbox.join(',') + '"data-wof-id="' + feature.properties.id + '"><span class="fa fa-check"></span> ' + feature.properties.label + '</div>';
 					});
-				}
+					$select.html(places);
+					$('#config-places-select .place').click(self.place_click);
+
+					var wof_id = $('input[name="default_wof_id"]').val();
+					$('.place[data-wof-id="' + wof_id + '"]').trigger('click');
+					if ($select.find('.selected').length == 0) {
+						$('#config-places-random').trigger('click');
+					}
+
+					if (typeof cb == 'function') {
+						cb(rsp);
+					}
+				}, function(rsp) {
+					$('#config-places-select').html('<div class="response">Error loading places. Invalid API key?</div>');
+				});
 			}
 		},
 
