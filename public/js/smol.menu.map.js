@@ -17,6 +17,11 @@ smol.menu.map = (function() {
 
 			$('#map-style').change(self.update);
 			$('#map-theme').change(self.update);
+
+			$('#map .edit-delete').click(function(e) {
+				e.preventDefault();
+				self.delete_map();
+			});
 		},
 
 		update: function() {
@@ -96,6 +101,19 @@ smol.menu.map = (function() {
 				bounds._northEast.lat.toFixed(6)
 			];
 			$('#map-bbox').val(bbox.join(','));
+		},
+
+		delete_map: function() {
+			var map = smol.maps.data.map;
+			var name = map.name || map.slug;
+			if (! confirm("Are you sure you want to delete " + name + "?")) {
+				return;
+			}
+			map.active = 0;
+			$.post('/api/map/' + map.slug, map).then(function() {
+				var base_url = window.location.href.match(/https?:\/\/(.+?)\//);
+				window.location = base_url[0];
+			});
 		}
 
 	}

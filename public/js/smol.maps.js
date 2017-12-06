@@ -187,6 +187,11 @@ smol.maps = (function() {
 
 		load_map: function(slug) {
 			$.get('/api/map/' + slug).then(function(data) {
+				if (data.map.active == "0") { // Blarg, change this "0" to 0 someday
+					var base_url = window.location.href.match(/https?:\/\/(.+?)\//);
+					window.location = base_url[0];
+					return;
+				}
 				self.data = data;
 				self.setup_map();
 				smol.sidebar.update_map(data.map);
