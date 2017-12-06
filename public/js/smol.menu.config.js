@@ -96,6 +96,7 @@ smol.menu.config = (function() {
 		},
 
 		submit: function(config) {
+			config.random_slug = smol.maps.config.random_slug;
 			smol.maps.config = config;
 			smol.maps.setup_data();
 			smol.menu.hide();

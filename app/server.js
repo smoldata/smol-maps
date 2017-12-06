@@ -55,8 +55,10 @@ app.get("/api/config", function(request, response) {
 	var onerror = function(err) {
 		response.send({
 			ok: 0,
-			error: err,
-			data: {}
+			error: 'Could not load config.',
+			data: {
+				random_slug: url_words.random()
+			}
 		});
 	};
 	dotdata.get("config")

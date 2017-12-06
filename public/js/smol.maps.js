@@ -20,6 +20,7 @@ smol.maps = (function() {
 					self.setup_map();
 				} else {
 					$('#menu').addClass('no-animation');
+					self.config = rsp.data;
 					smol.menu.show('config');
 				}
 			}, function(rsp) {
