@@ -66,7 +66,14 @@ smol.menu = (function() {
 			if (smol.menu[page] &&
 				typeof smol.menu[page].validate == 'function') {
 				var rsp = smol.menu[page].validate();
-				if (! rsp.ok) {
+				if (rsp.ok == -1) {
+					// -1 means "mayyyybe?"
+					// Wait a second and then try again
+					setTimeout(function() {
+						self.submit(e)
+					}, 250);
+					return;
+				} else if (! rsp.ok) {
 					$form.find('.response').html(rsp.error);
 					return;
 				}

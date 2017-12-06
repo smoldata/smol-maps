@@ -33,6 +33,7 @@ smol.menu.config = (function() {
 				setTimeout(self.places_show, 0);
 			});
 			$('#config-api-key').change(function() {
+				valid_api_key = -1; // -1 is a signal that we're checking
 				var api_key = $('#config-api-key').val();
 				api_key = api_key.trim();
 				self.validate_api_key(api_key, function(rsp) {
@@ -85,7 +86,9 @@ smol.menu.config = (function() {
 		},
 
 		validate: function() {
-			if (valid_api_key) {
+			if (valid_api_key == -1) {
+				return { ok: -1 };
+			} else if (valid_api_key) {
 				return { ok: 1 };
 			} else {
 				return {
