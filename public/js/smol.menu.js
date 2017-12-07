@@ -74,14 +74,16 @@ smol.menu = (function() {
 					}, 250);
 					return;
 				} else if (! rsp.ok) {
-					$form.find('.response').html(rsp.error);
+					var esc_error = smol.esc_html(rsp.error);
+					$form.find('.response').html(esc_error);
 					return;
 				}
 			}
 
 			var onerror = function(rsp) {
 				var error = rsp.error || 'Error submitting data.';
-				$form.find('.response').html(error);
+				var esc_error = smol.esc_html(error);
+				$form.find('.response').html(esc_error);
 			};
 
 			var onsuccess = function(rsp) {

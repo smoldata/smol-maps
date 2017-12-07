@@ -121,8 +121,10 @@ smol.menu.venue = (function() {
 			}
 
 			var icons = [];
+			var icon;
 			for (var i = 0; i < recent.length; i++) {
-				icons.push('<a href="#" class="icon-bg" data-icon="' + recent[i] + '"><span class="icon" style="background-image: url(/img/icons/' + recent[i] + '.svg);"></span><span class="icon-label">' + recent[i] + '</span></a>');
+				esc_icon = smol.esc_html(recent[i]);
+				icons.push('<a href="#" class="icon-bg" data-icon="' + esc_icon + '"><span class="icon" style="background-image: url(/img/icons/' + esc_icon + '.svg);"></span><span class="icon-label">' + esc_icon + '</span></a>');
 				if (icons.length == 9) {
 					break;
 				}
@@ -135,7 +137,8 @@ smol.menu.venue = (function() {
 				$.get('/api/icons').then(function(rsp) {
 					var icons = '';
 					$.each(rsp.icons, function(i, icon) {
-						icons += '<a href="#" class="icon-bg" data-icon="' + icon + '"><span class="icon" style="background-image: url(/img/icons/' + icon + '.svg);" title="' + icon + '"></span><span class="icon-label">' + icon + '</span></a>';
+						esc_icon = smol.esc_html(icon);
+						icons += '<a href="#" class="icon-bg" data-icon="' + esc_icon + '"><span class="icon" style="background-image: url(/img/icons/' + esc_icon + '.svg);" title="' + esc_icon + '"></span><span class="icon-label">' + esc_icon + '</span></a>';
 					});
 					$('#venue-icons').html(icons);
 					$('#venue-icons .icon-bg').click(self.venue_icon_click);
@@ -219,7 +222,8 @@ smol.menu.venue = (function() {
 
 			$.post('/api/venue', delete_venue).then(function(rsp) {
 				if (rsp.error) {
-					$('.response').html(rsp.error);
+					var esc_error = smol.esc_html(rsp.error);
+					$('.response').html(esc_error);
 					$('.response').addClass('error');
 					return;
 				}

@@ -13,7 +13,8 @@ smol.menu.map = (function() {
 			});
 
 			var base_url = location.href.match(/https?:\/\/.+?\//)[0];
-			$('#map-base-url').html(base_url);
+			var esc_base_url = smol.esc_html(base_url);
+			$('#map-base-url').html(esc_base_url);
 
 			$('#map-style').change(self.update);
 			$('#map-theme').change(self.update);

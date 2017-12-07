@@ -2,6 +2,10 @@ var smol = smol || {};
 
 smol.esc_html = function(html) {
 
+	if (typeof html != 'string') {
+		return html;
+	}
+
 	// & comes first, to avoid double-encoding
 	var esc_html = html.replace(/&/g, '&amp;');
 

@@ -375,7 +375,8 @@ smol.maps = (function() {
 
 			marker.on('popupclose', function() {
 				if (this.venue.name) {
-					this.bindTooltip(this.venue.name);
+					var esc_name = smol.esc_html(this.venue.name);
+					this.bindTooltip(esc_name);
 				}
 			});
 
@@ -402,7 +403,8 @@ smol.maps = (function() {
 				$.post('/api/venue', venue).then(onsuccess, onerror);
 
 				if (this.venue.name) {
-					this.bindTooltip(this.venue.name);
+					var esc_name = smol.esc_html(this.venue.name);
+					this.bindTooltip(esc_name);
 				}
 			});
 
@@ -414,21 +416,26 @@ smol.maps = (function() {
 			var marker = self.markers[venue.id];
 			marker.venue = venue;
 
-			var data_id = venue.id ? ' data-venue-id="' + venue.id + '"' : '';
+			var esc_id = smol.esc_html(venue.id);
+			var esc_color = smol.esc_html(venue.color);
+			var esc_icon = smol.esc_html(venue.icon);
+			var esc_name = smol.esc_html(venue.name);
+
+			var data_id = venue.id ? ' data-venue-id="' + esc_id + '"' : '';
 			var hsl = smol.color.hex2hsl(venue.color);
 			var icon_inverted = (hsl.l < 0.66) ? ' inverted' : '';
-			var name = venue.name;
-			if (! name) {
+
+			if (! venue.name) {
 				var lat = parseFloat(venue.latitude).toFixed(6);
 				var lng = parseFloat(venue.longitude).toFixed(6);
-				name = lat + ', ' + lng;
+				esc_name = smol.esc_html(lat + ', ' + lng);
 			}
 			var html = '<form action="/api/venue" class="venue"' + data_id + ' onsubmit="smol.maps.venue_edit_name_save(); return false;">' +
-					'<div class="icon-bg" style="background-color: ' + venue.color + ';">' +
-					'<div class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + venue.icon + '.svg);"></div></div>' +
-					'<div class="name">' +
-					'<div class="display">' + name + '</div>' +
-					'<input type="text" name="name" value="' + name + '">' +
+					'<div class="icon-bg" style="background-color: ' + esc_color + ';">' +
+					'<div class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + esc_icon + '.svg);"></div></div>' +
+					'<div class="name" data-name="' + esc_name + '">' +
+					'<div class="display">' + esc_name + '</div>' +
+					'<input type="text" name="name" value="' + esc_name + '">' +
 					'<div class="response hidden"></div>' +
 					'<div class="buttons">' +
 					'<input type="button" value="Cancel" class="btn btn-cancel">' +
@@ -446,7 +453,8 @@ smol.maps = (function() {
 				marker._icon.style.backgroundColor = rgba;
 			}
 			if (venue.name) {
-				marker.bindTooltip(venue.name);
+				var esc_name = smol.esc_html(venue.name);
+				marker.bindTooltip(esc_name);
 			} else {
 				marker.unbindTooltip();
 			}
@@ -477,7 +485,7 @@ smol.maps = (function() {
 				return;
 			}
 			$venue.closest('.leaflet-popup').addClass('editing');
-			var name = $venue.find('.name .display').html();
+			var name = $venue.find('.name').data('name');
 			$venue.find('.name input[type="text"]').val(name);
 			$venue.find('.name input[type="text"]')[0].select();
 
@@ -494,6 +502,9 @@ smol.maps = (function() {
 			var id = $('.leaflet-popup form').data('venue-id');
 			var venue = null;
 
+			var esc_name = smol.esc_html(name);
+			$('.leaflet-popup .name').data('name', esc_name);
+
 			for (var i = 0; i < smol.maps.data.venues.length; i++) {
 				if (smol.maps.data.venues[i].id == id) {
 					venue = smol.maps.data.venues[i];
@@ -508,7 +519,8 @@ smol.maps = (function() {
 			}
 
 			$.post('/api/venue', venue).then(function(rsp) {
-				$('.leaflet-popup .name .display').html(name);
+				var esc_name = smol.esc_html(name);
+				$('.leaflet-popup .name .display').html(esc_name);
 				$('.leaflet-popup').removeClass('editing');
 				smol.sidebar.update_venue(venue);
 				self.update_marker(venue);

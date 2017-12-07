@@ -49,6 +49,7 @@ smol.menu.config = (function() {
 		},
 
 		setup: function(config) {
+
 			$('#config-api-key').val(config.mapzen_api_key);
 			$('input[name="default_bbox"]').val(config.default_bbox);
 			$('input[name="default_wof_id"]').val(config.default_wof_id);
@@ -56,11 +57,13 @@ smol.menu.config = (function() {
 			if (parseInt(config.default_wof_id) != -1) {
 				var onsuccess = function(rsp) {
 					var feature = rsp.place;
-					var bbox = feature['geom:bbox'];
-					var label = feature['wof:name'] + ', ' + feature['wof:country'];
-					var html = '<div class="place selected" data-bbox="' + bbox + '"data-wof-id="' + feature['wof:id'] + '"><span class="fa fa-check"></span> ' + label + '</div>';
+					var esc_id = smol.esc_html(feature['wof:id']);
+					var esc_bbox = smol.esc_html(feature['geom:bbox']);
+					var esc_label = smol.esc_html(feature['wof:name']) + ', ' +
+					                smol.esc_html(feature['wof:country']);
+					var html = '<div class="place selected" data-wof-id="' + esc_id + '" data-bbox="' + esc_bbox + '"><span class="fa fa-check"></span> ' + esc_label + '</div>';
 					$('#config-places-select').html(html);
-					$('#config-location').val(label);
+					$('#config-location').val(esc_label);
 					$('#config-places-random').removeClass('selected');
 				};
 
@@ -164,7 +167,12 @@ smol.menu.config = (function() {
 					var $select = $('#config-places-select');
 					var places = '';
 					$.each(rsp.features, function(i, feature) {
-						places += '<div class="place" data-bbox="' + feature.bbox.join(',') + '"data-wof-id="' + feature.properties.id + '"><span class="fa fa-check"></span> ' + feature.properties.label + '</div>';
+
+						var esc_id = smol.esc_html(feature.properties.id);
+						var esc_bbox = smol.esc_html(feature.bbox.join(','));
+						var esc_label = smol.esc_html(feature.properties.label);
+
+						places += '<div class="place" data-wof-id="' + esc_id + '" data-bbox="' + esc_bbox + '"><span class="fa fa-check"></span> ' + esc_label + '</div>';
 					});
 					$select.html(places);
 					$('#config-places-select .place').click(self.place_click);
