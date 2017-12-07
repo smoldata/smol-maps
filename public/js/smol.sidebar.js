@@ -37,6 +37,8 @@ smol.sidebar = (function() {
 					html += '<h1 class="name">' + name + '</h1>';
 					if (map.author) {
 						html += '<div class="author">' + map.author + '</div>';
+					} else {
+						html += '<div class="author hidden"></div>';
 					}
 					html += '<a href="/' + map.slug + '"></a>';
 					html += '</li>';
@@ -97,6 +99,13 @@ smol.sidebar = (function() {
 				$('#sidebar-map .description').removeClass('hidden');
 			} else {
 				$('#sidebar-map .description').addClass('hidden');
+			}
+			$('#sidebar-map-' + map.id + ' .name').html(map.name || map.slug);
+			if (map.author) {
+				$('#sidebar-map-' + map.id + ' .author').html(map.author);
+				$('#sidebar-map-' + map.id + ' .author').removeClass('hidden');
+			} else {
+				$('#sidebar-map-' + map.id + ' .author').addClass('hidden');
 			}
 		},
 
