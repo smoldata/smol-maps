@@ -28,13 +28,25 @@
 			<div id="sidebar">
 
 				<span id="sidebar-close"><span class="fa fa-close"></span></span>
-				<div id="sidebar-map">
-					<h1 id="sidebar-map-name"></h1>
-					<div id="sidebar-map-author"></div>
-					<div id="sidebar-map-description"></div>
-					<a href="#" id="sidebar-map-edit">Edit map</a>
+
+				<a href="#" id="sidebar-back" class="btn hidden">
+					<span class="fa fa-arrow-left"></span>
+					<span id="sidebar-back-name"></span>
+				</a>
+				<div id="sidebar-map" class="sidebar-map">
+					<h1 class="name"></h1>
+					<div class="author"></div>
+					<div class="description"></div>
 				</div>
-				<ul id="sidebar-items"></ul>
+
+				<div id="sidebar-buttons">
+					<a href="#" id="sidebar-map-edit" class="btn">Edit map</a>
+					<a href="#" id="sidebar-map-browse" class="btn">Browse maps</a>
+				</div>
+
+				<ul id="sidebar-venues"></ul>
+				<ul id="sidebar-maps" class="hidden"></ul>
+
 				<div id="sidebar-config">
 					<div class="relative">
 						<div id="sidebar-config-utility" class="hidden">

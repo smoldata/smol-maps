@@ -195,6 +195,47 @@ var save_map = function(request, response) {
 	});
 };
 
+// Load map index
+app.get("/api/map", function(request, response) {
+
+	var onerror = function() {
+		response.status(500).send('Could not load map index.');
+	};
+
+	dotdata.index('maps').then(function(index) {
+
+		var maps = [];
+
+		var ready = function() {
+			response.send({
+				ok: 1,
+				maps: maps
+			});
+		};
+
+		var get_map = function(slug) {
+			return new Promise(function(resolve, reject) {
+				var name = "maps:" + slug;
+				dotdata.get(name).then(function(map) {
+					if (map.active != "0") { // This is a kludge, the value should be 0 not "0"
+						maps.push(map);
+					}
+					resolve(map);
+				}, function(err) {
+					reject(err);
+				});
+			});
+		};
+
+		var map_promises = [];
+		for (var i = 0; i < index.data.length; i++) {
+			map_promises.push(get_map(index.data[i]));
+		}
+		Promise.all(map_promises).then(ready, onerror);
+
+	}, onerror);
+});
+
 // Create a new map
 app.post("/api/map", function(request, response) {
 	save_map(request, response);

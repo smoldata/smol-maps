@@ -208,6 +208,7 @@ code {
 	cursor: pointer;
 	text-transform: uppercase;
 	margin-left: 5px;
+	text-decoration: none;
 }
 
 .btn:hover {

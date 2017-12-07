@@ -14,6 +14,10 @@
 	display: block;
 }
 
+#sidebar a:hover {
+	color: #fff;
+}
+
 #sidebar-close {
 	color: #fff;
 	position: fixed;
@@ -22,6 +26,7 @@
 	font-size: 24px;
 	padding: 10px;
 	cursor: pointer;
+	z-index: 1;
 }
 
 #sidebar-config {
@@ -34,11 +39,11 @@
 	cursor: pointer;
 }
 
-#sidebar-items {
+#sidebar-venues {
 	margin: 10px 0 30px 0;
 }
 
-#sidebar-items li {
+#sidebar-venues li {
 	position: relative;
 	padding: 7.5px 10px;
 	height: 55px;
@@ -46,7 +51,7 @@
 	cursor: pointer;
 }
 
-#sidebar-items li:hover {
+#sidebar-venues li:hover {
 	background: rgba(255, 255, 255, 0.1);
 }
 
@@ -62,7 +67,7 @@
 	cursor: pointer;
 }
 
-#sidebar .name {
+#sidebar-venues .name {
 	position: absolute;
 	left: 60px;
 	top: 50%;
@@ -73,25 +78,21 @@
 	width: calc(100% - 70px);
 }
 
-#sidebar-map {
-	padding: 0 10px;
-}
-
-#sidebar a:hover {
-	color: #fff;
+.sidebar-map {
+	padding: 15px 10px 20px 10px;
 }
 
 #sidebar h1 {
-	margin: 20px 0 10px 0;
+	margin: 0;
 }
 
-#sidebar-map-author::before {
+.sidebar-map .author::before {
 	content: "by ";
 }
 
-#sidebar-map-author,
-#sidebar-map-description {
-	margin-bottom: 10px;
+.sidebar-map .author,
+.sidebar-map .description {
+	margin-top: 10px;
 	line-height: 1.5;
 }
 
@@ -117,4 +118,58 @@
 #sidebar-config-utility a:hover {
 	color: #fff;
 	background: #8442D5;
+}
+
+#sidebar-buttons {
+	margin-bottom: 20px;
+	padding: 10px;
+}
+
+#sidebar-map-edit {
+	margin-left: 0;
+}
+
+#sidebar-map-browse {
+	margin-left: 10px;
+}
+
+#sidebar .btn:hover {
+	color: #170A26;
+	background: #fff;
+	border-color: #fff;
+}
+
+#sidebar-maps {
+	margin: 15px 0;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar-maps .sidebar-map {
+	position: relative;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar-maps .sidebar-map:hover {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+#sidebar-maps .sidebar-map a {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}
+
+#sidebar-back {
+	display: inline-block;
+	margin: 15px 10px 0 10px;
+}
+
+#sidebar-back .fa {
+	margin-left: -5px;
+}
+
+#sidebar-back-name {
+	margin-left: 5px;
 }
