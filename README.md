@@ -1,7 +1,5 @@
 # Smol Maps
 
-Note: this is a work in progress port from the more feature-complete [php-smol-maps](https://github.com/smoldata/php-smol-maps).
-
 ## Remix on Glitch
 
 1. Register a free [Mapzen API key](https://mapzen.com/dashboard)
@@ -34,3 +32,7 @@ There is one more fun detail for Linux users. Depending on the distro you use, y
     ```
 3. Load the website: http://localhost:4321/
 4. When prompted, enter the API key you just registered, and choose your default location
+
+## See also
+
+* [php version](https://github.com/smoldata/php-smol-maps/)
