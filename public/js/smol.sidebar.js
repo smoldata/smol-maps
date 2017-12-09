@@ -148,7 +148,10 @@ smol.sidebar = (function() {
 
 			$('#sidebar-venue-' + venue.id).click(function(e) {
 				e.preventDefault();
-				smol.maps.markers[venue.id].openPopup();
+				var marker = smol.maps.markers[venue.id];
+				if (! marker.isPopupOpen()) {
+					marker.openPopup();
+				}
 			});
 		}
 	};

@@ -457,7 +457,7 @@ smol.maps = (function() {
 			var html = '<form action="/api/venue" class="venue"' + data_id + ' onsubmit="smol.maps.venue_edit_name_save(); return false;">' +
 					'<div class="icon-bg" style="background-color: ' + esc_color + ';">' +
 					'<div class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + esc_icon + '.svg);"></div></div>' +
-					'<div class="name" data-name="' + esc_name + '">' +
+					'<div class="name single-line" data-name="' + esc_name + '">' +
 					'<div class="display">' + esc_name + '</div>' +
 					'<input type="text" name="name" value="' + esc_name + '">' +
 					'<div class="response hidden"></div>' +
@@ -491,12 +491,21 @@ smol.maps = (function() {
 				// which isn't the case here.
 				// (20171117/dphiffer)
 
-				var h = $('.leaflet-popup .name').height();
-				if (h < 30) {
-					$('.leaflet-popup .name').addClass('single-line');
-				} else {
-					$('.leaflet-popup .name').removeClass('single-line');
-				}
+				// In the absense of a good CSS-only approach I am adding
+				// an ugly awful setTimeout to account for the time it takes for
+				// Leaflet popup content to settle. Why 250ms? I dunno, it
+				// seemed to work on my laptop. I used 500ms somewhere else,
+				// but I suspect it depends on various client-side factors.
+				// (20171209/dphiffer)
+
+				setTimeout(function() {
+					var h = $('.leaflet-popup .name').height();
+					if (h < 30) {
+						$('.leaflet-popup .name').addClass('single-line');
+					} else {
+						$('.leaflet-popup .name').removeClass('single-line');
+					}
+				}, 250);
 			});
 
 			marker.on('popupclose', function(e) {
@@ -557,12 +566,14 @@ smol.maps = (function() {
 				// See comment above, in the popupopen handler, about doing this
 				// CSS-only.
 
-				var h = $('.leaflet-popup .name').height();
-				if (h < 30) {
-					$('.leaflet-popup .name').addClass('single-line');
-				} else {
-					$('.leaflet-popup .name').removeClass('single-line');
-				}
+				setTimeout(function() {
+					var h = $('.leaflet-popup .name').height();
+					if (h < 30) {
+						$('.leaflet-popup .name').addClass('single-line');
+					} else {
+						$('.leaflet-popup .name').removeClass('single-line');
+					}
+				}, 250);
 			}, function() {
 				$('.leaflet-popup form .response').removeClass('hidden');
 				$('.leaflet-popup form .response').html('Error: Could not save venue name.');
