@@ -77,9 +77,22 @@ smol.menu.config = (function() {
 		},
 
 		show: function() {
+
+			self.validate_api_key(smol.maps.config.mapzen_api_key, function(rsp) {
+				if (rsp.stat == 'ok') {
+					valid_api_key = true;
+				} else {
+					valid_api_key = false;
+				}
+			}, function(rsp) {
+				valid_api_key = false;
+			});
+
 			if (smol.maps.config && smol.maps.config.mapzen_api_key) {
 				return;
 			}
+
+			// Hide these on first run
 			$('#menu-close').addClass('hidden');
 			$('#config-cancel').addClass('hidden');
 		},
