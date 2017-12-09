@@ -508,16 +508,21 @@ smol.maps = (function() {
 			if ($venue.length == 0) {
 				return;
 			}
-			$venue.closest('.leaflet-popup').addClass('editing');
-			var name = $venue.find('.name').data('name');
-			$venue.find('.name input[type="text"]').val(name);
-			$venue.find('.name input[type="text"]')[0].select();
 
-			$venue.find('.btn-cancel').click(function(e) {
-				e.preventDefault();
-				e.stopPropagation();
-				$(e.target).closest('.leaflet-popup').removeClass('editing');
-			});
+			// Since Leaflet is swapping DOM content in the popup window, we
+			// need to wait a moment for that to finish. (20171209/dphiffer)
+			setTimeout(function() {
+				$venue.closest('.leaflet-popup').addClass('editing');
+				var name = $venue.find('.name').data('name');
+				$venue.find('.name input[type="text"]').val(name);
+				$venue.find('.name input[type="text"]')[0].select();
+
+				$venue.find('.btn-cancel').click(function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+					$(e.target).closest('.leaflet-popup').removeClass('editing');
+				});
+			}, 500);
 		},
 
 		venue_edit_name_save: function() {
