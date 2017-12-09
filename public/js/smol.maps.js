@@ -158,18 +158,32 @@ smol.maps = (function() {
 		},
 
 		setup_data: function() {
-			var path = location.pathname.match(/^\/([a-z0-9-]+)\/?$/);
-			if (path) {
-				var slug = path[1];
-			} else if (self.config.default_slug) {
-				var slug = self.config.default_slug;
-			} else if (self.config.random_slug) {
-				var slug = self.config.random_slug;
-			} else {
-				// In theory this should never get used...
-				var slug = 'map';
-			}
-			self.load_map(slug);
+
+			// This callback function should execute regardless of whether
+			// localforage hits an error or not. (20171209/dphiffer)
+			var cb = function() {
+				var path = location.pathname.match(/^\/([a-z0-9-]+)\/?$/);
+				if (path) {
+					var slug = path[1];
+				} else if (self.config.default_slug) {
+					var slug = self.config.default_slug;
+				} else if (self.config.random_slug) {
+					var slug = self.config.random_slug;
+				} else {
+					// In theory this should never get used...
+					var slug = 'map';
+				}
+				self.load_map(slug);
+			};
+
+			localforage.getItem('smol:maps:config').then(function(user_config) {
+				// Merge user config into the global one
+				self.config = L.extend(self.config, user_config);
+				cb();
+			}).catch(function(err) {
+				console.error(err);
+				cb();
+			});
 		},
 
 		setup_add_venue: function() {
@@ -200,6 +214,16 @@ smol.maps = (function() {
 				if (location.pathname != '/' + data.map.slug) {
 					history.pushState(data.map, data.map.name, '/' + data.map.slug);
 				}
+
+				// Store this map slug as the default
+				localforage.getItem('smol:maps:config').then(function(config) {
+					if (! config) {
+						config = {};
+					}
+					config.default_slug = slug;
+					smol.maps.config.default_slug = slug;
+					localforage.setItem('smol:maps:config', config);
+				});
 			}, function(rsp) {
 				alert("Error: could not load map '" + slug + "'.");
 			});
