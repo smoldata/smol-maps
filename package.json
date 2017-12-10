@@ -2,22 +2,25 @@
   "name": "smol-maps",
   "version": "0.0.21",
   "description": "An editable offline-friendly slippy map",
-  "main": "server.js",
+  "main": "app/smol-maps.js",
   "scripts": {
-    "start": "node app/server.js",
-    "startjs": "nodejs app/server.js"
+    "start": "node app/smol-maps.js",
+    "startjs": "nodejs app/smol-maps.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smoldata/smol-maps.git"
   },
   "dependencies": {
-    "bower": "^1.8.2",
     "express": "^4.16.2"
   },
   "engines": {
     "node": "8.x"
   },
-  "repository": {
-    "url": "https://github.com/smoldata/smol-maps"
-  },
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/smoldata/smol-chat/issues"
+  },
   "keywords": [
     "smol data",
     "maps",
