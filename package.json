@@ -12,7 +12,8 @@
     "url": "git+https://github.com/smoldata/smol-maps.git"
   },
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "multer": "^1.3.0"
   },
   "engines": {
     "node": "8.x"
