@@ -236,6 +236,7 @@ code {
 
 .leaflet-popup figure {
 	width: 210px;
+	margin-top: 10px;
 }
 
 .leaflet-popup figure img {
