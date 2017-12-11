@@ -441,6 +441,7 @@ smol.maps = (function() {
 			marker.venue = venue;
 
 			var esc_id = smol.esc_html(venue.id);
+			var esc_map_id = smol.esc_html(venue.map_id);
 			var esc_color = smol.esc_html(venue.color);
 			var esc_icon = smol.esc_html(venue.icon);
 			var esc_name = smol.esc_html(venue.name);
@@ -454,20 +455,29 @@ smol.maps = (function() {
 				var lng = parseFloat(venue.longitude).toFixed(6);
 				esc_name = smol.esc_html(lat + ', ' + lng);
 			}
-			var html = '<form action="/api/venue" class="venue"' + data_id + ' onsubmit="smol.maps.venue_edit_name_save(); return false;">' +
-					'<div class="icon-bg" style="background-color: ' + esc_color + ';">' +
-					'<div class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + esc_icon + '.svg);"></div></div>' +
-					'<div class="name single-line" data-name="' + esc_name + '">' +
-					'<div class="display">' + esc_name + '</div>' +
-					'<input type="text" name="name" value="' + esc_name + '">' +
-					'<div class="response hidden"></div>' +
-					'<div class="buttons">' +
-					'<input type="button" value="Cancel" class="btn btn-cancel">' +
-					'<input type="submit" value="Save" class="btn btn-save">' +
-					'</div>' +
-					'</div>' +
-					'<br class="clear">' +
-					'</form>';
+			if (venue.photo) {
+				var esc_photo = smol.esc_html(venue.photo);
+				var esc_url = '/api/photo/' + esc_map_id + '/' + esc_id + '/' + esc_photo;
+				var html = '<figure class="venue"' + data_id + '>' +
+						'<a href="' + esc_url + '" target="_blank">' +
+						'<img src="' + esc_url + '">' +
+						'</a></figure>';
+			} else {
+				var html = '<form action="/api/venue" class="venue"' + data_id + ' onsubmit="smol.maps.venue_edit_name_save(); return false;">' +
+						'<div class="icon-bg" style="background-color: ' + esc_color + ';">' +
+						'<div class="icon' + icon_inverted + '" style="background-image: url(/img/icons/' + esc_icon + '.svg);"></div></div>' +
+						'<div class="name single-line" data-name="' + esc_name + '">' +
+						'<div class="display">' + esc_name + '</div>' +
+						'<input type="text" name="name" value="' + esc_name + '">' +
+						'<div class="response hidden"></div>' +
+						'<div class="buttons">' +
+						'<input type="button" value="Cancel" class="btn btn-cancel">' +
+						'<input type="submit" value="Save" class="btn btn-save">' +
+						'</div>' +
+						'</div>' +
+						'<br class="clear">' +
+						'</form>';
+			}
 			marker.bindPopup(html);
 
 			var rgb = smol.color.hex2rgb(venue.color);

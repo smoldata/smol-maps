@@ -234,6 +234,15 @@ code {
 	margin-top: -5px;
 }
 
+.leaflet-popup figure {
+	width: 210px;
+}
+
+.leaflet-popup figure img {
+	width: 100%;
+	height: auto;
+}
+
 @media (min-width: 321px) {
 	.leaflet-touch .leaflet-control-add-venue a,
 	.leaflet-control-add-venue a:hover,
