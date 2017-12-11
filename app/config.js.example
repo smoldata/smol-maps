@@ -1,0 +1,6 @@
+
+// This file overrides other configuration settings.
+
+module.exports = {
+	feature_photos: 0
+};

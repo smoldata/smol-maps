@@ -13,6 +13,12 @@ var url_words = require('./url_words');
 
 var app = express();
 
+var config_path = __dirname + '/config.js';
+if (! fs.existsSync(config_path)) {
+	fs.copyFileSync(__dirname + '/config.js.example', config_path);
+}
+var config = require('./config');
+
 dotdata.init();
 
 // http://expressjs.com/en/starter/static-files.html
@@ -44,6 +50,9 @@ app.get("/api/id", function(request, response) {
 // Load config
 app.get("/api/config", function(request, response) {
 	var onsuccess = function(data) {
+		for (var key in config) {
+			data[key] = config[key];
+		}
 		if (! data.default_slug) {
 			data.random_slug = url_words.random();
 		}
@@ -53,12 +62,16 @@ app.get("/api/config", function(request, response) {
 		});
 	};
 	var onerror = function(err) {
+		var data = {
+			random_slug: url_words.random()
+		};
+		for (var key in config) {
+			data[key] = config[key];
+		}
 		response.send({
 			ok: 0,
 			error: 'Could not load config.',
-			data: {
-				random_slug: url_words.random()
-			}
+			data: data
 		});
 	};
 	dotdata.get("config")
