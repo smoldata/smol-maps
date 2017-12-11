@@ -1,6 +1,6 @@
 {
   "name": "smol-maps",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "An editable offline-friendly slippy map",
   "main": "app/smol-maps.js",
   "scripts": {
