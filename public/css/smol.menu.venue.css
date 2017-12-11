@@ -52,13 +52,19 @@
 	z-index: -1;
 }
 
-#venue-photo + .btn {
-	width: 115px;
+#venue-photo-label .btn {
 	margin-left: 0;
 	margin-top: 10px;
+	float: left;
 }
 
-#venue-photo + .btn .fa {
+#venue-photo-label .btn .fa {
 	margin-left: -5px;
 	margin-right: 5px;
+}
+
+#venue-photo-value {
+	float: left;
+	margin-left: 10px;
+	padding-top: 20px;
 }

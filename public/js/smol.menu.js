@@ -92,12 +92,7 @@ smol.menu = (function() {
 					return onerror(rsp);
 				}
 
-				var args = $form.serializeArray();
-				var data = {};
-				for (var i = 0; i < args.length; i++) {
-					var key = args[i].name;
-					data[key] = args[i].value;
-				}
+				var data = rsp.data;
 
 				if (smol.menu[page] &&
 				    typeof smol.menu[page].submit == 'function') {
