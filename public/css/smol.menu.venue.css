@@ -42,3 +42,23 @@
 	width: calc(9.0909% - 1px);
 	margin-right: 1px;
 }
+
+#venue-photo {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+#venue-photo + .btn {
+	width: 115px;
+	margin-left: 0;
+	margin-top: 10px;
+}
+
+#venue-photo + .btn .fa {
+	margin-left: -5px;
+	margin-right: 5px;
+}

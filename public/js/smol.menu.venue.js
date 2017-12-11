@@ -78,6 +78,11 @@ smol.menu.venue = (function() {
 
 			$('#venue .response').html('');
 
+			if (smol.maps.config &&
+			    ! smol.maps.config.feature_photos) {
+				$('#venue-photo').closest('label').remove();
+			}
+
 			self.setup_icons();
 			smol.menu.show('venue');
 		},

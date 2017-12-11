@@ -217,7 +217,7 @@
 					<a href="#" class="edit-delete">Delete map</a>
 				</form>
 
-				<form action="/api/venue" method="post" id="venue" class="menu-page">
+				<form action="/api/venue" method="post" id="venue" class="menu-page" enctype="multipart/form-data">
 					<h1>Edit venue</h1>
 					<input type="hidden" name="id" id="venue-id" value="">
 					<input type="hidden" name="map_id" id="venue-map-id" value="">
@@ -265,6 +265,11 @@
 							<br class="clear">
 						</div>
 						<div class="help"><a href="https://en.wikipedia.org/wiki/Web_colors" target="_blank">hex color</a> code, for inspiration check out <a href="http://colorbrewer2.org/" target="_blank">Color Brewer</a></div>
+					</label>
+					<label>
+						Photo
+						<input type="file" name="photo" id="venue-photo">
+						<div class="btn"><span class="fa fa-camera"></span> Pick a file</div>
 					</label>
 					<label>
 						Tags

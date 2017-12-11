@@ -61,11 +61,11 @@ smol.menu = (function() {
 			var $form = $(e.target);
 			var page = $form.attr('id');
 			var url = $form.attr('action');
-			var data = $form.serialize();
+			var data = new FormData($form[0]);
 
 			if (smol.menu[page] &&
 				typeof smol.menu[page].validate == 'function') {
-				var rsp = smol.menu[page].validate();
+				var rsp = smol.menu[page].validate(data);
 				if (rsp.ok == -1) {
 					// -1 means "mayyyybe?"
 					// Wait a second and then try again
@@ -105,7 +105,13 @@ smol.menu = (function() {
 				}
 			};
 
-			$.post(url, data).then(onsuccess, onerror);
+			$.ajax({
+				url: url,
+				data: data,
+				type: 'POST',
+				contentType: false,
+				processData: false
+			}).then(onsuccess, onerror);
 		}
 
 	};
