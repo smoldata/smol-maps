@@ -5,6 +5,7 @@
 
 var express = require('express');
 var body_parser = require('body-parser');
+var multer = require('multer');
 var path = require('path');
 var fs = require('fs');
 var dotdata = require('./dotdata');
@@ -18,6 +19,25 @@ if (! fs.existsSync(config_path)) {
 	fs.copyFileSync(__dirname + '/config.js.example', config_path);
 }
 var config = require('./config');
+
+var upload_storage = multer.diskStorage({
+	destination: function(req, file, cb) {
+		var root = path.dirname(__dirname);
+		var id = req.body.id;
+		var map_id = req.body.map_id;
+		var dir = root + '/.data/maps/' + map_id + '/' + id;
+		if (! fs.existsSync(dir)) {
+			fs.mkdirSync(dir);
+		}
+		cb(null, dir);
+	},
+	filename: function(req, file, cb) {
+		cb(null, file.originalname);
+	}
+});
+var upload = multer({
+	storage: upload_storage
+});
 
 dotdata.init();
 
@@ -468,7 +488,8 @@ app.get("/api/export/:slug", function(request, response) {
 });
 
 // Save a venue
-app.post("/api/venue", function(request, response) {
+app.post("/api/venue", upload.single('photo'), function(request, response) {
+
 	var onsuccess = function(data) {
 		response.send({
 			ok: 1,
@@ -483,9 +504,26 @@ app.post("/api/venue", function(request, response) {
 			data: {}
 		}).status(400);
 	};
+
 	var data = request.body;
-	dotdata.set("maps:" + data.map_id + ":" + data.id, data)
-	       .then(onsuccess, onerror);
+	var name = "maps:" + data.map_id + ":" + data.id;
+
+	data.photo = request.file.originalname;
+
+	dotdata.set(name, data).then(onsuccess, onerror);
+});
+
+app.get("/api/photo/:map_id/:venue_id/:filename", function(request, response) {
+
+	var filename = path.dirname(__dirname) +
+	               '/.data/maps/' + parseInt(request.params.map_id) +
+	               '/' + parseInt(request.params.venue_id) +
+	               '/' + request.params.filename.replace('..', '');
+	if (fs.existsSync(filename)) {
+		response.sendFile(filename);
+	} else {
+		response.status(404).send("Not found.");
+	}
 });
 
 // List the available icons
