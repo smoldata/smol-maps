@@ -78,10 +78,14 @@ smol.menu.venue = (function() {
 			$('#venue-icon-preview .icon').css('background-image', 'url("/img/icons/' + venue.icon + '.svg")');
 			$('#venue-color').val(venue.color);
 
-			var esc_photo = smol.esc_html(venue.photo);
-			var esc_photo_url = '/api/photo/' + parseInt(venue.map_id) + '/' + parseInt(venue.id) + '/' + esc_photo;
-			var esc_photo = '<a href="' + esc_photo_url + '">' + esc_photo + '</a>';
-			$('#venue-photo-value').html(esc_photo);
+			if (venue.photo) {
+				var esc_photo = smol.esc_html(venue.photo);
+				var esc_photo_url = '/api/photo/' + parseInt(venue.map_id) + '/' + parseInt(venue.id) + '/' + esc_photo;
+				var esc_photo = '<a href="' + esc_photo_url + '">' + esc_photo + '</a>';
+				$('#venue-photo-value').html(esc_photo);
+			} else {
+				$('#venue-photo-value').html('');
+			}
 
 			var hsl = smol.color.hex2hsl(venue.color);
 			if (hsl.l < 0.66) {
