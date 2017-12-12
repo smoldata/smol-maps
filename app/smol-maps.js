@@ -508,7 +508,9 @@ app.post("/api/venue", upload.single('photo'), function(request, response) {
 	var data = request.body;
 	var name = "maps:" + data.map_id + ":" + data.id;
 
-	data.photo = request.file.originalname;
+	if (data.file) {
+		data.photo = request.file.originalname;
+	}
 
 	dotdata.set(name, data).then(onsuccess, onerror);
 });
