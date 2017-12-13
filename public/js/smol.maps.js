@@ -428,6 +428,7 @@ smol.maps = (function() {
 			smol.sidebar.add_venue(venue);
 
 			marker.on('popupopen', function() {
+				self.update_marker(this.venue);
 				this.unbindTooltip();
 			});
 
@@ -738,7 +739,6 @@ smol.maps = (function() {
 				for (var id in rsp.photos) {
 					id = parseInt(id);
 					lookup[id].photo = rsp.photos[id];
-					self.update_marker(lookup[id]);
 				}
 			};
 

@@ -8,6 +8,7 @@ var body_parser = require('body-parser');
 var multer = require('multer');
 var path = require('path');
 var fs = require('fs');
+var sharp = require('sharp');
 
 var dotdata = require('./dotdata');
 var sequence = require('./sequence');
@@ -527,8 +528,21 @@ app.post("/api/photos", upload.array('photos'), function(request, response) {
 			fs.mkdirSync(venue_dir);
 		}
 
-		var venue_path = venue_dir + '/' + file.originalname;
-		fs.renameSync(file.path, venue_path);
+		var orig_path = venue_dir + '/' + file.originalname;
+		var thumb_path = orig_path.replace(/(\.\w+)$/, '-thumb.$1');
+
+		sharp(file.path)
+			.rotate()
+			.toFile(orig_path)
+			.then(function() {
+				sharp(file.path)
+					.rotate()
+					.resize(210, null)
+					.toFile(thumb_path)
+					.then(function() {
+						fs.unlinkSync(file.path);
+					});
+			});
 
 		var name = "maps:" + map_id + ":" + venue_id;
 		dotdata.get(name).then(function(data) {
