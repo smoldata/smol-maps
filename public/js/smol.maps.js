@@ -12,6 +12,17 @@ smol.maps = (function() {
 			className: 'map-marker'
 		}),
 
+		exif_orientation_classes: {
+			case1: '',
+			case2: 'flip-horiz',
+			case3: 'rotate-180',
+			case4: 'flip-horiz rotate-180',
+			case5: 'flip-horiz rotate-90',
+			case6: 'rotate-90',
+			case7: 'flip-horiz rotate-270',
+			case8: 'rotate-270'
+		},
+
 		init: function() {
 			$.get('/api/config').then(function(rsp) {
 				if (rsp.ok) {
@@ -135,6 +146,9 @@ smol.maps = (function() {
 						marker.openPopup();
 						self.venue_edit_name($('.leaflet-popup .venue'));
 					});
+				},
+				longHold: function(e) {
+					$('#map-upload').addClass('visible');
 				}
 			}).addTo(self.map);
 
@@ -198,6 +212,19 @@ smol.maps = (function() {
 			} else {
 				$('.leaflet-control-add-venue .icon').removeClass('inverted');
 			}
+
+			self.setup_upload();
+		},
+
+		setup_upload: function() {
+			var html = '<div id="map-upload" class="icon-bg">' +
+				'<span class="fa fa-camera"></span></div>' +
+				'<input type="file" id="map-upload-input">';
+			$('.leaflet-control-add-venue').append(html);
+
+			$('#map-upload-input').change(function() {
+				self.store_photos();
+			});
 		},
 
 		load_map: function(slug) {
@@ -345,17 +372,19 @@ smol.maps = (function() {
 			]);
 		},
 
-		create_venue: function(cb) {
+		create_venue: function(cb, lat, lng) {
 			$.get('/api/id').then(function(rsp) {
 				var center = self.map.getCenter();
+				lat = lat || center.lat;
+				lng = lng || center.lng;
 				var color = self.config.default_color || '#8442D5';
 				var icon = self.config.default_icon || 'marker-stroked';
 				var venue = {
 					id: rsp.id,
 					map_id: self.data.map.id,
 					active: 1,
-					latitude: center.lat,
-					longitude: center.lng,
+					latitude: lat,
+					longitude: lng,
 					color: color,
 					icon: icon
 				};
@@ -595,7 +624,169 @@ smol.maps = (function() {
 				var fname = prefix + '-' + (new Date().getTime()) + '.png';
 				saveAs(sh.blob, fname);
 			});
+		},
+
+		store_photos: function() {
+			self.photo_queue = [];
+			var files = $('#map-upload-input')[0].files;
+			for (var i = 0; i < files.length; i++) {
+				self.photo_queue.push(files[i]);
+			}
+			self.photo_reader = new FileReader();
+			self.store_next_photo();
+		},
+
+		store_next_photo: function() {
+			if (! self.photo_queue || self.photo_queue.length == 0) {
+				console.log('done');
+			} else {
+
+				var file = self.photo_queue.shift();
+				console.log('next photo: ' + file.name);
+				if (! file.name.match(/\.jpe?g$/)) {
+					alert('Currently you can only upload JPEG photos.');
+					return self.store_next_photo();
+				}
+
+				self.pending_photo = {
+					file: file,
+					filename: file.name,
+					uploaded: (new Date()).toJSON()
+				};
+
+				self.photo_reader.onload = self.photo_array_buffer;
+				self.photo_reader.readAsArrayBuffer(file);
+			}
+		},
+
+		photo_array_buffer: function(e) {
+
+			if (! e.target ||
+			    ! e.target.result) {
+				console.error('could not read photo as array buffer');
+				return;
+			}
+
+			var exif = EXIF.readFromBinaryFile(e.target.result);
+			self.pending_photo.exif = exif;
+
+			if (exif.GPSLatitude &&
+			    exif.GPSLatitudeRef &&
+			    exif.GPSLongitude &&
+			    exif.GPSLongitudeRef) {
+				self.pending_photo.geotags = self.photo_geotags(exif);
+			}
+
+			if (exif.Orientation) {
+				self.pending_photo.orientation = self.photo_orientation(exif);
+			}
+
+			self.photo_reader.onload = self.photo_data_uri;
+			self.photo_reader.readAsDataURL(self.pending_photo.file);
+		},
+
+		photo_data_uri: function(e) {
+
+			if (! e.target ||
+			    ! e.target.result) {
+				console.error('could not read photo as data URI');
+				return;
+			}
+
+			self.pending_photo.data_uri = e.target.result;
+			delete self.pending_photo.file;
+
+			self.photo_display(self.pending_photo);
+			self.photo_upload(self.pending_photo);
+
+			self.store_next_photo(); // do it again!
+		},
+
+		photo_display: function(photo) {
+			var cb = function(marker) {
+				marker.openPopup();
+				var class_name = '';
+				if (photo.orientation) {
+					class_name = photo.orientation;
+				}
+				var html = '<figure class="' + class_name + '"><img src="' + photo.data_uri + '"></figure>';
+				$('.leaflet-popup-content').append(html);
+			};
+			self.create_venue(cb, photo.geotags.latitude, photo.geotags.longitude);
+		},
+
+		photo_upload: function() {
+
+		},
+
+		// Adapted from https://stackoverflow.com/a/2572991/937170
+		photo_geotags: function(exif) {
+			var lat = self.photo_exif_geotag(exif.GPSLatitude, exif.GPSLatitudeRef);
+			var lng = self.photo_exif_geotag(exif.GPSLongitude, exif.GPSLongitudeRef);
+			var geotags = {
+				latitude: lat,
+				longitude: lng
+			};
+			if (exif.GPSAltitude && exif.GPSAltitudeRef) {
+
+				// altitude is in meters
+				geotags.altitude = parseFloat(exif.GPSAltitude);
+
+				// if ref is 0: altitude is above sea level
+				// if ref is 1: altitude is below sea level
+				if (exif.GPSAltitudeRef) {
+					geotags.altitude = -geotags.altitude;
+				}
+			}
+			return geotags;
+		},
+
+		photo_exif_geotag: function(coord, hemi) {
+			var degrees = coord.length > 0 ? self.photo_coord(coord[0]) : 0;
+			var minutes = coord.length > 1 ? self.photo_coord(coord[1]) : 0;
+			var seconds = coord.length > 1 ? self.photo_coord(coord[2]) : 0;
+
+			var flip = (hemi == 'W' || hemi == 'S') ? -1 : 1;
+
+			return flip * (degrees + minutes / 60 + seconds / 3600);
+		},
+
+		photo_coord: function(coord) {
+			coord = '' + coord;
+			var parts = coord.split('/');
+
+			if (parts.length == 0) {
+				return 0;
+			}
+
+			if (parts.length == 1) {
+				return parseFloat(parts[0]);
+			}
+
+			return parseFloat(parts[0]) / parseFloat(parts[1]);
+		},
+
+		photo_orientation: function(exif) {
+			switch (exif.Orientation) {
+				case 1:
+					return self.exif_orientation_classes.case1;
+				case 2:
+					return self.exif_orientation_classes.case2;
+				case 3:
+					return self.exif_orientation_classes.case3;
+				case 4:
+					return self.exif_orientation_classes.case4;
+				case 5:
+					return self.exif_orientation_classes.case5;
+				case 6:
+					return self.exif_orientation_classes.case6;
+				case 7:
+					return self.exif_orientation_classes.case7;
+				case 8:
+					return self.exif_orientation_classes.case8;
+			}
 		}
+
 	};
 
 	$(document).ready(function() {

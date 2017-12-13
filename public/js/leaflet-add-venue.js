@@ -22,6 +22,8 @@
 
 } (function (L) {
 
+	var long_click = false;
+
 	var AddVenue = L.Control.extend({
 
 		options: {
@@ -74,13 +76,38 @@
 				.on(this._link, 'click', this._onClick, this)
 				.on(this._link, 'dblclick', L.DomEvent.stopPropagation);
 
+			var press_hold_timeout;
+			var self = this;
+			L.DomEvent
+				.on(this._link, 'mousedown', function(e) {
+					press_hold_timeout = setTimeout(function() {
+						press_hold_timeout = null;
+						if (self.options.longHold) {
+							self.options.longHold(e);
+						}
+					}, 1000);
+				})
+				.on(this._link, 'mouseup', function(e) {
+					if (press_hold_timeout) {
+						clearTimeout(press_hold_timeout);
+						press_hold_timeout = null;
+					} else {
+						long_click = true;
+					}
+				});
+
 			this._map.on('unload', this._unload, this);
 
 			return container;
 		},
 
 		_onClick: function() {
-			if (this.options.click) {
+			if (long_click) {
+				long_click = false;
+				if (this.options.longClick) {
+					this.options.longClick();
+				}
+			} else if (this.options.click) {
 				this.options.click();
 			}
 		},
