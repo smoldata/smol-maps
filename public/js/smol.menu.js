@@ -61,14 +61,18 @@ smol.menu = (function() {
 			var $form = $(e.target);
 			var page = $form.attr('id');
 			var url = $form.attr('action');
-			var data = new FormData($form[0]);
+			if ($form.attr('enctype') == 'multipart/form-data') {
+				var data = new FormData($form[0]);
+			} else {
+				var data = $form.serialize();
+			}
 
 			if (smol.menu[page] &&
 				typeof smol.menu[page].validate == 'function') {
 				var rsp = smol.menu[page].validate(data);
 				if (rsp.ok == -1) {
 					// -1 means "mayyyybe?"
-					// Wait a second and then try again
+					// Wait a moment and then try again
 					setTimeout(function() {
 						self.submit(e)
 					}, 250);
@@ -100,13 +104,17 @@ smol.menu = (function() {
 				}
 			};
 
-			$.ajax({
-				url: url,
-				data: data,
-				type: 'POST',
-				contentType: false,
-				processData: false
-			}).then(onsuccess, onerror);
+			if ($form.attr('enctype') == 'multipart/form-data') {
+				$.ajax({
+					url: url,
+					data: data,
+					type: 'POST',
+					contentType: false,
+					processData: false
+				}).then(onsuccess, onerror);
+			} else {
+				$.post(url, data).then(onsuccess, onerror);
+			}
 		}
 
 	};

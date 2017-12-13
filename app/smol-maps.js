@@ -8,6 +8,7 @@ var body_parser = require('body-parser');
 var multer = require('multer');
 var path = require('path');
 var fs = require('fs');
+
 var dotdata = require('./dotdata');
 var sequence = require('./sequence');
 var url_words = require('./url_words');
@@ -23,16 +24,11 @@ var config = require('./config');
 var upload_storage = multer.diskStorage({
 	destination: function(req, file, cb) {
 		var root = path.dirname(__dirname);
-		var id = req.body.id;
-		var map_id = req.body.map_id;
-		var dir = root + '/.data/maps/' + map_id + '/' + id;
+		var dir = root + '/.data/maps/tmp';
 		if (! fs.existsSync(dir)) {
 			fs.mkdirSync(dir);
 		}
 		cb(null, dir);
-	},
-	filename: function(req, file, cb) {
-		cb(null, file.originalname);
 	}
 });
 var upload = multer({
@@ -513,6 +509,46 @@ app.post("/api/venue", upload.single('photo'), function(request, response) {
 	}
 
 	dotdata.set(name, data).then(onsuccess, onerror);
+});
+
+app.post("/api/photos", upload.array('photos'), function(request, response) {
+
+	var root = path.dirname(__dirname);
+	var map_id = parseInt(request.body.map_id);
+	var venue_ids = request.body.venue_ids.split(',');
+	var photos = {};
+
+	var save_photo = function(file, index) {
+
+		var venue_id = parseInt(venue_ids[index]);
+
+		var venue_dir = root + '/.data/maps/' + map_id + '/' + venue_id;
+		if (! fs.existsSync(venue_dir)) {
+			fs.mkdirSync(venue_dir);
+		}
+
+		var venue_path = venue_dir + '/' + file.originalname;
+		fs.renameSync(file.path, venue_path);
+
+		var name = "maps:" + map_id + ":" + venue_id;
+		dotdata.get(name).then(function(data) {
+			data.photo = file.originalname;
+			dotdata.set(name, data);
+		});
+
+		photos[venue_id] = file.originalname;
+	};
+
+	for (var i = 0; i < request.files.length; i++) {
+		save_photo(request.files[i], i);
+	}
+
+	// This is not good error handling. plz fix!
+	// (20171212/dphiffer)
+	response.send({
+		ok: 1,
+		photos: photos
+	});
 });
 
 app.get("/api/photo/:map_id/:venue_id/:filename", function(request, response) {

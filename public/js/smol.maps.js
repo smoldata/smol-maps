@@ -217,9 +217,14 @@ smol.maps = (function() {
 		},
 
 		setup_upload: function() {
+			var esc_map_id = parseInt(self.data.map.id);
 			var html = '<div id="map-upload" class="icon-bg">' +
 				'<span class="fa fa-camera"></span></div>' +
-				'<input type="file" id="map-upload-input">';
+				'<form id="map-upload-form">' +
+				'<input type="file" name="photos" id="map-upload-input" multiple>' +
+				'<input type="hidden" name="map_id" id="map-upload-map-id" value="' + esc_map_id + '">' +
+				'<input type="hidden" name="venue_ids" id="map-upload-ids" value="">' +
+				'</form>';
 			$('.leaflet-control-add-venue').append(html);
 
 			$('#map-upload-input').change(function() {
@@ -633,12 +638,17 @@ smol.maps = (function() {
 				self.photo_queue.push(files[i]);
 			}
 			self.photo_reader = new FileReader();
+			self.pending_venue_ids = [];
 			self.store_next_photo();
 		},
 
 		store_next_photo: function() {
-			if (! self.photo_queue || self.photo_queue.length == 0) {
-				console.log('done');
+			if (! self.photo_queue) {
+				console.error('error storing photos');
+			} else if (self.photo_queue.length == 0) {
+				if (self.pending_venue_ids.length > 0) {
+					self.upload_photos();
+				}
 			} else {
 
 				var file = self.photo_queue.shift();
@@ -697,9 +707,6 @@ smol.maps = (function() {
 			delete self.pending_photo.file;
 
 			self.photo_display(self.pending_photo);
-			self.photo_upload(self.pending_photo);
-
-			self.store_next_photo(); // do it again!
 		},
 
 		photo_display: function(photo) {
@@ -711,12 +718,41 @@ smol.maps = (function() {
 				}
 				var html = '<figure class="' + class_name + '"><img src="' + photo.data_uri + '"></figure>';
 				$('.leaflet-popup-content').append(html);
+				self.pending_venue_ids.push(marker.venue.id);
+				self.store_next_photo(); // do it again!
 			};
 			self.create_venue(cb, photo.geotags.latitude, photo.geotags.longitude);
 		},
 
-		photo_upload: function() {
+		upload_photos: function(venue, photo) {
+			$('#map-upload-ids').val(self.pending_venue_ids.join(','));
+			var data = new FormData($('#map-upload-form')[0]);
 
+			var onsuccess = function(rsp) {
+				var lookup = {};
+				var id;
+				for (var i = 0; i < self.data.venues.length; i++) {
+					id = parseInt(self.data.venues[i].id);
+					lookup[id] = self.data.venues[i];
+				}
+				for (var id in rsp.photos) {
+					id = parseInt(id);
+					lookup[id].photo = rsp.photos[id];
+					self.update_marker(lookup[id]);
+				}
+			};
+
+			var onerror = function(rsp) {
+				console.error(rsp);
+			};
+
+			$.ajax({
+				url: '/api/photos',
+				data: data,
+				type: 'POST',
+				contentType: false,
+				processData: false
+			}).then(onsuccess, onerror);
 		},
 
 		// Adapted from https://stackoverflow.com/a/2572991/937170
