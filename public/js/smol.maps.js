@@ -228,7 +228,7 @@ smol.maps = (function() {
 			$('.leaflet-control-add-venue').append(html);
 
 			$('#map-upload-input').change(function() {
-				self.store_photos();
+				self.enqueue_photos();
 			});
 		},
 
@@ -377,7 +377,7 @@ smol.maps = (function() {
 			]);
 		},
 
-		create_venue: function(cb, lat, lng) {
+		create_venue: function(cb, lat, lng, photo) {
 			$.get('/api/id').then(function(rsp) {
 				var center = self.map.getCenter();
 				lat = lat || center.lat;
@@ -396,7 +396,7 @@ smol.maps = (function() {
 
 				var onsuccess = function() {
 					self.data.venues.push(venue);
-					var marker = self.add_marker(venue);
+					var marker = self.add_marker(venue, photo);
 					if (typeof cb == 'function') {
 						cb(marker);
 					}
@@ -412,7 +412,7 @@ smol.maps = (function() {
 			});
 		},
 
-		add_marker: function(venue) {
+		add_marker: function(venue, pending_photo) {
 
 			var coords = [venue.latitude, venue.longitude];
 			var marker = new L.marker(coords, {
@@ -424,11 +424,10 @@ smol.maps = (function() {
 			self.markers[venue.id] = marker;
 
 			marker.addTo(self.map);
-			self.update_marker(venue);
+			self.update_marker(venue, pending_photo);
 			smol.sidebar.add_venue(venue);
 
 			marker.on('popupopen', function() {
-				self.update_marker(this.venue);
 				this.unbindTooltip();
 			});
 
@@ -450,7 +449,7 @@ smol.maps = (function() {
 				if (! venue.name) {
 					// Since this is labelled with lat/lng, we should update
 					// the lat/lngs.
-					self.update_marker(venue);
+					self.update_marker(venue, pending_photo);
 					smol.sidebar.update_venue(venue);
 				}
 
@@ -470,7 +469,7 @@ smol.maps = (function() {
 			return marker;
 		},
 
-		update_marker: function(venue) {
+		update_marker: function(venue, pending_photo) {
 
 			var marker = self.markers[venue.id];
 			marker.venue = venue;
@@ -507,10 +506,19 @@ smol.maps = (function() {
 			if (venue.photo) {
 				var esc_photo = smol.esc_html(venue.photo);
 				var esc_url = '/api/photo/' + esc_map_id + '/' + esc_id + '/' + esc_photo;
-				html += '<figure class="venue"' + data_id + '>' +
+				html += '<figure>' +
 						'<a href="' + esc_url + '" target="_blank">' +
 						'<img src="' + esc_url + '">' +
 						'</a></figure>';
+			} else if (pending_photo) {
+				var class_name = '';
+				if (pending_photo.orientation) {
+					class_name = smol.esc_html(pending_photo.orientation);
+				}
+				html += '<figure class="' + class_name + '">' +
+						'<img src="' + pending_photo.data_uri + '">' +
+						'<span class="fa fa-hourglass"></span>' +
+						'</figure>';
 			}
 			marker.bindPopup(html);
 
@@ -632,7 +640,7 @@ smol.maps = (function() {
 			});
 		},
 
-		store_photos: function() {
+		enqueue_photos: function() {
 			self.photo_queue = [];
 			var files = $('#map-upload-input')[0].files;
 			for (var i = 0; i < files.length; i++) {
@@ -640,34 +648,29 @@ smol.maps = (function() {
 			}
 			self.photo_reader = new FileReader();
 			self.pending_venue_ids = [];
-			self.store_next_photo();
+			self.next_photo();
 		},
 
-		store_next_photo: function() {
-			if (! self.photo_queue) {
-				console.error('error storing photos');
-			} else if (self.photo_queue.length == 0) {
-				if (self.pending_venue_ids.length > 0) {
-					self.upload_photos();
-				}
-			} else {
+		next_photo: function() {
 
-				var file = self.photo_queue.shift();
-				console.log('next photo: ' + file.name);
-				if (! file.name.match(/\.jpe?g$/)) {
-					alert('Currently you can only upload JPEG photos.');
-					return self.store_next_photo();
-				}
-
-				self.pending_photo = {
-					file: file,
-					filename: file.name,
-					uploaded: (new Date()).toJSON()
-				};
-
-				self.photo_reader.onload = self.photo_array_buffer;
-				self.photo_reader.readAsArrayBuffer(file);
+			if (self.photo_queue.length == 0) {
+				smol.maps.map.closePopup();
+				return;
 			}
+
+			var file = self.photo_queue.shift();
+
+			if (! file.name.match(/\.jpe?g$/)) {
+				alert('Sorry you can only upload JPEG photos.');
+				return self.next_photo();
+			}
+
+			self.pending_photo = {
+				file: file
+			};
+
+			self.photo_reader.onload = self.photo_array_buffer;
+			self.photo_reader.readAsArrayBuffer(file);
 		},
 
 		photo_array_buffer: function(e) {
@@ -705,41 +708,41 @@ smol.maps = (function() {
 			}
 
 			self.pending_photo.data_uri = e.target.result;
-			delete self.pending_photo.file;
-
-			self.photo_display(self.pending_photo);
+			self.photo_display();
 		},
 
-		photo_display: function(photo) {
+		photo_display: function() {
+
 			var cb = function(marker) {
 				marker.openPopup();
-				var class_name = '';
-				if (photo.orientation) {
-					class_name = photo.orientation;
-				}
-				var html = '<figure class="' + class_name + '"><img src="' + photo.data_uri + '"></figure>';
-				$('.leaflet-popup-content').append(html);
-				self.pending_venue_ids.push(marker.venue.id);
-				self.store_next_photo(); // do it again!
+				self.pending_photo.venue_id = marker.venue.id;
+				self.upload_photo();
 			};
-			self.create_venue(cb, photo.geotags.latitude, photo.geotags.longitude);
+
+			var lat = self.pending_photo.geotags.latitude;
+			var lng = self.pending_photo.geotags.longitude;
+			self.create_venue(cb, lat, lng, self.pending_photo);
 		},
 
-		upload_photos: function(venue, photo) {
-			$('#map-upload-ids').val(self.pending_venue_ids.join(','));
-			var data = new FormData($('#map-upload-form')[0]);
+		upload_photo: function() {
+
+			var data = new FormData();
+			var file = self.pending_photo.file;
+			data.append('map_id', self.data.map.id);
+			data.append('venue_id', self.pending_photo.venue_id);
+			data.append('photo', file, file.name);
 
 			var onsuccess = function(rsp) {
 				var lookup = {};
 				var id;
 				for (var i = 0; i < self.data.venues.length; i++) {
 					id = parseInt(self.data.venues[i].id);
-					lookup[id] = self.data.venues[i];
+					if (id == self.pending_photo.venue_id) {
+						self.data.venues[i].photo = rsp.photo;
+						self.update_marker(self.data.venues[i]);
+					}
 				}
-				for (var id in rsp.photos) {
-					id = parseInt(id);
-					lookup[id].photo = rsp.photos[id];
-				}
+				self.next_photo();
 			};
 
 			var onerror = function(rsp) {
@@ -747,7 +750,7 @@ smol.maps = (function() {
 			};
 
 			$.ajax({
-				url: '/api/photos',
+				url: '/api/photo',
 				data: data,
 				type: 'POST',
 				contentType: false,

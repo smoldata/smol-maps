@@ -512,57 +512,52 @@ app.post("/api/venue", upload.single('photo'), function(request, response) {
 	dotdata.set(name, data).then(onsuccess, onerror);
 });
 
-app.post("/api/photos", upload.array('photos'), function(request, response) {
+app.post("/api/photo", upload.single('photo'), function(request, response) {
 
 	var root = path.dirname(__dirname);
+	var file = request.file;
 	var map_id = parseInt(request.body.map_id);
-	var venue_ids = request.body.venue_ids.split(',');
-	var photos = {};
+	var venue_id = parseInt(request.body.venue_id);
 
-	var save_photo = function(file, index) {
-
-		var venue_id = parseInt(venue_ids[index]);
-
-		var venue_dir = root + '/.data/maps/' + map_id + '/' + venue_id;
-		if (! fs.existsSync(venue_dir)) {
-			fs.mkdirSync(venue_dir);
-		}
-
-		var orig_path = venue_dir + '/' + file.originalname;
-		var thumb_path = orig_path.replace(/(\.\w+)$/, '-thumb.$1');
-
-		sharp(file.path)
-			.rotate()
-			.toFile(orig_path)
-			.then(function() {
-				sharp(file.path)
-					.rotate()
-					.resize(210, null)
-					.toFile(thumb_path)
-					.then(function() {
-						fs.unlinkSync(file.path);
-					});
-			});
-
-		var name = "maps:" + map_id + ":" + venue_id;
-		dotdata.get(name).then(function(data) {
-			data.photo = file.originalname;
-			dotdata.set(name, data);
-		});
-
-		photos[venue_id] = file.originalname;
-	};
-
-	for (var i = 0; i < request.files.length; i++) {
-		save_photo(request.files[i], i);
+	var venue_dir = root + '/.data/maps/' + map_id + '/' + venue_id;
+	if (! fs.existsSync(venue_dir)) {
+		fs.mkdirSync(venue_dir);
 	}
 
-	// This is not good error handling. plz fix!
-	// (20171212/dphiffer)
-	response.send({
-		ok: 1,
-		photos: photos
-	});
+	var orig_path = venue_dir + '/' + file.originalname;
+	var thumb_path = orig_path.replace(/(\.\w+)$/, '-420$1');
+	var large_path = orig_path.replace(/(\.\w+)$/, '-1240$1');
+
+	var onerror = function() {
+		response.send({
+			ok: 0,
+			error: 'Could not upload image'
+		});
+	};
+
+	sharp(file.path)
+		.rotate()
+		.resize(420, null)
+		.toFile(large_path)
+		.then(function() {
+			sharp(file.path)
+				.rotate()
+				.resize(1240, null)
+				.toFile(thumb_path)
+				.then(function() {
+					fs.renameSync(file.path, orig_path);
+					var name = "maps:" + map_id + ":" + venue_id;
+					dotdata.get(name).then(function(data) {
+						data.photo = file.originalname;
+						dotdata.set(name, data);
+						response.send({
+							ok: 1,
+							photo: file.originalname,
+							data: data
+						});
+					}, onerror);
+				}, onerror);
+		}, onerror);
 });
 
 app.get("/api/photo/:map_id/:venue_id/:filename", function(request, response) {

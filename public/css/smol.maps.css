@@ -235,6 +235,7 @@ code {
 }
 
 .leaflet-popup figure {
+	position: relative;
 	width: 210px;
 	margin-top: 10px;
 }
@@ -242,6 +243,18 @@ code {
 .leaflet-popup figure img {
 	width: 100%;
 	height: auto;
+}
+
+.leaflet-popup figure .fa {
+	color: #fff;
+	background: rgba(0, 0, 0, 0.8);
+	padding: 10px;
+	border-radius: 4px;
+	position: absolute;
+	font-size: 30px;
+	left: 50%;
+	top: 50%;
+	transform: translate3D(-50%, -50%, 0);
 }
 
 #map-upload {
