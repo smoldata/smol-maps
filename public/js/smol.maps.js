@@ -665,7 +665,7 @@ smol.maps = (function() {
 
 			var file = self.photo_queue.shift();
 
-			if (! file.name.match(/\.jpe?g$/)) {
+			if (! file.name.match(/\.jpe?g$/i)) {
 				alert('Sorry you can only upload JPEG photos.');
 				return self.next_photo();
 			}
