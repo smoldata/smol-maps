@@ -506,10 +506,12 @@ smol.maps = (function() {
 			if (venue.photo) {
 				var esc_photo = smol.esc_html(venue.photo);
 				var thumb = esc_photo.replace(/(\.\w+)$/, '-420$1');
-				var esc_url = '/api/photo/' + esc_map_id + '/' + esc_id + '/' + thumb;
+				var large = esc_photo.replace(/(\.\w+)$/, '-1240$1');
+				var esc_src = '/api/photo/' + esc_map_id + '/' + esc_id + '/' + thumb;
+				var esc_href = '/api/photo/' + esc_map_id + '/' + esc_id + '/' + large;
 				html += '<figure>' +
-						'<a href="' + esc_url + '" target="_blank">' +
-						'<img src="' + esc_url + '">' +
+						'<a href="' + esc_href + '" target="_blank">' +
+						'<img src="' + esc_src + '">' +
 						'</a></figure>';
 			} else if (pending_photo) {
 				var class_name = '';
