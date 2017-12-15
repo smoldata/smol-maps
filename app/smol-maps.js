@@ -484,6 +484,47 @@ app.get("/api/export/:slug", function(request, response) {
 	load_map(request.params.slug).then(onsuccess, onerror);
 });
 
+function upload_photo(request) {
+
+	return new Promise(function(resolve, reject) {
+
+		var root = path.dirname(__dirname);
+		var file = request.file;
+		var map_id = parseInt(request.body.map_id);
+		var venue_id = request.body.venue_id || request.body.id;
+		venue_id = parseInt(venue_id);
+
+		var venue_dir = root + '/.data/maps/' + map_id + '/' + venue_id;
+		if (! fs.existsSync(venue_dir)) {
+			fs.mkdirSync(venue_dir);
+		}
+
+		var orig_path = venue_dir + '/' + file.originalname;
+		var thumb_path = orig_path.replace(/(\.\w+)$/, '-420$1'.toLowerCase());
+		var large_path = orig_path.replace(/(\.\w+)$/, '-1240$1'.toLowerCase());
+
+		sharp(file.path)
+			.rotate()
+			.resize(1240, null)
+			.toFile(large_path)
+			.then(function() {
+				sharp(file.path)
+					.rotate()
+					.resize(420, null)
+					.toFile(thumb_path)
+					.then(function() {
+						fs.renameSync(file.path, orig_path);
+						var name = "maps:" + map_id + ":" + venue_id;
+						dotdata.get(name).then(function(data) {
+							data.photo = file.originalname;
+							dotdata.set(name, data);
+							resolve(data);
+						}, reject);
+					}, reject);
+			}, reject);
+	});
+}
+
 // Save a venue
 app.post("/api/venue", upload.single('photo'), function(request, response) {
 
@@ -493,6 +534,7 @@ app.post("/api/venue", upload.single('photo'), function(request, response) {
 			data: data
 		});
 	};
+
 	var onerror = function(err) {
 		response.body({
 			ok: 0,
@@ -502,62 +544,35 @@ app.post("/api/venue", upload.single('photo'), function(request, response) {
 		}).status(400);
 	};
 
-	var data = request.body;
-	var name = "maps:" + data.map_id + ":" + data.id;
+	var args = request.body;
+	var name = "maps:" + args.map_id + ":" + args.id;
 
-	if (data.file) {
-		data.photo = request.file.originalname;
-	}
-
-	dotdata.set(name, data).then(onsuccess, onerror);
+	dotdata.set(name, args).then(function(data) {
+		if (request.file) {
+			upload_photo(request).then(onsuccess, onerror);
+		} else {
+			onsuccess(data);
+		}
+	}, onerror);
 });
 
 app.post("/api/photo", upload.single('photo'), function(request, response) {
 
-	var root = path.dirname(__dirname);
-	var file = request.file;
-	var map_id = parseInt(request.body.map_id);
-	var venue_id = parseInt(request.body.venue_id);
-
-	var venue_dir = root + '/.data/maps/' + map_id + '/' + venue_id;
-	if (! fs.existsSync(venue_dir)) {
-		fs.mkdirSync(venue_dir);
-	}
-
-	var orig_path = venue_dir + '/' + file.originalname;
-	var thumb_path = orig_path.replace(/(\.\w+)$/, '-420$1');
-	var large_path = orig_path.replace(/(\.\w+)$/, '-1240$1');
+	var onsuccess = function(data) {
+		response.send({
+			ok: 1,
+			data: data
+		});
+	};
 
 	var onerror = function() {
 		response.send({
 			ok: 0,
-			error: 'Could not upload image'
+			error: 'Could not upload photo.'
 		});
 	};
 
-	sharp(file.path)
-		.rotate()
-		.resize(1240, null)
-		.toFile(large_path)
-		.then(function() {
-			sharp(file.path)
-				.rotate()
-				.resize(420, null)
-				.toFile(thumb_path)
-				.then(function() {
-					fs.renameSync(file.path, orig_path);
-					var name = "maps:" + map_id + ":" + venue_id;
-					dotdata.get(name).then(function(data) {
-						data.photo = file.originalname;
-						dotdata.set(name, data);
-						response.send({
-							ok: 1,
-							photo: file.originalname,
-							data: data
-						});
-					}, onerror);
-				}, onerror);
-		}, onerror);
+	upload_photo(request).then(onsuccess, onerror);
 });
 
 app.get("/api/photo/:map_id/:venue_id/:filename", function(request, response) {

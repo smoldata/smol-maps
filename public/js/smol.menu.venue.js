@@ -77,6 +77,7 @@ smol.menu.venue = (function() {
 			$('#venue-icon-preview').css('background-color', venue.color);
 			$('#venue-icon-preview .icon').css('background-image', 'url("/img/icons/' + venue.icon + '.svg")');
 			$('#venue-color').val(venue.color);
+			$('#venue-photo').val('');
 
 			if (venue.photo) {
 				var esc_photo = smol.esc_html(venue.photo);

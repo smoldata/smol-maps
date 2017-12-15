@@ -104,6 +104,8 @@ smol.menu = (function() {
 				}
 			};
 
+			$form.find('.response').html('Saving...');
+
 			if ($form.attr('enctype') == 'multipart/form-data') {
 				$.ajax({
 					url: url,
