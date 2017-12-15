@@ -194,8 +194,7 @@ var save_map = function(request, response) {
 		var respond = function(data) {
 			response.send({
 				ok: 1,
-				map: data.map,
-				venues: data.venues
+				data: data.map
 			});
 		};
 
