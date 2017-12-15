@@ -644,7 +644,9 @@ smol.maps = (function() {
 		},
 
 		enqueue_photos: function() {
-			self.photo_queue = [];
+			if (! self.photo_queue) {
+				self.photo_queue = [];
+			}
 			var files = $('#map-upload-input')[0].files;
 			for (var i = 0; i < files.length; i++) {
 				self.photo_queue.push(files[i]);
@@ -692,6 +694,10 @@ smol.maps = (function() {
 			    exif.GPSLongitude &&
 			    exif.GPSLongitudeRef) {
 				self.pending_photo.geotags = self.photo_geotags(exif);
+			} else {
+				console.error('no GPS coordinates found for ' + self.pending_photo.file.name);
+				self.next_photo();
+				return;
 			}
 
 			if (exif.Orientation) {
