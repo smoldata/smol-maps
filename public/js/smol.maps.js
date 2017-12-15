@@ -505,7 +505,8 @@ smol.maps = (function() {
 					'</form>';
 			if (venue.photo) {
 				var esc_photo = smol.esc_html(venue.photo);
-				var esc_url = '/api/photo/' + esc_map_id + '/' + esc_id + '/' + esc_photo;
+				var thumb = esc_photo.replace(/(\.\w+)$/, '-420$1');
+				var esc_url = '/api/photo/' + esc_map_id + '/' + esc_id + '/' + thumb;
 				html += '<figure>' +
 						'<a href="' + esc_url + '" target="_blank">' +
 						'<img src="' + esc_url + '">' +

@@ -537,12 +537,12 @@ app.post("/api/photo", upload.single('photo'), function(request, response) {
 
 	sharp(file.path)
 		.rotate()
-		.resize(420, null)
+		.resize(1240, null)
 		.toFile(large_path)
 		.then(function() {
 			sharp(file.path)
 				.rotate()
-				.resize(1240, null)
+				.resize(420, null)
 				.toFile(thumb_path)
 				.then(function() {
 					fs.renameSync(file.path, orig_path);
