@@ -293,7 +293,8 @@ app.get("/api/map/:slug", function(request, response) {
 		dotdata.get('config').then(function(config) {
 			request.body = {
 				name: config.default_name || request.params.slug,
-				bbox: config.default_bbox
+				bbox: config.default_bbox,
+				active: 1
 			};
 			save_map(request, response);
 		});
