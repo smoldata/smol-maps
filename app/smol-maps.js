@@ -157,6 +157,10 @@ function load_map(slug) {
 	});
 }
 
+// See that third argument, respond? That is kind of a hack and
+// should probably be removed at some point. There's more commentary
+// over here: https://github.com/smoldata/smol-maps/issues/13#issuecomment-356661484
+// (20180110/dphiffer)
 var save_map = function(request, response, respond) {
 
 	if (request.params.slug) {
@@ -300,11 +304,16 @@ app.get("/api/map/:slug", function(request, response) {
 				active: 1
 			};
 			var respond = function(data) {
-				// Note here that we are potentially entering an infinite loop, since
-				// onerror is the fallback, and we are calling it from *within* onerror.
-				// (20180110/dphiffer)
+				// Note here that we are potentially entering an infinite loop,
+				// since onerror is the fallback, and we are calling it from
+				// *within* onerror. (20180110/dphiffer)
 				load_map(slug).then(onsuccess, onerror);
 			};
+
+			// See that third argument, respond? That is kind of a hack and
+			// should probably be removed at some point. There's more commentary
+			// over here: https://github.com/smoldata/smol-maps/issues/13#issuecomment-356661484
+			// (20180110/dphiffer)
 			save_map(request, response, respond);
 		});
 	};
