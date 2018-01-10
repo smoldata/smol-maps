@@ -295,14 +295,9 @@ app.get("/api/map/:slug", function(request, response) {
 		dotdata.get('config').then(function(config) {
 			var slug = config.default_name || request.params.slug;
 			request.body = {
-<<<<<<< HEAD
 				name: config.default_name || request.params.slug,
 				bbox: config.default_bbox,
 				active: 1
-=======
-				name: slug,
-				bbox: config.default_bbox
->>>>>>> :octopus: fix for 'new random map' response
 			};
 			var respond = function(data) {
 				// Note here that we are potentially entering an infinite loop, since
