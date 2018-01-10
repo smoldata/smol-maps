@@ -157,7 +157,7 @@ function load_map(slug) {
 	});
 }
 
-var save_map = function(request, response) {
+var save_map = function(request, response, respond) {
 
 	if (request.params.slug) {
 		var slug = request.params.slug;
@@ -191,12 +191,14 @@ var save_map = function(request, response) {
 			});
 		};
 
-		var respond = function(data) {
-			response.send({
-				ok: 1,
-				data: data.map
-			});
-		};
+		if (! respond) {
+			respond = function(data) {
+				response.send({
+					ok: 1,
+					data: data.map
+				});
+			};
+		}
 
 		var onsuccess = function() {
 			if (map.slug != slug) {
@@ -291,12 +293,24 @@ app.get("/api/map/:slug", function(request, response) {
 		// Doesn't exist? Presto, now it does!
 
 		dotdata.get('config').then(function(config) {
+			var slug = config.default_name || request.params.slug;
 			request.body = {
+<<<<<<< HEAD
 				name: config.default_name || request.params.slug,
 				bbox: config.default_bbox,
 				active: 1
+=======
+				name: slug,
+				bbox: config.default_bbox
+>>>>>>> :octopus: fix for 'new random map' response
 			};
-			save_map(request, response);
+			var respond = function(data) {
+				// Note here that we are potentially entering an infinite loop, since
+				// onerror is the fallback, and we are calling it from *within* onerror.
+				// (20180110/dphiffer)
+				load_map(slug).then(onsuccess, onerror);
+			};
+			save_map(request, response, respond);
 		});
 	};
 
