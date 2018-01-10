@@ -293,9 +293,9 @@ app.get("/api/map/:slug", function(request, response) {
 		// Doesn't exist? Presto, now it does!
 
 		dotdata.get('config').then(function(config) {
-			var slug = config.default_name || request.params.slug;
+			var slug = request.params.slug;
 			request.body = {
-				name: config.default_name || request.params.slug,
+				name: slug,
 				bbox: config.default_bbox,
 				active: 1
 			};
