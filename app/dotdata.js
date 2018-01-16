@@ -23,7 +23,14 @@ var dotdata = {
 				if (err) {
 					return reject(err);
 				}
-				resolve(JSON.parse(json));
+				try {
+	    		var data = JSON.parse(json);
+			} catch (e) {
+	    	console.log('Error parsing "' + name + '": ' + e.message);
+	    	reject(e);
+	    return;
+	}
+	resolve(data);
 			});
 		});
 	},
@@ -154,15 +161,16 @@ var dotdata = {
 			};
 
 			var onerror = function(err) {
-				if (err.code == 'ENOENT') {
-					resolve({
-						data: [],
-						dirs: []
-					});
-				} else {
-					reject(err);
-				}
-			};
+    console.log('wow so much error');
+    if (err.code == 'ENOENT') {
+        resolve({
+            data: [],
+            dirs: []
+        });
+    } else {
+        reject(err);
+    }
+};
 
 			if (! name) {
 				name = '';
