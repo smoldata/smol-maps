@@ -156,7 +156,9 @@ var dotdata = {
 					index.dirs.push(file);
 				}
 			}
-			cb(index);
+			if (typeof cb == 'function') {
+				cb(index);
+			}
 			dotdata.set(name, index);
 		});
 	},
