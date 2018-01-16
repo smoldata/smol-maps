@@ -26,7 +26,14 @@ var dotdata = {
 				try {
 					var data = JSON.parse(json);
 				} catch (e) {
-					console.log('Error parsing "' + name + '": ' + e.message);
+
+					// OK, so this is bad. We were not able to parse the JSON.
+					// What happens next is up to whoever called .get(), but
+					// we will leave a clue by setting e.code to EJSON. That
+					// is a totally made up error code, but it doesn't seem
+					// like the e object gets any code as-is.
+					// (20180118/dphiffer)
+
 					e.code = 'EJSON';
 					reject(e);
 					return;
@@ -127,7 +134,7 @@ var dotdata = {
 		});
 	},
 
-	update_index: function(dir) {
+	update_index: function(dir, cb) {
 		fs.readdir(dir, function(err, files) {
 			var root = path.dirname(__dirname);
 			var name = dir.replace(root + '/.data', '')
@@ -149,20 +156,23 @@ var dotdata = {
 					index.dirs.push(file);
 				}
 			}
+			cb(index);
 			dotdata.set(name, index);
 		});
 	},
 
 	index: function(name) {
 
-		if (! name) {
-			name = '';
-		} else {
-			name += ':';
-		}
-		name += '.index';
+		return new Promise(function(resolve, reject) {
 
-		var dir = path.dirname(dotdata.filename(name));
+			if (! name) {
+				name = '';
+			} else {
+				name += ':';
+			}
+			name += '.index';
+
+			var dir = path.dirname(dotdata.filename(name));
 
 			var onsuccess = function(data) {
 				resolve(data);
@@ -175,8 +185,17 @@ var dotdata = {
 						dirs: []
 					});
 				} else if (err.code == 'EJSON') {
-					dotdata.update_index(dir, function(data) {
-						resolve(data);
+					var filename = dotdata.filename(name);
+					console.log('Error parsing ' + filename + ': ' + err.message);
+					console.log('Regenerating the index...');
+					dotdata.update_index(dir, function(index) {
+						if (typeof index == 'object' &&
+						    typeof index.data == 'object') {
+							console.log('Index regenerated.');
+							resolve(index);
+						} else {
+							reject(err);
+						}
 					});
 				} else {
 					reject(err);
@@ -184,7 +203,7 @@ var dotdata = {
 			};
 			dotdata.get(name).then(onsuccess, onerror);
 
-
+		});
 	},
 
 	filename: function(name) {
