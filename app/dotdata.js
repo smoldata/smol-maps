@@ -26,8 +26,9 @@ var dotdata = {
 				try {
 	    		var data = JSON.parse(json);
 			} catch (e) {
-	    	console.log('Error parsing "' + name + '": ' + e.message);
-	    	reject(e);
+				console.log('Error parsing "' + name + '": ' + e.message);
+				e.code = 'EJSON';
+				reject(e);
 	    return;
 	}
 	resolve(data);
@@ -154,7 +155,16 @@ var dotdata = {
 
 	index: function(name) {
 
-		return new Promise(function(resolve, reject) {
+    if (! name) {
+        name = '';
+    } else {
+        name += ':';
+    }
+    name += '.index';
+
+    var dir = path.dirname(dotdata.filename(name));
+
+
 
 			var onsuccess = function(data) {
 				resolve(data);
@@ -162,26 +172,22 @@ var dotdata = {
 
 			var onerror = function(err) {
     console.log('wow so much error');
-    if (err.code == 'ENOENT') {
-        resolve({
-            data: [],
-            dirs: []
-        });
-    } else {
-        reject(err);
-    }
+		if (err.code == 'ENOENT') {
+	    resolve({
+	        data: [],
+	        dirs: []
+	    });
+	} else if (err.code == 'EJSON') {
+	    dotdata.update_index(dir, function(data) {
+	        resolve(data);
+	    });
+	} else {
+	    reject(err);
+	}
 };
-
-			if (! name) {
-				name = '';
-			} else {
-				name += ':';
-			}
-			name += '.index';
-
 			dotdata.get(name).then(onsuccess, onerror);
 
-		});
+
 	},
 
 	filename: function(name) {
