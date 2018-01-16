@@ -185,7 +185,7 @@ var dotdata = {
 		}
 		name = name.replace(/:/g, '/');
 		var root = path.dirname(__dirname);
-		filename = root + '/.data/' + name + '.json';
+		var filename = root + '/.data/' + name + '.json';
 		return filename;
 	}
 };
