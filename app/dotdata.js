@@ -219,6 +219,30 @@ var dotdata = {
 		var root = path.dirname(__dirname);
 		var filename = root + '/.data/' + name + '.json';
 		return filename;
+	},
+
+	snapshot_filename: function(name,rev){
+		if (! name.match(/^[a-z0-9_:.-]+$/i)) {
+			return null;
+		}
+		if (name.indexOf('..') != -1) {
+			return null;
+		}
+		name = name.replace(/:/g, '/');
+
+		var base_filename = dotdata.filename(name);
+		var root = path.dirname(base_filename);
+		if (rev) {
+	        return root + '/.snapshots/' + name + '/' + rev + '.json';
+	    }
+		var rev = 1;
+		var check = root + '/.snapshots/' + name + '/' + rev + '.json';
+		while (fs.existsSync(check)) {
+    		rev++;
+    		check = root + '/.snapshots/' + name + '/' + rev + '.json';
+			}
+		return check;
+
 	}
 };
 
