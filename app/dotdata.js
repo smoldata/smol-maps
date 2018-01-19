@@ -49,7 +49,7 @@ var dotdata = {
 
 			var json = JSON.stringify(data, null, 4);
 			var filename = dotdata.filename(name);
-
+			var snapshot_filename = dotdata.snapshot_filename(name);
 			if (! filename) {
 				return reject({
 					error: 'Invalid name: ' + name
@@ -58,8 +58,16 @@ var dotdata = {
 
 			var write_to_disk = function() {
 				var dir = path.dirname(filename);
+				var snapshot_dir = path.dirname(snapshot_filename);
 				if (! fs.existsSync(dir)) {
 					fs.mkdirSync(dir, 0o755);
+				}
+				
+				if (! fs.existsSync(path.dirname(snapshot_dir))) {
+					fs.mkdirSync(path.dirname(snapshot_dir), 0o755);
+				}
+				if (! fs.existsSync(snapshot_dir)) {
+						fs.mkdirSync(snapshot_dir, 0o755);
 				}
 				fs.writeFile(filename, json, 'utf8', function(err) {
 					if (err) {
@@ -70,6 +78,15 @@ var dotdata = {
 						dotdata.update_index(dir);
 					}
 				});
+				if (! snapshot_filename.match(/\.index\/\d+\.json$/)) {
+					fs.writeFile(snapshot_filename, json, 'utf8', function(err) {
+						if (err) {
+							console.log('Error writing snapshot ' + snapshot_filename + ': ' + err.message);
+						}else {
+							dotdata.update_index(snapshot_dir);
+						}
+					});
+				}
 			}
 
 			// This is a little weird: if a document exists already, and it has
