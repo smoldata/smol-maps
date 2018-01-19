@@ -159,40 +159,64 @@ var dotdata = {
 					console.log('Error writing snapshot ' + filename + ': ' + err.message);
 				} else {
 					resolve();
-					dotdata.update_index(dir);
+					dotdata.update_index(dir, dotdata.summarize_snapshots);
 				}
 			});
 
 		});
 	},
 
-	update_index: function(dir, cb) {
-		fs.readdir(dir, function(err, files) {
-			var root = path.dirname(__dirname);
-			var name = dir.replace(root + '/.data', '')
-			              .replace(/\//g, ':') + ':.index';
-			if (name.substr(0, 1) == ':') {
-				name = name.substr(1);
-			}
-			var index = {
-				data: [],
-				dirs: []
-			};
-			for (var file, i = 0; i < files.length; i++) {
-				file = files[i];
-				if (file.substr(0, 1) == '.') {
-					continue;
-				} else if (file.substr(-5, 5) == '.json') {
-					index.data.push(file.substr(0, file.length - 5));
-				} else {
-					index.dirs.push(file);
+	update_index: function(dir, index_filter) {
+
+		return new Promise(function(resolve, reject) {
+
+			fs.readdir(dir, function(err, files) {
+
+				var root = path.dirname(__dirname);
+				var name = dir.replace(root + '/.data', '')
+				              .replace(/\//g, ':') + ':.index';
+
+				if (name.substr(0, 1) == ':') {
+					name = name.substr(1);
 				}
-			}
-			if (typeof cb == 'function') {
-				cb(index);
-			}
-			dotdata.set(name, index).catch(function(err) {
-				console.log(err);
+
+				var index = {
+					data: [],
+					dirs: []
+				};
+
+				var write_to_disk = function() {
+					dotdata.set(name, index)
+						.then(function() {
+							resolve(index);
+						})
+						.catch(function(err) {
+							reject(err);
+						});
+				};
+
+				for (var file, i = 0; i < files.length; i++) {
+					file = files[i];
+					if (file.substr(0, 1) == '.') {
+						continue;
+					} else if (file.substr(-5, 5) == '.json') {
+						index.data.push(file.substr(0, file.length - 5));
+					} else {
+						index.dirs.push(file);
+					}
+				}
+
+				if (typeof index_filter == 'function') {
+					index_filter(dir, index)
+						.then(function(index) {
+							write_to_disk();
+						})
+						.catch(function(err) {
+							reject(err);
+						});
+				} else {
+					write_to_disk();
+				}
 			});
 		});
 	},
@@ -224,7 +248,7 @@ var dotdata = {
 					var filename = dotdata.filename(name);
 					console.log('Error parsing ' + filename + ': ' + err.message);
 					console.log('Regenerating the index...');
-					dotdata.update_index(dir, function(index) {
+					dotdata.update_index(dir).then(function(index) {
 						if (typeof index == 'object' &&
 						    typeof index.data == 'object') {
 							console.log('Index regenerated.');
@@ -243,6 +267,9 @@ var dotdata = {
 	},
 
 	filename: function(name) {
+		if (! name) {
+			return null;
+		}
 		if (! name.match(/^[a-z0-9_:.-]+$/i)) {
 			return null;
 		}
@@ -295,6 +322,112 @@ var dotdata = {
 		}
 		return check;
 
+	},
+
+	summarize_snapshots: function(dir, index) {
+
+		return new Promise(function(resolve, reject) {
+
+			// First, let's turn all the .data entries into integers.
+			for (var i = 0; i < index.data.length; i++) {
+				index.data[i] = parseInt(index.data[i]);
+			}
+
+			// last will be used to compare one revision to another.
+			var last = null;
+
+			function summarize_diff(rev, a, b) {
+
+				var summary = {
+					rev: rev,
+					description: 'First revision',
+					total: 0,
+					added: [],
+					modified: [],
+					removed: []
+				};
+
+				if (! a) {
+					for (var key in b) {
+						summary.added.push(key);
+						summary.total++;
+					}
+					return summary;
+				}
+
+				for (var key in b) {
+					if (! key in a) {
+						summary.added.push(key);
+						summary.total++;
+					}
+				}
+
+				for (var key in a) {
+					if (key in b) {
+						if (JSON.stringify(a[key]) != JSON.stringify(b[key])) {
+							summary.modified.push(key);
+							summary.total++;
+						}
+					} else {
+						summary.removed.push(key);
+						summary.total++;
+					}
+				}
+
+				if (summary.total == 0) {
+					summary.description = 'No changes';
+				} else if (summary.total > 3) {
+					summary.description = summary.total + ' properties changed';
+				} else {
+					var descriptions = [];
+					if (summary.added.length > 0) {
+						descriptions.push('Added: ' + summary.added.join(', '));
+					}
+					if (summary.modified.length > 0) {
+						descriptions.push('Modified: ' + summary.modified.join(', '));
+					}
+					if (summary.removed.length > 0) {
+						descriptions.push('Removed: ' + summary.removed.join(', '));
+					}
+					if (descriptions.length == 0) {
+						summary.description = 'No changes';
+					} else {
+						summary.description = descriptions.join(', ');
+					}
+				}
+
+				return summary;
+			}
+
+			function summarize_revision(rev) {
+				fs.readFile(dir + '/' + rev + '.json', function(err, json) {
+
+					if (err) {
+						return reject(err);
+					}
+
+					try {
+						var data = JSON.parse(json);
+					} catch (err) {
+						return reject(err);
+					}
+
+					index.summary.push(summarize_diff(rev, last, data));
+
+					if (index.data.indexOf(rev + 1) == -1) {
+						// We are done!
+						resolve(index);
+					} else {
+						last = data;
+						summarize_revision(rev + 1);
+					}
+				});
+			}
+
+			index.summary = [];
+			summarize_revision(1);
+
+		});
 	}
 };
 
