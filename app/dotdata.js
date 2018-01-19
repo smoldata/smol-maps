@@ -336,10 +336,11 @@ var dotdata = {
 			// last will be used to compare one revision to another.
 			var last = null;
 
-			function summarize_diff(rev, a, b) {
+			function summarize_diff(rev, a, b, stats) {
 
 				var summary = {
 					rev: rev,
+					created: stats.ctime,
 					description: 'First revision',
 					total: 0,
 					added: [],
@@ -400,7 +401,9 @@ var dotdata = {
 			}
 
 			function summarize_revision(rev) {
-				fs.readFile(dir + '/' + rev + '.json', function(err, json) {
+
+				var path = dir + '/' + rev + '.json';
+				fs.readFile(path, function(err, json) {
 
 					if (err) {
 						return reject(err);
@@ -412,7 +415,8 @@ var dotdata = {
 						return reject(err);
 					}
 
-					index.summary.push(summarize_diff(rev, last, data));
+					var stats = fs.statSync(path);
+					index.summary.push(summarize_diff(rev, last, data, stats));
 
 					if (index.data.indexOf(rev + 1) == -1) {
 						// We are done!
