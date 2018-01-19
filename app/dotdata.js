@@ -49,7 +49,6 @@ var dotdata = {
 
 			var json = JSON.stringify(data, null, 4);
 			var filename = dotdata.filename(name);
-			var snapshot_filename = dotdata.snapshot_filename(name);
 			if (! filename) {
 				return reject({
 					error: 'Invalid name: ' + name
@@ -58,35 +57,20 @@ var dotdata = {
 
 			var write_to_disk = function() {
 				var dir = path.dirname(filename);
-				var snapshot_dir = path.dirname(snapshot_filename);
 				if (! fs.existsSync(dir)) {
 					fs.mkdirSync(dir, 0o755);
-				}
-				
-				if (! fs.existsSync(path.dirname(snapshot_dir))) {
-					fs.mkdirSync(path.dirname(snapshot_dir), 0o755);
-				}
-				if (! fs.existsSync(snapshot_dir)) {
-						fs.mkdirSync(snapshot_dir, 0o755);
 				}
 				fs.writeFile(filename, json, 'utf8', function(err) {
 					if (err) {
 						return reject(err);
 					}
-					resolve(data);
+					dotdata.snapshot(name, json).then(function() {
+						resolve(data);
+					});
 					if (! filename.match(/\.index\.json$/)) {
 						dotdata.update_index(dir);
 					}
 				});
-				if (! snapshot_filename.match(/\.index\/\d+\.json$/)) {
-					fs.writeFile(snapshot_filename, json, 'utf8', function(err) {
-						if (err) {
-							console.log('Error writing snapshot ' + snapshot_filename + ': ' + err.message);
-						}else {
-							dotdata.update_index(snapshot_dir);
-						}
-					});
-				}
 			}
 
 			// This is a little weird: if a document exists already, and it has
@@ -151,6 +135,37 @@ var dotdata = {
 		});
 	},
 
+	snapshot: function(name, json) {
+
+		return new Promise(function(resolve, reject) {
+
+			var filename = dotdata.snapshot_filename(name);
+			if (! filename) {
+				return resolve();
+			}
+
+			var dir = path.dirname(filename);
+			var parent_dir = path.dirname(dir);
+			if (! fs.existsSync(parent_dir)) {
+				fs.mkdirSync(parent_dir, 0o755);
+			}
+			if (! fs.existsSync(dir)) {
+				fs.mkdirSync(dir, 0o755);
+			}
+
+			fs.writeFile(filename, json, 'utf8', function(err) {
+				if (err) {
+					reject(err);
+					console.log('Error writing snapshot ' + filename + ': ' + err.message);
+				} else {
+					resolve();
+					dotdata.update_index(dir);
+				}
+			});
+
+		});
+	},
+
 	update_index: function(dir, cb) {
 		fs.readdir(dir, function(err, files) {
 			var root = path.dirname(__dirname);
@@ -176,7 +191,9 @@ var dotdata = {
 			if (typeof cb == 'function') {
 				cb(index);
 			}
-			dotdata.set(name, index);
+			dotdata.set(name, index).catch(function(err) {
+				console.log(err);
+			});
 		});
 	},
 
@@ -238,26 +255,44 @@ var dotdata = {
 		return filename;
 	},
 
-	snapshot_filename: function(name,rev){
+	snapshot_filename: function(name, rev) {
+
+		var base_filename = dotdata.filename(name);
+		var root = path.dirname(base_filename);
+
+		// If any of these pre-conditions fail, return null, meaning "don't
+		// snapshot this file." (20180118/dphiffer)
+
+		if (! base_filename) {
+			return null;
+		}
 		if (! name.match(/^[a-z0-9_:.-]+$/i)) {
 			return null;
 		}
 		if (name.indexOf('..') != -1) {
 			return null;
 		}
+		if (name.indexOf('.snapshots') != -1) {
+			return null;
+		}
+		if (name.indexOf('.index') != -1) {
+			return null;
+		}
+
 		name = name.replace(/:/g, '/');
 
-		var base_filename = dotdata.filename(name);
-		var root = path.dirname(base_filename);
+		// If the user passed in a revision number, we're done!
 		if (rev) {
-	        return root + '/.snapshots/' + name + '/' + rev + '.json';
-	    }
+			return root + '/.snapshots/' + name + '/' + rev + '.json';
+		}
+
+		// Check for the next available revision number.
 		var rev = 1;
 		var check = root + '/.snapshots/' + name + '/' + rev + '.json';
 		while (fs.existsSync(check)) {
-    		rev++;
-    		check = root + '/.snapshots/' + name + '/' + rev + '.json';
-			}
+			rev++;
+			check = root + '/.snapshots/' + name + '/' + rev + '.json';
+		}
 		return check;
 
 	}
