@@ -5,10 +5,7 @@ var dotdata = {
 
 	init: function() {
 		var root = path.dirname(__dirname);
-		var datadir = root + '/.data';
-		if (! fs.existsSync(datadir)) {
-			fs.mkdirSync(datadir, 0o755);
-		}
+		dotdata.mkdir(root + '/.data');
 	},
 
 	get: function(name) {
@@ -57,9 +54,7 @@ var dotdata = {
 
 			var write_to_disk = function() {
 				var dir = path.dirname(filename);
-				if (! fs.existsSync(dir)) {
-					fs.mkdirSync(dir, 0o755);
-				}
+				dotdata.mkdir(dir);
 				fs.writeFile(filename, json, 'utf8', function(err) {
 					if (err) {
 						return reject(err);
@@ -145,13 +140,7 @@ var dotdata = {
 			}
 
 			var dir = path.dirname(filename);
-			var parent_dir = path.dirname(dir);
-			if (! fs.existsSync(parent_dir)) {
-				fs.mkdirSync(parent_dir, 0o755);
-			}
-			if (! fs.existsSync(dir)) {
-				fs.mkdirSync(dir, 0o755);
-			}
+			dotdata.mkdir(dir);
 
 			fs.writeFile(filename, json, 'utf8', function(err) {
 				if (err) {
@@ -305,20 +294,23 @@ var dotdata = {
 		if (name.indexOf('.index') != -1) {
 			return null;
 		}
+		if (name == 'sequence') {
+			return null;
+		}
 
-		name = name.replace(/:/g, '/');
+		var base_name = name.match(/([^:]+)$/)[1];
 
 		// If the user passed in a revision number, we're done!
 		if (rev) {
-			return root + '/.snapshots/' + name + '/' + rev + '.json';
+			return root + '/.snapshots/' + base_name + '/' + rev + '.json';
 		}
 
 		// Check for the next available revision number.
 		var rev = 1;
-		var check = root + '/.snapshots/' + name + '/' + rev + '.json';
+		var check = root + '/.snapshots/' + base_name + '/' + rev + '.json';
 		while (fs.existsSync(check)) {
 			rev++;
-			check = root + '/.snapshots/' + name + '/' + rev + '.json';
+			check = root + '/.snapshots/' + base_name + '/' + rev + '.json';
 		}
 		return check;
 
@@ -432,6 +424,37 @@ var dotdata = {
 			summarize_revision(1);
 
 		});
+	},
+
+	mkdir: function(dir) {
+
+		// This behaves like `mkdir -p` where recursively calls mkdir on each
+		// parent directory. It uses mkdirSync, so perhaps it should be improved
+		// by making an async version. (20180123/dphiffer)
+
+		if (fs.existsSync(dir)) {
+			// It already exists!
+			return true;
+		}
+
+		try {
+			fs.mkdirSync(dir, 0o755);
+		} catch(err) {
+			if (err.code == 'ENOENT') {
+				var parent_dir = path.dirname(dir);
+				if (parent_dir == path.dirname(__dirname)) {
+					console.log('Tried to mkdir on root: ' + dir);
+					return false;
+				}
+				dotdata.mkdir(parent_dir);
+				dotdata.mkdir(dir);
+			} else {
+				console.log('Could not mkdir: ' + dir);
+				console.log(err);
+				return false;
+			}
+		}
+		return true;
 	}
 };
 
