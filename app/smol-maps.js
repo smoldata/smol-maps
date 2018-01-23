@@ -544,7 +544,7 @@ function upload_photo(request) {
 }
 
 // Save a venue
-app.post("/api/venue", upload.single('photo'), function(request, response) {
+app.post("/api/venue", upload.single('photo_upload'), function(request, response) {
 
 	var onsuccess = function(data) {
 		response.send({

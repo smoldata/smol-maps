@@ -43,7 +43,7 @@
 	margin-right: 1px;
 }
 
-#venue-photo {
+#venue-photo-upload {
 	width: 0.1px;
 	height: 0.1px;
 	opacity: 0;
@@ -52,13 +52,13 @@
 	z-index: -1;
 }
 
-#venue-photo-label .btn {
+#venue-photo-upload-label .btn {
 	margin-left: 0;
 	margin-top: 10px;
 	float: left;
 }
 
-#venue-photo-label .btn .fa {
+#venue-photo-upload-label .btn .fa {
 	margin-left: -5px;
 	margin-right: 5px;
 }

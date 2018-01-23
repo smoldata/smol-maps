@@ -39,8 +39,8 @@ smol.menu.venue = (function() {
 				});
 			});
 
-			$('#venue-photo').change(function() {
-				var filename = $('#venue-photo').val();
+			$('#venue-photo-upload').change(function() {
+				var filename = $('#venue-photo-upload').val();
 				var basename = filename.match(/\w+\.\w+$/);
 				if (basename) {
 					basename = basename[0];
@@ -68,6 +68,7 @@ smol.menu.venue = (function() {
 			$('#venue-map-id').val(venue.map_id);
 			$('#venue-latitude').val(venue.latitude);
 			$('#venue-longitude').val(venue.longitude);
+			$('#venue-photo').val(venue.photo);
 			$('#venue-name').val(venue.name);
 			$('#venue-address').val(venue.address);
 			$('#venue-tags').val(venue.tags);
@@ -77,7 +78,7 @@ smol.menu.venue = (function() {
 			$('#venue-icon-preview').css('background-color', venue.color);
 			$('#venue-icon-preview .icon').css('background-image', 'url("/img/icons/' + venue.icon + '.svg")');
 			$('#venue-color').val(venue.color);
-			$('#venue-photo').val('');
+			$('#venue-photo-upload').val('');
 
 			if (venue.photo) {
 				var esc_photo = smol.esc_html(venue.photo);
