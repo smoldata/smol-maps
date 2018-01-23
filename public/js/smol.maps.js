@@ -747,7 +747,7 @@ smol.maps = (function() {
 				for (var i = 0; i < self.data.venues.length; i++) {
 					id = parseInt(self.data.venues[i].id);
 					if (id == self.pending_photo.venue_id) {
-						self.data.venues[i].photo = rsp.photo;
+						self.data.venues[i].photo = rsp.data.photo;
 						self.update_marker(self.data.venues[i]);
 					}
 				}
