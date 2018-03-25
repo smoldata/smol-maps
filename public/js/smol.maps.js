@@ -56,18 +56,20 @@ smol.maps = (function() {
 			var initial_load = true;
 			self.tangram.scene.subscribe({
 				load: function() {
-					if (self.config.tiles_url) {
-						var sources = self.tangram_sources();
-						for (var source in sources) {
-							if (sources[source].url.substr(0, 24) == 'https://tile.mapzen.com/') {
-								sources[source].url_params = {
-									api_key: self.config.mapzen_api_key
-								};
-							}
-							self.tangram.scene.setDataSource(source, sources[source]);
-						}
-						self.tangram.scene.updateConfig();
+					var default_tiles_url = 'https://tile.nextzen.org/tilezen/{format}/v1/512/all/{z}/{x}/{y}.{format}';
+					if (! self.config.tiles_url) {
+						self.config.tiles_url = default_tiles_url;
 					}
+					var sources = self.tangram_sources();
+					for (var source in sources) {
+						if (sources[source].url.substr(0, 25) == 'https://tile.nextzen.org/') {
+							sources[source].url_params = {
+								api_key: self.config.nextzen_api_key
+							};
+						}
+						self.tangram.scene.setDataSource(source, sources[source]);
+					}
+					self.tangram.scene.updateConfig();
 				},
 				view_complete: function() {
 					if (initial_load) {
@@ -122,9 +124,9 @@ smol.maps = (function() {
 				$('#leaflet').addClass('has-zoom-controls');
 			}
 
-			L.control.geocoder(self.config.mapzen_api_key, {
+			L.control.geocoder(self.config.nextzen_api_key, {
 				expanded: true,
-				attribution: '<a href="https://mapzen.com/" target="_blank">Mapzen</a> | <a href="https://openstreetmap.org/">OSM</a>'
+				attribution: '<a href="https://nextzen.org/" target="_blank">Nextzen</a> | <a href="https://openstreetmap.org/">OSM</a>'
 			}).addTo(self.map);
 			$('.leaflet-pelias-search-icon').html('<span class="fa fa-bars"></span>');
 
@@ -278,7 +280,7 @@ smol.maps = (function() {
 
 			var scene = {
 				global: {
-					sdk_mapzen_api_key: self.config.mapzen_api_key
+					sdk_api_key: self.config.nextzen_api_key
 				},
 				import: []
 			};
@@ -322,16 +324,21 @@ smol.maps = (function() {
 
 			var tiles = self.config.tiles_url;
 			var tiles_mvt = tiles.replace(/\{format\}/g, 'mvt');
-			var tiles_topojson = tiles.replace(/\{format\}/g, 'topojson');
 			var tiles_terrain = tiles.replace(/\{format\}/g, 'terrain');
+			tiles_mvt = tiles_mvt.replace(/tilezen\/mvt/, 'tilezen/vector');
 			tiles_terrain = tiles_terrain.replace(/\.terrain$/, '.png');
 
 			var sources = {
 				"refill-style": {
 					"mapzen": {
-						"type": "TopoJSON",
-						"url": tiles_topojson,
+						"type": "MVT",
+						"url": tiles_mvt,
 						"max_zoom": 16
+					},
+					"normals": {
+						"type": "Raster",
+						"url": tiles_terrain,
+						"max_zoom": 15
 					}
 				},
 				"walkabout-style": {
