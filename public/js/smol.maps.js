@@ -136,7 +136,10 @@ smol.maps = (function() {
 			});
 
 			L.control.locate({
-				position: 'bottomleft'
+				position: 'bottomleft',
+				locateOptions: {
+					maxZoom: 17
+				}
 			}).addTo(self.map);
 
 			new L.Hash(self.map);
