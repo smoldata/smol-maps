@@ -278,6 +278,6 @@
 	color: #fff;
 }
 
-.leaflet-popup-pane {
-	z-index: 10001; /* why does this not work?? */
+.leaflet-top.leaflet-left {
+	z-index: 1001;
 }

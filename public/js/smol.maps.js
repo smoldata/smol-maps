@@ -124,7 +124,8 @@ smol.maps = (function() {
 				$('#leaflet').addClass('has-zoom-controls');
 			}
 
-			L.control.geocoder(self.config.nextzen_api_key, {
+			L.control.geocoder(self.config.geocodedotearth_api_key, {
+				url: 'https://api.geocode.earth/v1',
 				expanded: true,
 				attribution: '<a href="https://nextzen.org/" target="_blank">Nextzen</a> | <a href="https://openstreetmap.org/">OSM</a>'
 			}).addTo(self.map);
