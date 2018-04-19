@@ -7,6 +7,7 @@ smol.menu.config = (function() {
 
 		setup: function(config) {
 			$('#nextzen-api-key').val(config.nextzen_api_key);
+			$('#geocodedotearth-api-key').val(config.geocodedotearth_api_key);
 		},
 
 		show: function() {
