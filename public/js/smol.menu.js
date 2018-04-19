@@ -102,6 +102,8 @@ smol.menu = (function() {
 				    typeof smol.menu[page].submit == 'function') {
 					smol.menu[page].submit(data);
 				}
+
+				$form.find('.response').html('');
 			};
 
 			$form.find('.response').html('Saving...');

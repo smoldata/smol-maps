@@ -159,12 +159,12 @@ code {
 	position: relative;
 	display: inline-block;
 	color: #fff;
-	font-size: 28px;
-	line-height: 60px;
+	font-size: 18px;
+	line-height: 40px;
 	padding: 0;
-	width: 60px;
-	height: 60px;
-	border-radius: 30px;
+	width: 40px;
+	height: 40px;
+	border-radius: 20px;
 	text-align: center;
 	margin-right: 10px;
 	vertical-align: middle;
@@ -276,16 +276,16 @@ code {
 #map-upload.visible {
 	display: block;
 	opacity: 1;
-	top: -64px;
+	top: -44px;
 }
 
 #map-upload-input {
 	position: absolute;
 	opacity: 0;
-	top: -64px;
+	top: -44px;
 	left: 0;
-	width: 60px;
-	height: 60px;
+	width: 40px;
+	height: 40px;
 }
 
 .rotate-90 {
@@ -335,5 +335,23 @@ code {
 	.leaflet-touch .leaflet-control-add-venue a:last-child {
 		font-size: 28px;
 		border-radius: 30px;
+	}
+
+	.icon-bg {
+		font-size: 28px;
+		line-height: 60px;
+		width: 60px;
+		height: 60px;
+		border-radius: 30px;
+	}
+
+	#map-upload.visible {
+		top: -64px;
+	}
+
+	#map-upload-input {
+		top: -64px;
+		width: 60px;
+		height: 60px;
 	}
 }

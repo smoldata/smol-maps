@@ -50,7 +50,7 @@
 .leaflet-control-add-venue a:first-child,
 .leaflet-control-add-venue a:last-child {
 	background: #8442D5;
-	border-radius: 20px;
+	border-radius: 20px !important;
 }
 
 .leaflet-control-locate a:hover,
@@ -280,4 +280,15 @@
 
 .leaflet-top.leaflet-left {
 	z-index: 1001;
+}
+
+@media (min-width: 321px) {
+
+	.leaflet-control-add-venue a,
+	.leaflet-touch .leaflet-control-add-venue a,
+	.leaflet-control-add-venue a:first-child,
+	.leaflet-control-add-venue a:last-child {
+		border-radius: 30px !important;
+	}
+
 }
