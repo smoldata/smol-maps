@@ -25,7 +25,7 @@ smol.menu.config = (function() {
 		},
 
 		submit: function(config) {
-			smol.maps.config = config;
+			smol.maps.config = L.extend(smol.maps.config, config);
 			smol.maps.setup_data();
 			smol.menu.hide();
 			setTimeout(function() {
