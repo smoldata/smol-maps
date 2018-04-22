@@ -19,6 +19,7 @@
 		<link rel="stylesheet" href="/css/smol.menu.config.css">
 		<link rel="stylesheet" href="/css/smol.menu.map.css">
 		<link rel="stylesheet" href="/css/smol.menu.venue.css">
+		<link rel="stylesheet" href="/css/smol.menu.data.css">
 		<link rel="stylesheet" href="/css/smol.sidebar.css">
 		<link rel="stylesheet" href="/css/smol.leaflet.css">
 		<link rel="stylesheet" href="/css/smol.maps.css">
@@ -51,9 +52,8 @@
 					<div class="relative">
 						<div id="sidebar-config-utility" class="hidden">
 							<ul>
-								<!--<li><a href="#" id="utility-import">Import map GeoJSON</a></li>-->
-								<li><a href="#" id="utility-save">Save as static image</a></li>
-								<li><a href="#" id="utility-export">Export GeoJSON</a></li>
+								<!--<li><a href="#" id="utility-save">Save as static image</a></li>-->
+								<li><a href="#" id="utility-data">Import/Export Data</a></li>
 								<li><a href="#" id="utility-config">Smol Maps Settings</a></li>
 							</ul>
 						</div>
@@ -290,6 +290,27 @@
 					<a href="#" class="edit-delete">Delete this venue?</a>
 				</form>
 
+				<form action="/api/data" method="post" id="data" class="menu-page" enctype="multipart/form-data">
+					<h1>Map Data</h1>
+					<label id="data-export">
+						Export map data
+						<div class="buttons">
+							<a href="#" id="data-export-geojson" class="btn">Export GeoJSON</a>
+							<!--<a href="#" id="data-zip" class="btn">Zip archive</a>
+							<a href="#" id="data-csv" class="btn">CSV venues</a>-->
+						</div>
+					</label>
+					<label id="data-import-label">
+						Import map data
+						<input type="file" name="file" id="data-import">
+						<div>
+							<div class="btn"><span class="fa fa-upload"></span> Pick a file</div>
+							<div id="data-import-value"></div>
+							<br class="clear">
+						</div>
+					</label>
+				</form>
+
 			</div>
 		</div>
 		<script src="/lib/jquery/dist/jquery.min.js"></script>
@@ -310,6 +331,7 @@
 		<script src="/js/smol.menu.config.js"></script>
 		<script src="/js/smol.menu.map.js"></script>
 		<script src="/js/smol.menu.venue.js"></script>
+		<script src="/js/smol.menu.data.js"></script>
 		<script src="/js/smol.sidebar.js"></script>
 		<script src="/js/smol.color.js"></script>
 	</body>
