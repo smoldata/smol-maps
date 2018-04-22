@@ -1,0 +1,39 @@
+#data-geojson {
+	margin-left: 0;
+}
+
+#data-import {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+#data-import-label .btn {
+	margin-left: 0;
+	margin-top: 10px;
+	float: left;
+}
+
+#data-import-label .btn .fa {
+	margin-left: -5px;
+	margin-right: 5px;
+}
+
+#data-import-value {
+	float: left;
+	margin-left: 10px;
+	padding-top: 20px;
+}
+
+#data-export .buttons {
+	border-top: none;
+	border-bottom: 1px solid #ccc;
+	padding-bottom: 40px;
+}
+
+#data-export-geojson {
+	margin-left: 0;
+}
