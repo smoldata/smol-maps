@@ -28,7 +28,7 @@ smol.menu.data = (function() {
 
 		import: function(file) {
 
-			self.import_status('Parsing GeoJSON...');
+			self.import_status('Importing GeoJSON...');
 
 			var reader = new FileReader();
 			reader.onload = function(e) {
@@ -57,6 +57,7 @@ smol.menu.data = (function() {
 					self.import_feature(collection.features[i]);
 				}
 
+				self.import_status('');
 				smol.menu.hide();
 			};
 			reader.readAsText(file);
@@ -67,9 +68,9 @@ smol.menu.data = (function() {
 		},
 
 		import_map: function(map) {
-			map = L.extend(smol.maps.data.map, map);
 			delete map.id;
 			delete map.slug;
+			map = L.extend(smol.maps.data.map, map);
 			smol.maps.update_map(map);
 		},
 
