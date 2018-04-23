@@ -35,14 +35,14 @@ smol.menu.data = (function() {
 
 				if (! e.target ||
 				    ! e.target.result) {
-					self.import_status('Error loading GeoJSON.')
+					self.import_status('Error loading GeoJSON.');
 					return;
 				}
 
 				try {
 					var collection = JSON.parse(e.target.result);
 				} catch(e) {
-					self.import_status('Error parsing GeoJSON.')
+					self.import_status('Error parsing GeoJSON.');
 					return;
 				}
 
@@ -76,10 +76,10 @@ smol.menu.data = (function() {
 
 		import_feature: function(feature) {
 			var venue = self.feature_to_venue(feature);
-			venue.map_id = smol.maps.data.map.id;
 			if (! venue) {
 				return;
 			}
+			venue.map_id = smol.maps.data.map.id;
 			if ('id' in venue) {
 				if (venue.id in smol.maps.markers) {
 					for (var i = 0; i < smol.maps.data.venues.length; i++) {
