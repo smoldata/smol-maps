@@ -280,6 +280,17 @@ smol.maps = (function() {
 			});
 		},
 
+		update_map: function(map) {
+			if (map.slug != self.data.map.slug) {
+				$('#map').attr('action', '/api/map/' + map.slug);
+				history.pushState(map, map.name, '/' + map.slug);
+			}
+			self.data.map = map;
+			self.tangram.scene.load(smol.maps.tangram_scene());
+			smol.sidebar.update_map(map);
+			document.title = map.name || map.slug;
+		},
+
 		tangram_scene: function() {
 
 			var scene = {
@@ -388,22 +399,23 @@ smol.maps = (function() {
 			]);
 		},
 
-		create_venue: function(cb, lat, lng, photo) {
+		create_venue: function(cb, props, photo) {
 			$.get('/api/id').then(function(rsp) {
+
 				var center = self.map.getCenter();
-				lat = lat || center.lat;
-				lng = lng || center.lng;
-				var color = self.config.default_color || '#8442D5';
-				var icon = self.config.default_icon || 'marker-stroked';
 				var venue = {
 					id: rsp.id,
 					map_id: self.data.map.id,
 					active: 1,
-					latitude: lat,
-					longitude: lng,
-					color: color,
-					icon: icon
+					latitude: center.lat,
+					longitude: center.lng,
+					color: self.config.default_color || '#8442D5',
+					icon: self.config.default_icon || 'marker-stroked'
 				};
+
+				if (props) {
+					venue = L.extend(venue, props);
+				}
 
 				var onsuccess = function() {
 					self.data.venues.push(venue);
@@ -739,9 +751,11 @@ smol.maps = (function() {
 				self.upload_photo();
 			};
 
-			var lat = self.pending_photo.geotags.latitude;
-			var lng = self.pending_photo.geotags.longitude;
-			self.create_venue(cb, lat, lng, self.pending_photo);
+			var props = {
+				lat: self.pending_photo.geotags.latitude,
+				lng: self.pending_photo.geotags.longitude
+			};
+			self.create_venue(cb, props, self.pending_photo);
 		},
 
 		upload_photo: function() {

@@ -82,15 +82,8 @@ smol.menu.map = (function() {
 		},
 
 		submit: function(map) {
-			if (map.slug != smol.maps.data.map.slug) {
-				$('#map').attr('action', '/api/map/' + map.slug);
-				history.pushState(map, map.name, '/' + map.slug);
-			}
-			smol.maps.data.map = map;
-			smol.maps.tangram.scene.load(smol.maps.tangram_scene());
-			smol.sidebar.update_map(map);
+			smol.maps.update_map(map);
 			smol.menu.hide();
-			document.title = map.name || map.slug;
 		},
 
 		update_bbox: function() {

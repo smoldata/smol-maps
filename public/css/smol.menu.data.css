@@ -37,3 +37,10 @@
 #data-export-geojson {
 	margin-left: 0;
 }
+
+#data-import-status {
+	font-size: 14px;
+	font-weight: bold;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
