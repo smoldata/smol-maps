@@ -7,12 +7,12 @@
 # Usage: tilepack.sh path/to/tiles
 # 1. Looks for path/to/tiles/tiles.json config, generates one if none is found
 # 2. Uses a Who's On First ID to determine lat/lon bounding box and downloads
-#    tiles in mvt, topojson, terrain formats
+#    tiles in mvt, terrain formats
 # 3. Merges multiple WOF IDs into a common folder structure, separated by format
 #
 # See also: https://github.com/tilezen/tilepacks
 
-DEPS="curl jq python rsync unzip"
+DEPS="curl python rsync unzip pup jq"
 for CMD in $DEPS ; do
 	command -v "$CMD" >/dev/null 2>&1 || { echo "Please install $CMD." >&2; exit 1; }
 done
@@ -31,46 +31,30 @@ WHOAMI=`python -c 'import os, sys; print os.path.realpath(sys.argv[1])' $0`
 DIR=`dirname $WHOAMI`
 TILES_JSON="$TILES_DIR/tiles.json"
 TILEPACKS_URL="https://github.com/tilezen/tilepacks/archive/master.zip"
-FORMATS="mvt topojson terrain"
-WOF_EXTRAS="geom:,lbl:"
+FORMATS="vector terrain"
+MAPZEN_URL_PREFIX=https://tile.nextzen.org/tilezen
 
 mkdir -p $TILES_DIR
 
 if [ ! -f "$TILES_JSON" ] ; then
-	while [[ ! $MAPZEN_API_KEY =~ ^[a-z]+-[a-zA-Z0-9]+$ ]] ; do
-		echo "Mapzen API key"
-		echo "Register here: https://mapzen.com/dashboard"
+	while [[ ! $MAPZEN_API_KEY =~ ^[a-zA-Z0-9_]+$ ]] ; do
+		echo "Nextzen API key"
+		echo "Register here: https://developers.nextzen.org/"
 		echo -n "> "
 		read MAPZEN_API_KEY
-		if [[ ! $MAPZEN_API_KEY =~ ^[a-z]+-[a-zA-Z0-9]+$ ]] ; then
-			echo "Please enter a valid Mapzen API key"
+		if [[ ! $MAPZEN_API_KEY =~ ^[a-zA-Z0-9_]+$ ]] ; then
+			echo "Please enter a valid Nextzen API key"
 		fi
 	done
 
 	while [[ ! $WOF_ID =~ ^[0-9]+$ ]] ; do
 		echo "Who's On First ID of the area you wish to download"
-		echo "Search here: https://whosonfirst.mapzen.com/spelunker"
+		echo "Search here: https://spelunker.whosonfirst.org/"
 		echo -n "> "
 		read WOF_ID
 
 		if [[ ! $WOF_ID =~ ^[0-9]+$ ]] ; then
 			echo "Please enter a valid WOF ID (numeric)"
-		fi
-
-		WOF_JSON="$TILES_DIR/$WOF_ID.json"
-
-		if [ ! -f $WOF_JSON ] ; then
-			API_URL="https://places.mapzen.com/v1?api_key=$MAPZEN_API_KEY&method=whosonfirst.places.getInfo&id=$WOF_ID&extras=$WOF_EXTRAS"
-			curl -s -o $WOF_JSON $API_URL
-		fi
-
-		WOF_NAME=`jq -r '.place["wof:name"]' $WOF_JSON`
-
-		if [ "$WOF_NAME" == "null" ] ; then
-			echo "Could not find WOF ID $WOF_ID"
-			WOF_ID=""
-		else
-			echo "Using $WOF_NAME ($WOF_ID)"
 		fi
 	done
 
@@ -100,17 +84,13 @@ if [ ! -f "$TILES_JSON" ] ; then
 
 	cat <<- EOF > "$TILES_JSON"
 	{
-	    "mapzen_api_key": "$MAPZEN_API_KEY",
+	    "nextzen_api_key": "$MAPZEN_API_KEY",
 	    "wof_ids": [$WOF_ID],
 	    "min_zoom": $MIN_ZOOM,
 	    "max_zoom": $MAX_ZOOM,
 	    "formats": {
-	        "mvt": {
+	        "vector": {
 	            "tilepack_args": "--type=vector --tile-format=mvt",
-	            "layer": "all"
-	        },
-	        "topojson": {
-	            "tilepack_args": "--type=vector --tile-format=topojson",
 	            "layer": "all"
 	        },
 	        "terrain": {
@@ -136,26 +116,16 @@ virtualenv -p python3 env
 source env/bin/activate
 pip install -e .
 
-export MAPZEN_API_KEY=`jq -r ".mapzen_api_key" $TILES_JSON`
+export MAPZEN_API_KEY=`jq -r ".nextzen_api_key" $TILES_JSON`
 WOF_IDS=`jq -r ".wof_ids[]" $TILES_JSON`
 
 for WOF_ID in $WOF_IDS ; do
 
-	WOF_JSON="$TILES_DIR/$WOF_ID.json"
+	echo "Downloading $WOF_ID"
 
-	if [ ! -f $WOF_JSON ] ; then
-		API_URL="https://places.mapzen.com/api?api_key=$MAPZEN_API_KEY&method=whosonfirst.places.getInfo&id=$WOF_ID&extras=$WOF_EXTRAS"
-		curl -s -o $WOF_JSON $API_URL
-	fi
+	PLACES_URL="https://places.whosonfirst.org/id/$WOF_ID"
+	BBOX=`curl -s $PLACES_URL | pup '.whosonfirst-geometry-boundingbox text{}'`
 
-	WOF_NAME=`jq -r '.place["wof:name"]' $WOF_JSON`
-	BBOX=`jq -r '.place["geom:bbox"]' $WOF_JSON`
-
-	if [ "$WOF_NAME" == "null" ] ; then
-		echo "Could not find WOF ID $WOF_ID (skipping)"
-		continue
-	fi
-	echo "Downloading $WOF_NAME ($WOF_ID)"
 	echo "Bounding box: $BBOX"
 
 	LON_MIN=`echo $BBOX | cut -d',' -f1`
@@ -173,20 +143,18 @@ for WOF_ID in $WOF_IDS ; do
 		ARGS=`jq -r ".formats.$FORMAT.tilepack_args" $TILES_JSON`
 		LAYER=`jq -r ".formats.$FORMAT.layer" $TILES_JSON`
 
-		mkdir -p $TILES_DIR/tmp
-
-		if [ ! -f "$TILES_DIR/tmp/$WOF_ID-$FORMAT.zip" ] ; then
-			echo "Downloading $FORMAT tiles to tmp/$WOF_ID-$FORMAT.zip"
+		if [ ! -f "$TILES_DIR/$WOF_ID-$FORMAT.zip" ] ; then
+			echo "Downloading $FORMAT tiles to $WOF_ID-$FORMAT.zip"
 			tilepack $ARGS \
 			         --output-formats=zipfile \
-			         $LON_MIN $LAT_MIN $LON_MAX $LAT_MAX \
+			         $LON_MIN$LAT_MIN$LON_MAX$LAT_MAX \
 			         $MIN_ZOOM $MAX_ZOOM \
 			         $TILES_DIR/tmp/$WOF_ID-$FORMAT
 		else
-			echo "Found existing tmp/$WOF_ID-$FORMAT.zip, using that"
+			echo "Found existing $WOF_ID-$FORMAT.zip, using that"
 		fi
 
-		echo "Unzipping tmp/$WOF_ID-$FORMAT.zip to tmp/$WOF_ID-$FORMAT"
+		echo "Unzipping $WOF_ID-$FORMAT.zip to tmp/$WOF_ID-$FORMAT"
 		mkdir -p $TILES_DIR/tmp/$WOF_ID-$FORMAT
 		unzip -q $TILES_DIR/tmp/$WOF_ID-$FORMAT.zip -d $TILES_DIR/tmp/$WOF_ID-$FORMAT
 
