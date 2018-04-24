@@ -56,7 +56,7 @@ smol.maps = (function() {
 			var initial_load = true;
 			self.tangram.scene.subscribe({
 				load: function() {
-					var default_tiles_url = 'https://tile.nextzen.org/tilezen/{format}/v1/512/all/{z}/{x}/{y}.{format}';
+					var default_tiles_url = 'https://tile.nextzen.org/tilezen/{format}/v1/512/all/{z}/{x}/{y}.{ext}';
 					if (! self.config.tiles_url) {
 						self.config.tiles_url = default_tiles_url;
 					}
@@ -338,28 +338,30 @@ smol.maps = (function() {
 		tangram_sources: function() {
 
 			var tiles = self.config.tiles_url;
-			var tiles_mvt = tiles.replace(/\{format\}/g, 'mvt');
+			var tiles_vector = tiles.replace(/\{format\}/g, 'vector');
+			tiles_vector = tiles_vector.replace(/\{ext\}/g, 'mvt');
 			var tiles_terrain = tiles.replace(/\{format\}/g, 'terrain');
-			tiles_mvt = tiles_mvt.replace(/tilezen\/mvt/, 'tilezen/vector');
-			tiles_terrain = tiles_terrain.replace(/\.terrain$/, '.png');
+			tiles_terrain = tiles_terrain.replace(/\{ext\}/g, 'png');
 
 			var sources = {
 				"refill-style": {
 					"mapzen": {
 						"type": "MVT",
-						"url": tiles_mvt,
-						"max_zoom": 16
+						"url": tiles_vector,
+						"max_zoom": 16,
+						"tile_size": 512
 					},
 					"normals": {
 						"type": "Raster",
 						"url": tiles_terrain,
-						"max_zoom": 15
+						"max_zoom": 14,
+						"tile_size": 512
 					}
 				},
 				"walkabout-style": {
 					"mapzen": {
 						"type": "MVT",
-						"url": tiles_mvt,
+						"url": tiles_vector,
 						"rasters": ["normals"],
 						"max_zoom": 16
 					},
@@ -372,7 +374,7 @@ smol.maps = (function() {
 				"bubble-wrap": {
 					"mapzen": {
 						"type": "MVT",
-						"url": tiles_mvt,
+						"url": tiles_vector,
 						"max_zoom": 16
 					}
 				}
